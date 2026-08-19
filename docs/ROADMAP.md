@@ -24,6 +24,8 @@ routes, API, cost audit, roadmap.
 
 ## Phase 1: Foundation
 
+**Status: done.**
+
 **Goal.** The design system exists as code and is machine-enforced before any feature is built.
 
 - npm workspaces monorepo: `client`, `server`, `shared`
@@ -41,8 +43,9 @@ routes, API, cost audit, roadmap.
 **Exit criterion.** A page composed only of `components/ui` renders correctly in both themes,
 `design-guard.sh` passes, and deliberately introducing `rounded-full` or a purple hex fails CI.
 
-**Measure here, before anything depends on it:** the Vercel rewrite proxy against a cold Render
-instance. See ADR-014. If the proxy times out on cold start, decide the fallback now.
+**Deferred to phase 12.** The Vercel rewrite proxy measurement against a cold Render instance
+belongs with deployment. Development runs both services locally, where the cookie is same-site
+and the question does not arise.
 
 ---
 
