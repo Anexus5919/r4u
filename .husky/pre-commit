@@ -1,2 +1,6 @@
 npx lint-staged
 bash scripts/design-guard.sh
+
+# 2.9s warm, 8.8s cold, measured. Two type errors reached commits before this was added, and the
+# roadmap's objection was to hooks slow enough to get bypassed, which this is not.
+npm run typecheck

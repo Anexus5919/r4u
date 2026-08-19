@@ -7,6 +7,12 @@ import type { EditorResume, EditorSection } from './types'
   the boundary rather than forcing a null check on every line of the editor.
 */
 export function fromWire(resume: ResumeDetail): EditorResume {
+  /*
+    Field by field rather than a spread over defaults. A spread would let an explicit
+    `fullName: undefined` from the wire wipe the default it was meant to fall back to.
+  */
+  const personal = resume.personal ?? {}
+
   return {
     id: resume.id,
     title: resume.title,
@@ -16,13 +22,12 @@ export function fromWire(resume: ResumeDetail): EditorResume {
     version: resume.version,
     notes: resume.notes ?? '',
     personal: {
-      fullName: '',
-      headline: '',
-      email: '',
-      phone: '',
-      location: '',
-      links: [],
-      ...resume.personal,
+      fullName: personal.fullName ?? '',
+      headline: personal.headline ?? '',
+      email: personal.email ?? '',
+      phone: personal.phone ?? '',
+      location: personal.location ?? '',
+      links: personal.links ?? [],
     },
     design: resume.design,
     sections: (resume.sections ?? []).map((section): EditorSection => ({

@@ -271,13 +271,16 @@ builds, tests, and deploys. The health endpoint reports `db: 1` in production.
 
 1. **Never commit `.env`.** `gitleaks` runs in CI, but the discipline comes first.
 2. **Never use `--no-verify`.** If a hook fails, fix the cause.
-3. **Every phase leaves `main` deployable.** Feature branches merge only when CI is green.
-4. **`COST.md` is updated before any dependency or service is added**, not after.
-5. **No em dashes** in code, comments, documentation, UI copy or commit messages.
-6. **No attribution** of any tool or assistant in any commit, file, comment or artefact.
-7. Comments are short and explain **why**, never what. No multi-line comment blocks describing
+3. **The pre-commit hook runs lint, the design guard and typecheck.** Typecheck was added after
+   two type errors reached commits; it measures 2.9s warm and 8.8s cold, which is well inside the
+   budget the no-slow-hooks rule was protecting. The full test suite stays in CI.
+4. **Every phase leaves `main` deployable.** Feature branches merge only when CI is green.
+5. **`COST.md` is updated before any dependency or service is added**, not after.
+6. **No em dashes** in code, comments, documentation, UI copy or commit messages.
+7. **No attribution** of any tool or assistant in any commit, file, comment or artefact.
+8. Comments are short and explain **why**, never what. No multi-line comment blocks describing
    obvious code.
-8. When a decision is made that a future reader would question, it goes in `DECISIONS.md` in the
+9. When a decision is made that a future reader would question, it goes in `DECISIONS.md` in the
    same commit that implements it.
 
 ---
