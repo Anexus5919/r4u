@@ -1,0 +1,13 @@
+npx --no -- commitlint --edit "$1"
+
+# em dashes are banned project-wide, commit messages included
+if LC_ALL=C grep -q $'\xe2\x80\x94' "$1"; then
+  echo "commit-msg: em dash found. Use commas, colons, parentheses, or restructure."
+  exit 1
+fi
+
+# no tool or assistant attribution, anywhere
+if grep -qiE 'co-authored-by|generated with|claude|anthropic|copilot|chatgpt' "$1"; then
+  echo "commit-msg: attribution found. Commit messages carry no tool or assistant credit."
+  exit 1
+fi
