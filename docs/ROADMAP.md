@@ -96,6 +96,9 @@ a readable message rather than a blank screen.
 
 ## Phase 4: Resume CRUD and dashboard
 
+**Status: done**, except guest drafts (AR 5), which is deferred to phase 6 alongside import so the
+merge path is written once.
+
 - `Resume` model with `sections[]`, `meta`, `version`
 - `shared/SECTION_REGISTRY` and the base Zod schemas, composed base-object-first
 - CRUD, duplicate, search, filter, sort
