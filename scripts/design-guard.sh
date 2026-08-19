@@ -58,7 +58,7 @@ check "Foreign grey ramp. R4U uses ink-* exclusively." \
 # Lengths of 4, 5 and 7 are excluded so an issue reference such as #1325 or #2659 is not a hit.
 check "Hex literal outside tokens.css." \
   '#[0-9a-fA-F]{6}([0-9a-fA-F]{2})?\b|#[a-fA-F][0-9a-fA-F]{2}\b|#[0-9a-fA-F][a-fA-F][0-9a-fA-F]\b|#[0-9a-fA-F]{2}[a-fA-F]\b' \
-  --include='*.ts' --include='*.tsx' --include='*.css' --exclude='tokens.css'
+  --include='*.ts' --include='*.tsx' --include='*.css' --exclude='tokens.css' --exclude='tokens.ts'
 
 # ---------------------------------------------------------------- geometry
 

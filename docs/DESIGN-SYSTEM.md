@@ -534,7 +534,14 @@ Rule        1px ink-04. The primary structural device in the product.
 
 `scripts/design-guard.sh` runs in CI and fails on any ban-list hit. Additionally:
 
-- **No hex literal may appear outside `src/styles/tokens.css`.** Everything else reads a token.
+- **Hex literals live in exactly two files, one per surface.**
+  - `client/src/styles/tokens.css` for the application chrome, resolved by the browser at runtime.
+  - `shared/src/layout/tokens.ts` for the resume document. A PDF has no CSS, no cascade and no
+    custom properties, so a template must be handed concrete values. Every one of them is a step
+    from the ink ramp above: the document does not get a palette of its own.
+
+  Everywhere else reads a token. The CI guard excludes those two filenames and nothing else.
+
 - Tailwind v4's `@theme` block defines the ramp in explicit sRGB hex, overriding Tailwind's
   default oklch palette entirely. This is required regardless of aesthetics: `html2canvas` throws
   on `oklch()` and would break thumbnail generation.
