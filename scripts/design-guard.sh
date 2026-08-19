@@ -54,9 +54,11 @@ check "Gradient. R4U has no gradients anywhere." \
 check "Foreign grey ramp. R4U uses ink-* exclusively." \
   '\b(slate|zinc|gray|grey|neutral|stone)-(50|[0-9]{3})\b'
 
+# Matches 6 and 8 digit colours, and 3 digit colours only when they contain a letter.
+# Lengths of 4, 5 and 7 are excluded so an issue reference such as #1325 or #2659 is not a hit.
 check "Hex literal outside tokens.css." \
-  '#[0-9a-fA-F]{3,8}\b' --include='*.ts' --include='*.tsx' --include='*.css' \
-  --exclude='tokens.css'
+  '#[0-9a-fA-F]{6}([0-9a-fA-F]{2})?\b|#[a-fA-F][0-9a-fA-F]{2}\b|#[0-9a-fA-F][a-fA-F][0-9a-fA-F]\b|#[0-9a-fA-F]{2}[a-fA-F]\b' \
+  --include='*.ts' --include='*.tsx' --include='*.css' --exclude='tokens.css'
 
 # ---------------------------------------------------------------- geometry
 
