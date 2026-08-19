@@ -3,6 +3,7 @@ import { attachPrincipal } from './middleware/authenticate.js'
 import { healthRouter } from './modules/health/health.routes.js'
 import { authRouter } from './modules/auth/auth.routes.js'
 import { usersRouter } from './modules/users/users.routes.js'
+import { resumesRouter } from './modules/resumes/resumes.routes.js'
 
 export const apiRouter = Router()
 
@@ -16,3 +17,4 @@ apiRouter.use(attachPrincipal)
 
 apiRouter.use('/auth', authRouter)
 apiRouter.use('/users', usersRouter)
+apiRouter.use('/resumes', resumesRouter)

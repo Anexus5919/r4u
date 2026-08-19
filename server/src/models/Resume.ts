@@ -1,5 +1,5 @@
 import { Schema, Types, model } from 'mongoose'
-import type { InferSchemaType, Query } from 'mongoose'
+import type { HydratedDocument, InferSchemaType, Query } from 'mongoose'
 
 /** Widened in phase 4 by SECTION_REGISTRY. Kept loose here so the strip hook can land first. */
 const entrySchema = new Schema(
@@ -89,4 +89,5 @@ resumeSchema.pre(/^find/, function (this: Query<unknown, unknown>) {
 })
 
 export type Resume = InferSchemaType<typeof resumeSchema>
+export type ResumeDoc = HydratedDocument<Resume>
 export const ResumeModel = model('Resume', resumeSchema)
