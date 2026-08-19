@@ -111,6 +111,15 @@ start.
 
 Public Sans is already loaded for the application chrome and is reused by Placard, Recto and Verso.
 
+**What ships today, and what does not.** All eight templates currently resolve to one pairing,
+Source Serif 4 for names and heads over Source Sans 3 for body, and both are loaded in
+`client/index.html` alongside the chrome faces. That is not cosmetic: a family the theme names and
+the browser cannot resolve renders the preview in the browser's default face while the export uses
+the registered TTF, so the preview and the PDF disagree by construction and every measurement taken
+off the preview, including the page-overflow warning, is taken in the wrong metrics. The
+per-template pairings in the table above land in Phase 7 with the static TTF work, and
+`atsProfile.bodyFont` names the face that actually renders rather than the one planned.
+
 Always `await document.fonts.ready` before any thumbnail snapshot. Canvas snapshots taken before
 font load silently ship in a fallback face while the on-screen preview looks correct.
 
@@ -172,17 +181,22 @@ ATS          SAFE
 Senior, 10 or more years, two pages.
 
 ```
-Columns      1 main, but short-item sections render as 2 or 3 column grids
+Columns      1
 Margins      16mm
 Body         10pt / 1.25, section gap 10pt
 Header       name 20pt left, contact stacked right at 8.5pt
 Signature    section heads set INLINE with a 0.5pt rule running from the end
              of the heading to the right margin
-Order        Summary / Core Competencies (3-col grid) / Professional Experience /
+Order        Summary / Core Competencies / Professional Experience /
              Selected Projects / Education / Certifications / Awards
 Type         IBM Plex Serif + Source Sans 3
-ATS          SAFE. Grid cells emit as separate text nodes, never a table.
+ATS          SAFE, 30 of 30 on dimension A.
 ```
+
+The 2 and 3 column short-item grid this template originally specified was **withdrawn**, not
+descoped. It would have created the multi-column reading order that caps Recto and Verso at 21,
+inside the one template badged 30 of 30, and a right-aligned date range in a one-third measure
+wraps across two lines, which is code 418. See ADR-016.
 
 ### 4.4 PLACARD
 
@@ -222,6 +236,8 @@ Design, marketing, career-changers, where skills must lead.
 
 ```
 Columns      2, sidebar LEFT at 34% on a 4% neutral tint ground
+Ground       the tint is a page-level ground node, not a stretched column.
+             Sized in points from the page width so both edges land together.
 Header       NONE as a separate block. The name lives inside the sidebar,
              stacked top-left. Structurally distinct from Recto.
 Divider      no rules. Separation by whitespace and the tint edge.
@@ -239,12 +255,18 @@ The most editorial layout in the set. Researchers, long chronologies, many short
 ```
 Columns      1 with a 26mm LEFT DATE RAIL
 Rail         dates and section headings sit right-aligned in the rail
-Body         all content in the main body. Heads are hung, not stacked.
+Head         hung in the rail, on a row of its OWN, at 0.8x body size
+Body         all content in the main body, inset past the rail
 Margins      18mm, body 10.5pt / 1.4
 Type         Source Serif 4 + Source Sans 3
 ATS          CAUTION. Rail content can interleave. Offers a variant that
              moves dates inline and headings above.
 ```
+
+The head gets its own row rather than hanging beside the first entry. Beside it, the heading and
+that entry's opening text share one extracted line, which fails B4 and would drop the dimension A
+cap below 24. On its own row it is still hung, still outside the measure, and still alone on its
+line. That row placement is the whole of axis 4 for this template.
 
 ### 4.8 BROADSHEET
 
