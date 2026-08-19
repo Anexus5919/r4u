@@ -97,6 +97,17 @@ export function renderToDom(nodes: LayoutNode[], keyPrefix = 'n'): React.ReactNo
       case 'spacer':
         return <div key={key} style={{ height: px(node.size), flexShrink: 0 }} />
 
+      // painted against the page padding box, so it bleeds past the margin on all four edges
+      case 'ground': {
+        const { width, backgroundColor } = toCss(node.style)
+        return (
+          <div
+            key={key}
+            style={{ position: 'absolute', top: 0, bottom: 0, left: 0, width, backgroundColor }}
+          />
+        )
+      }
+
       case 'block':
         return (
           // the DOM equivalent of wrap={false}: an entry never splits across a page

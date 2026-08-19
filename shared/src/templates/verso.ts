@@ -1,4 +1,4 @@
-import { compact, row, spacer, stack, text, tracking } from '../layout/helpers.js'
+import { compact, ground, row, spacer, stack, text, tracking } from '../layout/helpers.js'
 import { DOC_COLORS } from '../layout/tokens.js'
 import type { DocTheme, LayoutNode, ResumeTemplate, TemplateInput } from '../layout/types.js'
 import type { TemplateResume } from '../layout/types.js'
@@ -28,6 +28,9 @@ function render({ resume, theme }: TemplateInput): LayoutNode[] {
   const nameSize = theme.bodySize * 1.9
   const small = theme.bodySize * 0.85
 
+  // points: the ground measures against the page, the column against the content box
+  const asideWidth = (theme.pageWidth - 2 * theme.margin) * 0.34
+
   const aside = resume.sections.filter((section) =>
     (ASIDE_SECTIONS as readonly string[]).includes(section.type)
   )
@@ -52,14 +55,9 @@ function render({ resume, theme }: TemplateInput): LayoutNode[] {
 
   const sidebar = stack(
     {
-      width: '34%',
-      backgroundColor: DOC_COLORS.tint,
-      // pulled to the page edge on three sides, so the tint runs to the trim
-      marginTop: -theme.margin,
-      marginBottom: -theme.margin,
+      width: asideWidth,
+      // pulled out to the left trim, where the ground behind it starts
       marginLeft: -theme.margin,
-      paddingTop: theme.margin,
-      paddingBottom: theme.margin,
       paddingLeft: theme.margin,
       paddingRight: 16,
     },
@@ -97,8 +95,9 @@ function render({ resume, theme }: TemplateInput): LayoutNode[] {
     ]
   )
 
+  // flexGrow, or the sidebar's negative margin leaves 20mm of dead measure down the right edge
   const body = stack(
-    { width: '66%', paddingLeft: 20 },
+    { flexGrow: 1, flexShrink: 1, paddingLeft: 20 },
     main.map((section) =>
       stack({ marginBottom: theme.sectionGap }, [
         sectionHead(theme, section.title, 'plain'),
@@ -109,7 +108,10 @@ function render({ resume, theme }: TemplateInput): LayoutNode[] {
     )
   )
 
-  return [row({ gap: 0, alignItems: 'stretch' }, [sidebar, body])]
+  return [
+    ground({ width: asideWidth, backgroundColor: DOC_COLORS.tint }),
+    row({ gap: 0, alignItems: 'flex-start' }, [sidebar, body]),
+  ]
 }
 
 export const verso: ResumeTemplate = {
@@ -123,7 +125,7 @@ export const verso: ResumeTemplate = {
     hasTables: false,
     hasImages: false,
     headerFooterContent: false,
-    bodyFont: 'Public Sans',
+    bodyFont: 'Source Sans 3',
     bulletGlyph: '•',
     dateLayout: 'right',
     maxDimensionAScore: 21,

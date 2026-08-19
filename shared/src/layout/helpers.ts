@@ -1,5 +1,7 @@
+import { A4 } from './types.js'
 import { DOC_COLORS } from './tokens.js'
 import type { DocTheme, LayoutNode, Style, TemplateResume } from './types.js'
+import { hasContent } from '../resume/sections.js'
 import { personalOf } from '../resume/schema.js'
 import type { Resume, ResumeDesign } from '../resume/schema.js'
 
@@ -29,6 +31,17 @@ export const block = (style: Style, children: LayoutNode[]): LayoutNode => ({
   style,
   children,
 })
+
+/** A full-bleed ground behind the page. Takes width and backgroundColor, nothing else. */
+export const ground = (style: Style): LayoutNode => ({ type: 'ground', style })
+
+/** Grounds paint against the page box, so both adapters lift them out before walking the flow. */
+export function splitGrounds(nodes: LayoutNode[]): { grounds: LayoutNode[]; flow: LayoutNode[] } {
+  return {
+    grounds: nodes.filter((node) => node.type === 'ground'),
+    flow: nodes.filter((node) => node.type !== 'ground'),
+  }
+}
 
 /** Drops the nulls a template produces when a field is empty, so callers can map freely. */
 export function compact(nodes: (LayoutNode | null | undefined | false)[]): LayoutNode[] {
@@ -66,11 +79,13 @@ export function month(value: unknown): string {
 */
 export function dateRange(data: Record<string, unknown>): string {
   const from = month(data.startDate)
-  if (!from) return ''
+  const to = month(data.endDate)
+
+  // a certification carries an expiry with no issue date more often than not, and it is still a date
+  if (!from) return to ? `Until ${to}` : ''
 
   if (data.current === true) return `${from} – Present`
 
-  const to = month(data.endDate)
   return to ? `${from} – ${to}` : from
 }
 
@@ -109,6 +124,7 @@ export function resolveTheme(design: ResumeDesign, fonts: Partial<DocTheme> = {}
     sectionGap: Math.round(bodySize * 1.4 * spacing),
     // millimetres in the knob, points in the layout
     margin: Math.round(design.margins * 2.8346),
+    pageWidth: A4.width,
 
     ink: DOC_COLORS.ink,
     muted: DOC_COLORS.muted,
@@ -151,7 +167,9 @@ export function toTemplateResume(resume: Partial<Resume>): TemplateResume {
           .map((entry) => ({
             _id: String(entry._id ?? ''),
             data: (entry.data ?? {}) as Record<string, unknown>,
-          })),
+          }))
+          // an entry one click old holds no data and renders to nothing, heading included
+          .filter((entry) => hasContent(section.type, entry.data)),
       }))
       // a heading with nothing under it raises Textkernel code 324, so it never reaches the page
       .filter((section) => section.entries.length > 0),

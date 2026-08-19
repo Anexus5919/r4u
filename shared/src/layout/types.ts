@@ -24,7 +24,8 @@ import type { ResumeType, SectionType } from '../resume/sections.js'
 */
 export interface Style {
   flexDirection?: 'row' | 'column'
-  alignItems?: 'flex-start' | 'center' | 'flex-end' | 'baseline' | 'stretch'
+  // no baseline: @react-pdf gives Text no baseline function, so yoga bottom-aligns instead
+  alignItems?: 'flex-start' | 'center' | 'flex-end' | 'stretch'
   justifyContent?: 'flex-start' | 'center' | 'flex-end' | 'space-between'
   flexGrow?: number
   flexShrink?: number
@@ -75,6 +76,8 @@ export type LayoutNode =
     The PDF adapter maps it to wrap={false}; the DOM adapter uses break-inside: avoid.
   */
   | { type: 'block'; style?: Style; children: LayoutNode[] }
+  // a full-bleed ground behind the page, left trim to right. stretch would stop at the content
+  | { type: 'ground'; style?: Style }
 
 /** The resolved document theme. Templates read this and never reach for a raw token. */
 export interface DocTheme {
@@ -89,6 +92,8 @@ export interface DocTheme {
   sectionGap: number
   /** page margin in points */
   margin: number
+  /** A4 width in points, so a template can size a full-bleed ground against the trim */
+  pageWidth: number
 
   ink: string
   muted: string

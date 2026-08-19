@@ -1,5 +1,5 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
-import { PT_TO_PX, getTemplate, resolveTheme, toTemplateResume } from '@r4u/shared'
+import { PT_TO_PX, getTemplate, resolveTheme, splitGrounds, toTemplateResume } from '@r4u/shared'
 import type { Resume } from '@r4u/shared'
 import { renderToDom } from './renderToDom'
 
@@ -43,7 +43,9 @@ export function ResumePreview({
       margins: 20,
     }
   )
-  const nodes = template.render({ resume: toTemplateResume(resume), theme })
+  const { grounds, flow } = splitGrounds(
+    template.render({ resume: toTemplateResume(resume), theme })
+  )
 
   // scale to the available width, measured rather than assumed, so the panel can be any size
   useEffect(() => {
@@ -103,10 +105,21 @@ export function ResumePreview({
             overflow: 'hidden',
             display: 'flex',
             flexDirection: 'column',
+            // grounds are absolute against this box
+            position: 'relative',
+            // document defaults, matched on the PDF Page: an unset family is Helvetica there
+            fontFamily: theme.sans,
+            lineHeight: theme.leading,
+            color: theme.ink,
           }}
         >
-          <div ref={content} style={{ display: 'flex', flexDirection: 'column' }}>
-            {renderToDom(nodes)}
+          {renderToDom(grounds, 'g')}
+
+          <div
+            ref={content}
+            style={{ display: 'flex', flexDirection: 'column', position: 'relative' }}
+          >
+            {renderToDom(flow)}
           </div>
         </div>
       </div>
