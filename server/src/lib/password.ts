@@ -1,18 +1,13 @@
 import bcrypt from 'bcryptjs'
 import { env } from '../config/env.js'
 
+export { PASSWORD_MAX, PASSWORD_MIN } from '@r4u/shared'
+
 /*
   bcryptjs rather than the native bcrypt. The native module needs python3, make and g++ in the
   Docker image and in the CI runner, builds fine locally and fails on a slim base. The CPU
   difference is irrelevant at this scale.
 */
-
-export const PASSWORD_MIN = 12
-/*
-  bcrypt silently truncates at 72 bytes. Without an explicit maximum, two different long
-  passwords become the same password and neither the user nor the developer ever finds out.
-*/
-export const PASSWORD_MAX = 72
 
 export function hashPassword(plain: string): Promise<string> {
   return bcrypt.hash(plain, env.BCRYPT_ROUNDS)
