@@ -1,4 +1,4 @@
-import rateLimit from 'express-rate-limit'
+import rateLimit, { ipKeyGenerator } from 'express-rate-limit'
 import type { Request, Response } from 'express'
 import { isTest } from '../config/env.js'
 import type { ApiErrorShape } from '@r4u/shared'
@@ -45,8 +45,13 @@ export const passwordResetLimiter = rateLimit({
   ...base,
   windowMs: 60 * 60 * 1000,
   limit: 3,
+  /*
+    ipKeyGenerator normalises an IPv6 address to its /56 subnet. Keying on the raw address would
+    let one IPv6 client cycle through effectively unlimited addresses within its own allocation
+    and walk straight past the limit.
+  */
   keyGenerator: (req) => {
     const email = typeof req.body?.email === 'string' ? req.body.email.toLowerCase() : ''
-    return `${req.ip}:${email}`
+    return `${ipKeyGenerator(req.ip ?? '')}:${email}`
   },
 })
