@@ -36,6 +36,15 @@ const EnvSchema = z.object({
   LOG_LEVEL: z.enum(['fatal', 'error', 'warn', 'info', 'debug', 'trace']).default('info'),
 
   BCRYPT_ROUNDS: z.coerce.number().int().min(4).max(15).default(12),
+
+  /*
+    Optional. Avatar upload is the only feature that needs them, and it reports itself as
+    unavailable rather than the whole process refusing to start. Everything else works without
+    a Cloudinary account.
+  */
+  CLOUDINARY_CLOUD_NAME: z.string().optional(),
+  CLOUDINARY_API_KEY: z.string().optional(),
+  CLOUDINARY_API_SECRET: z.string().optional(),
 })
 
 const parsed = EnvSchema.safeParse(process.env)
@@ -51,6 +60,10 @@ export const env = parsed.data
 
 export const isProduction = env.NODE_ENV === 'production'
 export const isTest = env.NODE_ENV === 'test'
+
+export const cloudinaryConfigured = Boolean(
+  env.CLOUDINARY_CLOUD_NAME && env.CLOUDINARY_API_KEY && env.CLOUDINARY_API_SECRET
+)
 
 /*
   The two secrets must differ. Reusing one means a refresh token verifies as an access token,

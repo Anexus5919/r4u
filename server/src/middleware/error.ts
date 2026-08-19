@@ -13,7 +13,8 @@ export function notFoundHandler(req: Request, res: Response) {
 
 interface MongoLikeError {
   name?: string
-  code?: number
+  /** number for a mongo driver error, string for a multer limit */
+  code?: number | string
   type?: string
   keyPattern?: Record<string, unknown>
   errors?: Record<string, { path?: string; message?: string }>
@@ -44,6 +45,14 @@ function classify(error: unknown): AppError {
 
   if (e.name === 'TokenExpiredError') return new AppError('TOKEN_EXPIRED', 'Session expired')
   if (e.name === 'JsonWebTokenError') return new AppError('TOKEN_INVALID', 'Invalid token')
+
+  // multer signals its own limits with a string code rather than a typed error
+  if (e.code === 'LIMIT_FILE_SIZE') {
+    return new AppError('PAYLOAD_TOO_LARGE', 'That image is larger than 2 MB')
+  }
+  if (typeof e.code === 'string' && e.code.startsWith('LIMIT_')) {
+    return new AppError('VALIDATION_FAILED', 'That upload was rejected')
+  }
 
   if (e.type === 'entity.too.large') {
     return new AppError('PAYLOAD_TOO_LARGE', 'That request is too large')
