@@ -45,3 +45,7 @@ desktop.ini
 uploads/
 tmp/
 *.local
+
+# local agent instructions, not part of the project
+CLAUDE.md
+.claude/
