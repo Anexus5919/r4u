@@ -298,6 +298,20 @@ export function specFor(type: SectionType): SectionSpec {
   return SECTION_REGISTRY[type]
 }
 
+/** Whether an entry puts anything on the page. Dates alone are not content: that is code 324. */
+export function hasContent(type: SectionType, data: Record<string, unknown>): boolean {
+  const spec = SECTION_REGISTRY[type]
+  if (!spec) return true
+
+  return spec.fields.some((field) => {
+    if (field.type === 'month' || field.type === 'boolean') return false
+
+    const value = data[field.key]
+    if (Array.isArray(value)) return value.some((v) => typeof v === 'string' && v.trim() !== '')
+    return typeof value === 'string' && value.trim() !== ''
+  })
+}
+
 export function fieldSpec(type: SectionType, key: string): FieldSpec | undefined {
   return SECTION_REGISTRY[type].fields.find((field) => field.key === key)
 }

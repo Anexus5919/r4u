@@ -78,9 +78,21 @@ function titleRow(
     return text({ fontSize: theme.bodySize, fontWeight: 600, color: theme.ink }, left)
   }
 
-  return row({ justifyContent: 'space-between', alignItems: 'baseline', gap: 12 }, [
-    text({ flexGrow: 1, fontSize: theme.bodySize, fontWeight: 600, color: theme.ink }, left),
-    text({ fontSize: theme.bodySize * 0.92, color: theme.muted, fontFamily: theme.sans }, right),
+  // flexShrink 0: a date that shrinks wraps to two lines, which is Textkernel code 418
+  return row({ justifyContent: 'space-between', alignItems: 'flex-start', gap: 12 }, [
+    text(
+      { flexGrow: 1, flexShrink: 1, fontSize: theme.bodySize, fontWeight: 600, color: theme.ink },
+      left
+    ),
+    text(
+      {
+        flexShrink: 0,
+        fontSize: theme.bodySize * 0.92,
+        color: theme.muted,
+        fontFamily: theme.sans,
+      },
+      right
+    ),
   ])
 }
 
@@ -149,11 +161,16 @@ export function projectEntry(
 ): LayoutNode {
   const data = entry.data
   const stack_ = list(data, 'stack')
+  const dates = datesFor(data, options)
 
   return block({ marginTop: theme.bodySize * 0.9 }, [
     ...compact([
-      titleRow(theme, str(data, 'name'), datesFor(data, options), options),
-      subtitleRow(theme, [stack_.join(', '), str(data, 'url')]),
+      titleRow(theme, str(data, 'name'), dates, options),
+      subtitleRow(theme, [
+        stack_.join(', '),
+        str(data, 'url'),
+        options.dates === 'inline' ? dates : '',
+      ]),
     ]),
     ...bullets(theme, list(data, 'bullets'), options.bulletGlyph),
   ])
@@ -169,7 +186,8 @@ export function skillsEntry(theme: DocTheme, entry: Entry): LayoutNode {
   if (!items.length) return { type: 'spacer', size: 0 }
 
   return block({ marginTop: theme.bodySize * 0.45 }, [
-    row({ gap: 6, alignItems: 'baseline' }, [
+    // flex-start, so a one-line group label stays level with the first line of a list that wraps
+    row({ gap: 6, alignItems: 'flex-start' }, [
       ...compact([
         group
           ? text(
@@ -177,6 +195,8 @@ export function skillsEntry(theme: DocTheme, entry: Entry): LayoutNode {
                 width: '28%',
                 fontSize: theme.bodySize,
                 fontWeight: 600,
+                // matches the item list, so both first line boxes are the same height
+                lineHeight: theme.leading,
                 color: theme.ink,
               },
               group
@@ -200,6 +220,8 @@ export function skillsEntry(theme: DocTheme, entry: Entry): LayoutNode {
 export function simpleEntry(theme: DocTheme, entry: Entry, options: BlockOptions = {}): LayoutNode {
   const data = entry.data
   const title = str(data, 'name') || str(data, 'title') || str(data, 'degree')
+  const dates = datesFor(data, options)
+
   const detail = [
     str(data, 'issuer'),
     str(data, 'venue'),
@@ -209,13 +231,26 @@ export function simpleEntry(theme: DocTheme, entry: Entry, options: BlockOptions
     str(data, 'contact'),
     str(data, 'detail'),
     str(data, 'url'),
+    // inline dates have no column of their own, so the subtitle is the only place left for them
+    options.dates === 'inline' ? dates : '',
   ].filter(Boolean)
 
   return block({ marginTop: theme.bodySize * 0.55 }, [
+    ...compact([titleRow(theme, title, dates, options), subtitleRow(theme, detail)]),
+  ])
+}
+
+/** Its own renderer because simpleEntry printed neither the subtitle nor the bullets. */
+export function customEntry(theme: DocTheme, entry: Entry, options: BlockOptions = {}): LayoutNode {
+  const data = entry.data
+  const dates = datesFor(data, options)
+
+  return block({ marginTop: theme.bodySize * 0.7 }, [
     ...compact([
-      titleRow(theme, title, datesFor(data, options), options),
-      subtitleRow(theme, detail),
+      titleRow(theme, str(data, 'title'), dates, options),
+      subtitleRow(theme, [str(data, 'subtitle'), options.dates === 'inline' ? dates : '']),
     ]),
+    ...bullets(theme, list(data, 'bullets'), options.bulletGlyph),
   ])
 }
 
@@ -244,6 +279,8 @@ export function renderEntry(
       return projectEntry(theme, entry, options)
     case 'skills':
       return skillsEntry(theme, entry)
+    case 'custom':
+      return customEntry(theme, entry, options)
     default:
       return simpleEntry(theme, entry, options)
   }
@@ -255,10 +292,13 @@ export function renderEntry(
   mixes them, which is what makes the eight read as eight designs rather than one recoloured.
 */
 
-export type HeadStyle = 'rule-below' | 'rule-above' | 'rule-to-margin' | 'plain' | 'centered'
+export type HeadStyle =
+  'rule-below' | 'rule-above' | 'rule-to-margin' | 'plain' | 'centered' | 'rail'
 
 export function sectionHead(theme: DocTheme, title: string, style: HeadStyle): LayoutNode {
-  const size = theme.bodySize * 0.92
+  const rail = style === 'rail'
+  // the rail is 26mm, so a long canonical heading has to set smaller to hang in it
+  const size = theme.bodySize * (rail ? 0.8 : 0.92)
 
   const label = text(
     {
@@ -268,6 +308,7 @@ export function sectionHead(theme: DocTheme, title: string, style: HeadStyle): L
       textTransform: 'uppercase',
       // routed through tracking(), so it can never exceed the extraction-safe cap
       letterSpacing: tracking(size, 0.08),
+      textAlign: rail ? 'right' : 'left',
       color: theme.accent,
     },
     title
@@ -296,6 +337,10 @@ export function sectionHead(theme: DocTheme, title: string, style: HeadStyle): L
 
     case 'centered':
       return stack({ marginBottom: theme.bodySize * 0.5, alignItems: 'center' }, [label])
+
+    // hung in the rail. the caller gives it a row of its own, or it shares a line with an entry
+    case 'rail':
+      return label
 
     default:
       return stack({ marginBottom: theme.bodySize * 0.5 }, [label])

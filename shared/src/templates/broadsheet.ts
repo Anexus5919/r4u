@@ -122,7 +122,10 @@ function render({ resume, theme }: TemplateInput): LayoutNode[] {
               theme,
               index,
               str(entry.data, 'title'),
-              [str(entry.data, 'venue'), dateRange(entry.data)].filter(Boolean).join(', ')
+              // the link belongs in a citation: the DOI is half of what makes it one
+              [str(entry.data, 'venue'), dateRange(entry.data), str(entry.data, 'url')]
+                .filter(Boolean)
+                .join(', ')
             )
           )
         : section.entries.map((entry) =>
@@ -145,7 +148,7 @@ export const broadsheet: ResumeTemplate = {
     hasTables: false,
     hasImages: false,
     headerFooterContent: false,
-    bodyFont: 'EB Garamond',
+    bodyFont: 'Source Sans 3',
     bulletGlyph: '•',
     dateLayout: 'right',
     /*
