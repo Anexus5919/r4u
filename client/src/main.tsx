@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client'
 import { RouterProvider } from 'react-router-dom'
 import { AuthProvider } from '@/context/AuthProvider'
 import { ThemeProvider } from '@/context/ThemeProvider'
+import { ThemeSync } from '@/context/ThemeSync'
 import { ToastProvider } from '@/context/ToastProvider'
 import { router } from '@/routes/router'
 import '@/styles/index.css'
@@ -19,6 +20,7 @@ createRoot(container).render(
     <ThemeProvider>
       <ToastProvider>
         <AuthProvider>
+          <ThemeSync />
           <RouterProvider router={router} />
         </AuthProvider>
       </ToastProvider>

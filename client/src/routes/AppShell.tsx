@@ -2,7 +2,7 @@ import { Link, Outlet, useNavigate } from 'react-router-dom'
 import type { Theme } from '@r4u/shared'
 import { useAuth } from '@/context/AuthContext'
 import { useTheme } from '@/context/ThemeContext'
-import { Button } from '@/components/ui/Button'
+import { Button, ButtonLink } from '@/components/ui/Button'
 
 const THEMES: Theme[] = ['light', 'dark', 'system']
 
@@ -48,6 +48,9 @@ export function AppShell() {
                 </Button>
               ))}
             </div>
+            <ButtonLink to="/profile" variant="ghost" size="sm">
+              Profile
+            </ButtonLink>
             <Button size="sm" variant="ghost" onClick={onSignOut}>
               Sign out
             </Button>

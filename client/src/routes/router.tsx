@@ -2,6 +2,7 @@ import { createBrowserRouter } from 'react-router-dom'
 import { AppShell } from './AppShell'
 import { DesignSpecimen } from './DesignSpecimen'
 import { LoginPage } from './LoginPage'
+import { ProfilePage } from './ProfilePage'
 import { RegisterPage } from './RegisterPage'
 import { ResetPage } from './ResetPage'
 import { RequireAuth, RequireGuest, RequireRole } from './guards'
@@ -42,6 +43,10 @@ export const router = createBrowserRouter([
           {
             element: <RequireRole allowed={['admin']} />,
             children: [{ path: '/admin', element: <AdminPage /> }],
+          },
+          {
+            element: <RequireRole allowed={['user', 'reviewer', 'admin']} />,
+            children: [{ path: '/profile', element: <ProfilePage /> }],
           },
         ],
       },

@@ -15,6 +15,7 @@ function makeUser(role: PublicUser['role']): PublicUser {
     status: 'active',
     headline: '',
     theme: 'system',
+    avatarUrl: null,
   }
 }
 
