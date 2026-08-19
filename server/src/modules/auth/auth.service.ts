@@ -1,0 +1,205 @@
+import { createHash, randomBytes } from 'node:crypto'
+import { trusted } from 'mongoose'
+import { AppError } from '../../lib/AppError.js'
+import { hashPassword, verifyPassword, wasteTimeLikeAVerify } from '../../lib/password.js'
+import {
+  createRefreshToken,
+  hashToken,
+  refreshExpiryDate,
+  signAccessToken,
+} from '../../lib/tokens.js'
+import { PasswordResetTokenModel, RefreshTokenModel, UserModel } from '../../models/index.js'
+import { logger } from '../../config/logger.js'
+import type { UserDoc } from '../../models/User.js'
+
+const MAX_FAILED_LOGINS = 10
+const LOCK_MINUTES = 15
+const RESET_TTL_MINUTES = 15
+
+export interface SessionContext {
+  userAgent: string
+  ip: string
+}
+
+interface Session {
+  user: UserDoc
+  accessToken: string
+  refreshToken: string
+}
+
+function issueAccess(user: UserDoc): string {
+  return signAccessToken({ sub: user.id, role: user.role, tv: user.tokenVersion })
+}
+
+async function issueSession(user: UserDoc, ctx: SessionContext, family?: string): Promise<Session> {
+  const refresh = createRefreshToken(family)
+
+  await RefreshTokenModel.create({
+    user: user._id,
+    tokenHash: refresh.tokenHash,
+    family: refresh.family,
+    userAgent: ctx.userAgent.slice(0, 300),
+    ip: ctx.ip.slice(0, 64),
+    expiresAt: refreshExpiryDate(),
+  })
+
+  return { user, accessToken: issueAccess(user), refreshToken: refresh.token }
+}
+
+export async function register(
+  input: { name: string; email: string; password: string },
+  ctx: SessionContext
+): Promise<Session> {
+  const passwordHash = await hashPassword(input.password)
+
+  // the unique index on email is the real guard; a findOne first would be a race
+  const user = (await UserModel.create({
+    name: input.name,
+    email: input.email,
+    passwordHash,
+  })) as UserDoc
+
+  return issueSession(user, ctx)
+}
+
+export async function login(
+  input: { email: string; password: string },
+  ctx: SessionContext
+): Promise<Session> {
+  const user = (await UserModel.findOne({ email: input.email }).select(
+    '+passwordHash'
+  )) as UserDoc | null
+
+  /*
+    An unknown email still costs a bcrypt comparison and returns the identical message. Skipping
+    it would let response timing and wording enumerate which addresses are registered.
+  */
+  if (!user) {
+    await wasteTimeLikeAVerify()
+    throw new AppError('INVALID_CREDENTIALS', 'Email or password is incorrect')
+  }
+
+  if (user.status === 'blocked') throw new AppError('ACCOUNT_BLOCKED', 'This account is blocked')
+
+  /*
+    Persistent, unlike express-rate-limit's in-memory counters, which a free-tier restart wipes
+    along with an attacker's progress.
+  */
+  if (user.lockUntil && user.lockUntil.getTime() > Date.now()) {
+    throw new AppError('RATE_LIMITED', 'Too many attempts. Try again in a few minutes.')
+  }
+
+  const ok = await verifyPassword(input.password, user.passwordHash)
+
+  if (!ok) {
+    user.failedLoginCount += 1
+    if (user.failedLoginCount >= MAX_FAILED_LOGINS) {
+      user.lockUntil = new Date(Date.now() + LOCK_MINUTES * 60 * 1000)
+      user.failedLoginCount = 0
+    }
+    await user.save()
+    throw new AppError('INVALID_CREDENTIALS', 'Email or password is incorrect')
+  }
+
+  if (user.failedLoginCount !== 0 || user.lockUntil) {
+    user.failedLoginCount = 0
+    user.lockUntil = undefined
+    await user.save()
+  }
+
+  return issueSession(user, ctx)
+}
+
+export async function refresh(token: string, ctx: SessionContext): Promise<Session> {
+  const tokenHash = hashToken(token)
+  const stored = await RefreshTokenModel.findOne({ tokenHash })
+
+  if (!stored) throw new AppError('TOKEN_INVALID', 'Session expired')
+
+  /*
+    A token that was already consumed is being replayed. That is the signature of a stolen token
+    used alongside the legitimate one, so the whole family dies rather than just this token.
+  */
+  if (stored.consumedAt) {
+    await RefreshTokenModel.deleteMany({ family: stored.family })
+    logger.warn({ family: stored.family }, 'refresh token replay, family revoked')
+    throw new AppError('TOKEN_INVALID', 'Session expired')
+  }
+
+  if (stored.expiresAt.getTime() < Date.now()) {
+    throw new AppError('TOKEN_EXPIRED', 'Session expired')
+  }
+
+  const user = (await UserModel.findById(stored.user)) as UserDoc | null
+  if (!user) throw new AppError('TOKEN_INVALID', 'Session expired')
+  if (user.status === 'blocked') throw new AppError('ACCOUNT_BLOCKED', 'This account is blocked')
+
+  stored.consumedAt = new Date()
+  await stored.save()
+
+  // rotate within the same family, so a replay of any generation revokes the whole chain
+  return issueSession(user, ctx, stored.family)
+}
+
+export async function logout(token: string | undefined): Promise<void> {
+  if (!token) return
+  await RefreshTokenModel.deleteOne({ tokenHash: hashToken(token) })
+}
+
+/*
+  Always resolves, whether or not the address exists. The caller responds 200 either way, so the
+  endpoint cannot be used to discover which addresses are registered.
+*/
+export async function forgotPassword(email: string): Promise<void> {
+  const user = await UserModel.findOne({ email })
+  if (!user) return
+
+  /*
+    trusted() is required whenever a filter contains a server-authored $ operator. sanitizeFilter
+    cannot tell our operators from a client's, so without it this becomes
+    { usedAt: { $eq: { $exists: false } } }, which fails to cast to a Date and throws CastError.
+  */
+  await PasswordResetTokenModel.deleteMany({
+    user: user._id,
+    usedAt: trusted({ $exists: false }),
+  })
+
+  const token = randomBytes(32).toString('base64url')
+
+  await PasswordResetTokenModel.create({
+    user: user._id,
+    tokenHash: createHash('sha256').update(token).digest('hex'),
+    expiresAt: new Date(Date.now() + RESET_TTL_MINUTES * 60 * 1000),
+  })
+
+  // phase 3 replaces this with real delivery. the token is never logged in production.
+  logger.debug({ email, token }, 'password reset token issued')
+}
+
+export async function resetPassword(token: string, password: string): Promise<void> {
+  const tokenHash = createHash('sha256').update(token).digest('hex')
+  const stored = await PasswordResetTokenModel.findOne({ tokenHash })
+
+  if (!stored || stored.usedAt || stored.expiresAt.getTime() < Date.now()) {
+    throw new AppError('TOKEN_INVALID', 'That reset link is no longer valid')
+  }
+
+  const user = (await UserModel.findById(stored.user)) as UserDoc | null
+  if (!user) throw new AppError('TOKEN_INVALID', 'That reset link is no longer valid')
+
+  user.passwordHash = await hashPassword(password)
+  /*
+    A reset must end every existing session, which is the entire point of resetting after a
+    compromise. Bumping the version invalidates issued access tokens, and deleting the refresh
+    tokens stops new ones being minted.
+  */
+  user.tokenVersion += 1
+  user.failedLoginCount = 0
+  user.lockUntil = undefined
+  await user.save()
+
+  stored.usedAt = new Date()
+  await stored.save()
+
+  await RefreshTokenModel.deleteMany({ user: user._id })
+}
