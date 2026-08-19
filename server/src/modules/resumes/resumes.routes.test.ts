@@ -163,7 +163,10 @@ describe('ownership isolation', () => {
 
     const calls = [
       request(app).get(`/api/resumes/${resume.id}`).set(auth(bob.token)),
-      request(app).patch(`/api/resumes/${resume.id}`).set(auth(bob.token)).send({ title: 'Mine' }),
+      request(app)
+        .patch(`/api/resumes/${resume.id}/title`)
+        .set(auth(bob.token))
+        .send({ title: 'Mine' }),
       request(app).delete(`/api/resumes/${resume.id}`).set(auth(bob.token)),
       request(app).post(`/api/resumes/${resume.id}/duplicate`).set(auth(bob.token)).send({}),
     ]

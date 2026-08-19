@@ -1,7 +1,8 @@
 import type { Request, Response } from 'express'
-import type { ResumeType } from '@r4u/shared'
+import type { ResumeOp, ResumeType } from '@r4u/shared'
 import { AppError } from '../../lib/AppError.js'
 import { resumeDetail, resumeSummary } from '../../lib/serializers.js'
+import { VersionConflict, applyOps } from './resumes.autosave.js'
 import * as service from './resumes.service.js'
 import type { Principal } from './resumes.access.js'
 
@@ -45,6 +46,33 @@ export async function read(req: Request, res: Response) {
   const resume = await service.read(id, principal(req))
 
   res.json({ data: { resume: resumeDetail(resume) } })
+}
+
+/*
+  Autosave. The version in the body is the client's view of the document, and a mismatch is a
+  409 carrying the current state so the client can rebase rather than being told to reload and
+  lose its work.
+*/
+export async function autosave(req: Request, res: Response) {
+  const { id, version, ops } = req.validated as {
+    id: string
+    version: number
+    ops: ResumeOp[]
+  }
+
+  try {
+    const result = await applyOps(id, principal(req), version, ops)
+    res.json({ data: { version: result.version, meta: result.meta } })
+  } catch (error) {
+    if (error instanceof VersionConflict) {
+      res.status(409).json({
+        error: { code: 'VERSION_CONFLICT', message: error.message },
+        data: { resume: resumeDetail(error.current) },
+      })
+      return
+    }
+    throw error
+  }
 }
 
 export async function rename(req: Request, res: Response) {

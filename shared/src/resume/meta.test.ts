@@ -135,6 +135,29 @@ describe('completeness', () => {
   })
 })
 
+/*
+  Regression guard. The real caller is a Mongoose document from toObject(), where an untouched
+  subdocument is absent rather than defaulted. Blind destructuring threw here once, inside
+  autosave, which is the one path that must never fail.
+*/
+describe('tolerating stored shapes', () => {
+  it('handles a document with no personal, sections or entries', () => {
+    const partials = [
+      {},
+      { title: 'Draft' },
+      { title: 'Draft', sections: undefined },
+      { title: 'Draft', personal: undefined, sections: [] },
+      { title: 'Draft', sections: [{ type: 'skills', title: 'Skills' }] },
+      { title: 'Draft', sections: [{ type: 'skills', title: 'Skills', entries: [{}] }] },
+    ]
+
+    for (const partial of partials) {
+      expect(() => computeMeta(partial as never)).not.toThrow()
+      expect(computeMeta(partial as never).completeness).toBeGreaterThanOrEqual(0)
+    }
+  })
+})
+
 describe('wordCount', () => {
   it('ignores hidden entries', () => {
     const resume = ResumeBase.parse({

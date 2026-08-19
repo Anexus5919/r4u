@@ -44,29 +44,40 @@ export function isQuantified(bullet: string): boolean {
   return QUANTIFIERS.some((pattern) => pattern.test(stripped))
 }
 
+/*
+  Everything below tolerates a partial object on purpose.
+
+  The type says Resume, but the real caller is a Mongoose document converted with toObject(),
+  where an untouched subdocument is simply absent rather than defaulted. Destructuring it blind
+  throws, and it throws inside autosave, which is the one path that must never fail.
+*/
+function sectionsOf(resume: Partial<Resume>): ResumeSection[] {
+  return Array.isArray(resume.sections) ? resume.sections : []
+}
+
 function bulletsIn(section: ResumeSection): string[] {
-  if (section.hidden) return []
+  if (section.hidden || !Array.isArray(section.entries)) return []
 
   return section.entries
     .filter((entry) => !entry.hidden)
     .flatMap((entry) => {
-      const value = (entry.data as { bullets?: unknown }).bullets
+      const value = ((entry.data ?? {}) as { bullets?: unknown }).bullets
       return Array.isArray(value)
         ? value.filter((item): item is string => typeof item === 'string')
         : []
     })
 }
 
-function visibleText(resume: Resume): string[] {
+function visibleText(resume: Partial<Resume>): string[] {
   const parts: string[] = []
 
-  for (const section of resume.sections) {
-    if (section.hidden) continue
+  for (const section of sectionsOf(resume)) {
+    if (section.hidden || !Array.isArray(section.entries)) continue
 
     for (const entry of section.entries) {
       if (entry.hidden) continue
 
-      for (const value of Object.values(entry.data)) {
+      for (const value of Object.values(entry.data ?? {})) {
         if (typeof value === 'string') parts.push(value)
         else if (Array.isArray(value)) {
           parts.push(...value.filter((item): item is string => typeof item === 'string'))
@@ -78,18 +89,22 @@ function visibleText(resume: Resume): string[] {
   return parts
 }
 
-export function wordCount(resume: Resume): number {
+export function wordCount(resume: Partial<Resume>): number {
   return visibleText(resume).join(' ').split(/\s+/).filter(Boolean).length
 }
 
-export function quantifiedRatio(resume: Resume): { quantified: number; total: number } {
-  const bullets = resume.sections.flatMap(bulletsIn)
+export function quantifiedRatio(resume: Partial<Resume>): { quantified: number; total: number } {
+  const bullets = sectionsOf(resume).flatMap(bulletsIn)
   return { quantified: bullets.filter(isQuantified).length, total: bullets.length }
 }
 
-function hasVisibleEntries(resume: Resume, type: string): boolean {
-  return resume.sections.some(
-    (section) => section.type === type && !section.hidden && section.entries.some((e) => !e.hidden)
+function hasVisibleEntries(resume: Partial<Resume>, type: string): boolean {
+  return sectionsOf(resume).some(
+    (section) =>
+      section.type === type &&
+      !section.hidden &&
+      Array.isArray(section.entries) &&
+      section.entries.some((e) => !e.hidden)
   )
 }
 
@@ -114,15 +129,20 @@ const WEIGHTS = {
 
 export const COMPLETENESS_TOTAL = Object.values(WEIGHTS).reduce((sum, n) => sum + n, 0)
 
-export function completeness(resume: Resume): number {
+export function completeness(resume: Partial<Resume>): number {
   let earned = 0
 
-  const { fullName, email, phone, location } = resume.personal
-  const contactParts = [fullName, email, phone, location].filter(Boolean).length
+  const personal = resume.personal ?? {}
+  const contactParts = [
+    personal.fullName,
+    personal.email,
+    personal.phone,
+    personal.location,
+  ].filter(Boolean).length
   earned += Math.round((contactParts / 4) * WEIGHTS.contact)
 
-  const summary = resume.sections.find((s) => s.type === 'summary' && !s.hidden)
-  const summaryText = summary?.entries[0]?.data as { text?: string } | undefined
+  const summary = sectionsOf(resume).find((s) => s.type === 'summary' && !s.hidden)
+  const summaryText = summary?.entries?.[0]?.data as { text?: string } | undefined
   if ((summaryText?.text?.trim().length ?? 0) >= 120) earned += WEIGHTS.summary
 
   // experience or projects, because a fresher's projects are their history
@@ -148,10 +168,10 @@ export interface ResumeMeta {
   sectionCount: number
 }
 
-export function computeMeta(resume: Resume): ResumeMeta {
+export function computeMeta(resume: Partial<Resume>): ResumeMeta {
   return {
     completeness: completeness(resume),
     wordCount: wordCount(resume),
-    sectionCount: resume.sections.filter((section) => !section.hidden).length,
+    sectionCount: sectionsOf(resume).filter((section) => !section.hidden).length,
   }
 }
