@@ -27,4 +27,17 @@ export const DOC_COLORS = {
     because nobody picked anything is a template imposing itself on someone's document.
   */
   fallbackAccent: '#2e2924',
+
+  /*
+    ink-12 as a ground, for Placard's reversed header band.
+
+    The band must be real text drawn over a background rectangle and never a rasterised image.
+    An image of a name extracts as nothing, which would turn the one template with a strong
+    header into the one template with no name.
+  */
+  band: '#16130f',
+  onBand: '#ffffff',
+
+  /** ink-02. Verso's sidebar ground, four percent of ink so the edge reads without a rule */
+  tint: '#f6f5f4',
 } as const

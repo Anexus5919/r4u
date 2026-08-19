@@ -23,12 +23,17 @@ import type { DocTheme, LayoutNode, TemplateResume } from '../layout/types.js'
 type Entry = TemplateResume['sections'][number]['entries'][number]
 
 export interface BlockOptions {
-  /** right-aligned dates, or inline under the title */
-  dates?: 'right' | 'inline'
+  /** right-aligned, inline under the title, or omitted because the template puts them elsewhere */
+  dates?: 'right' | 'inline' | 'none'
   bulletGlyph?: string
 }
 
 const HANGING_INDENT = 11.3 // 4mm
+
+/** Marginalia hangs dates in a rail, so entry renderers need a way to leave them out. */
+function datesFor(data: Record<string, unknown>, options: BlockOptions): string {
+  return options.dates === 'none' ? '' : dateRange(data)
+}
 
 /*
   A bullet is a row, not a list marker. The glyph sits in its own fixed column so wrapped lines
@@ -100,7 +105,7 @@ export function experienceEntry(
   options: BlockOptions = {}
 ): LayoutNode {
   const data = entry.data
-  const dates = dateRange(data)
+  const dates = datesFor(data, options)
 
   return block({ marginTop: theme.bodySize * 0.9 }, [
     ...compact([
@@ -121,7 +126,7 @@ export function educationEntry(
   options: BlockOptions = {}
 ): LayoutNode {
   const data = entry.data
-  const dates = dateRange(data)
+  const dates = datesFor(data, options)
 
   return block({ marginTop: theme.bodySize * 0.9 }, [
     ...compact([
@@ -147,7 +152,7 @@ export function projectEntry(
 
   return block({ marginTop: theme.bodySize * 0.9 }, [
     ...compact([
-      titleRow(theme, str(data, 'name'), dateRange(data), options),
+      titleRow(theme, str(data, 'name'), datesFor(data, options), options),
       subtitleRow(theme, [stack_.join(', '), str(data, 'url')]),
     ]),
     ...bullets(theme, list(data, 'bullets'), options.bulletGlyph),
@@ -207,7 +212,10 @@ export function simpleEntry(theme: DocTheme, entry: Entry, options: BlockOptions
   ].filter(Boolean)
 
   return block({ marginTop: theme.bodySize * 0.55 }, [
-    ...compact([titleRow(theme, title, dateRange(data), options), subtitleRow(theme, detail)]),
+    ...compact([
+      titleRow(theme, title, datesFor(data, options), options),
+      subtitleRow(theme, detail),
+    ]),
   ])
 }
 

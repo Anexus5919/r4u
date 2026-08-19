@@ -1,11 +1,16 @@
 import type { SectionType } from '../resume/sections.js'
 import type { ResumeTemplate } from '../layout/types.js'
+import { broadsheet } from './broadsheet.js'
 import { foundry } from './foundry.js'
 import { ledger } from './ledger.js'
+import { marginalia } from './marginalia.js'
+import { placard } from './placard.js'
 import { quire } from './quire.js'
+import { recto } from './recto.js'
+import { verso } from './verso.js'
 
 export * from './blocks.js'
-export { foundry, ledger, quire }
+export { broadsheet, foundry, ledger, marginalia, placard, quire, recto, verso }
 
 /*
   Templates are functions in this repository, keyed by string. The Template collection stores only
@@ -19,6 +24,11 @@ export const TEMPLATES: Record<string, ResumeTemplate> = {
   foundry,
   quire,
   ledger,
+  placard,
+  recto,
+  verso,
+  marginalia,
+  broadsheet,
 }
 
 export const TEMPLATE_LIST: ResumeTemplate[] = Object.values(TEMPLATES)
