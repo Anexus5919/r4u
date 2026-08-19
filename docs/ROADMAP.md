@@ -115,8 +115,7 @@ user gets 404 on all of them.
 
 ## Phase 5: The editor
 
-**In progress.** The autosave engine, op vocabulary and version guard are done and tested. The
-editor reducer and UI are next.
+**Status: done.**
 
 **The largest phase. Split it across many commits.**
 
