@@ -51,6 +51,8 @@ and the question does not arise.
 
 ## Phase 2: Authentication, RBAC and the privacy boundary
 
+**Status: done.**
+
 **Goal.** Every role boundary exists and is tested before any content route is written.
 
 - `config/env.ts` with zod validation at boot, refusing to start on a short secret
@@ -76,6 +78,9 @@ regression is a privacy breach rather than a bug.
 ---
 
 ## Phase 3: Profile, theme, feedback
+
+**Status: done.** Avatar upload requires Cloudinary credentials and reports itself unavailable
+without them; everything else works with no third-party account.
 
 - `GET`/`PATCH /users/me`, password change, avatar upload to Cloudinary with magic-byte checks
 - Account deletion with cascade
