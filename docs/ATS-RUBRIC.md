@@ -270,10 +270,9 @@ take, leave, showed, helped, assisted.
 currency      /[$INR EUR GBP]\s?\d[\d,]*(\.\d+)?\s?(k|m|mn|bn|b|lakh|crore)?/i
 percentage    /\b\d[\d,]*(\.\d+)?\s?%/
 multiplier    /\b\d+(\.\d+)?\s?[x]\b/i
-counted nouns /\b\d[\d,]*\+?\s?(users|customers|clients|students|employees|engineers|
-              people|hours|hrs|days|weeks|months|years|requests|transactions|records|
-              rows|tickets|projects|countries|stores|sites|servers|queries|rps|qps|
-              ms|gb|tb|k|million|billion|thousand)\b/i
+counted nouns /\b\d[\d,]*(\.\d+)?\+?\s+(?:[a-z][a-z-]*\s+){0,2}[a-z]{3,}s\b/i
+units         /\b\d[\d,]*(\.\d+)?\+?\s?(ms|kb|mb|gb|tb|rps|qps|fps|k|
+              million|billion|thousand|lakh|crore)\b/i
 delta phrase  /\b(reduced|increased|improved|grew|cut|raised|lowered|saved|
               accelerated)\b[^.]{0,40}\d/i
 ```
@@ -283,6 +282,13 @@ delta phrase  /\b(reduced|increased|improved|grew|cut|raised|lowered|saved|
 
 Without it, every bullet in a 2021 to 2023 role scores as quantified, the D3 metric becomes noise,
 and users notice immediately when a duty-only bullet earns full marks.
+
+**Correction, made during implementation.** An enumerated noun list was the original design and
+it is the wrong shape: real bullets count services, minutes, deploys, incidents and failures,
+and any fixed list is one word short of the next resume someone writes. A number followed by a
+plural noun, with up to two words in between, generalises correctly. Verified against the sample
+resume, where three of eight bullets failed the enumerated version. The explicit list survives
+only for units that are not plural, such as ms and gb.
 
 ### 6.3 Filler list
 
