@@ -71,7 +71,7 @@ export const quire: ResumeTemplate = {
     hasTables: false,
     hasImages: false,
     headerFooterContent: false,
-    bodyFont: 'Public Sans',
+    bodyFont: 'Source Sans 3',
     bulletGlyph: '•',
     dateLayout: 'right',
     maxDimensionAScore: 30,
