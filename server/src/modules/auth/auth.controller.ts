@@ -1,6 +1,7 @@
 import type { CookieOptions, Request, Response } from 'express'
 import { isProduction } from '../../config/env.js'
 import { AppError } from '../../lib/AppError.js'
+import { publicUser } from '../../lib/serializers.js'
 import { UserModel } from '../../models/index.js'
 import * as service from './auth.service.js'
 import type { UserDoc } from '../../models/User.js'
@@ -20,18 +21,6 @@ function cookieOptions(): CookieOptions {
     sameSite: isProduction ? 'none' : 'lax',
     path: '/api/auth',
     maxAge: 30 * 24 * 60 * 60 * 1000,
-  }
-}
-
-function publicUser(user: UserDoc) {
-  return {
-    id: user.id,
-    name: user.name,
-    email: user.email,
-    role: user.role,
-    status: user.status,
-    headline: user.headline,
-    theme: user.theme,
   }
 }
 

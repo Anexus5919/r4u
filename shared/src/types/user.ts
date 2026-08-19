@@ -13,6 +13,27 @@ export interface PublicUser {
   status: UserStatus
   headline: string
   theme: Theme
+  /** null when no avatar is set, or when image hosting is not configured */
+  avatarUrl: string | null
+}
+
+/**
+ * The owner's own view of their account. Wider than PublicUser, and returned only from
+ * GET /users/me. The session payload stays minimal so a token refresh does not ship contact
+ * details around on every call.
+ */
+export interface ProfileUser extends PublicUser {
+  phone: string
+  location: string
+}
+
+/** What the profile screen edits. Everything is optional so a partial save is a normal case. */
+export interface ProfilePatch {
+  name?: string
+  headline?: string
+  phone?: string
+  location?: string
+  theme?: Theme
 }
 
 export interface Session {
