@@ -15,6 +15,23 @@ export default defineConfig({
         },
       },
       {
+        resolve: {
+          alias: {
+            '@r4u/shared': fileURLToPath(new URL('./shared/src/index.ts', import.meta.url)),
+          },
+        },
+        test: {
+          name: 'server',
+          root: './server',
+          environment: 'node',
+          setupFiles: ['./src/test/setup.ts'],
+          include: ['src/**/*.test.ts'],
+          // the first run downloads a mongod binary
+          testTimeout: 30_000,
+          hookTimeout: 180_000,
+        },
+      },
+      {
         plugins: [react()],
         resolve: {
           alias: {
