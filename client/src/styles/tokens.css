@@ -1,0 +1,206 @@
+/*
+  The only file in the project permitted to contain a hex literal.
+  Every value here is specified in docs/DESIGN-SYSTEM.md. Read it before changing anything.
+
+  Do not "warm up" the light end of the ramp. ink-01 at #fbfbfa holds chroma near zero so the
+  page reads as paper. At #faf8f5 it becomes the catalogued cream tell.
+*/
+
+/* Faces are linked from index.html with preconnect. Newsreader carries a real optical-size
+   axis, bound to rendered size in base.css. */
+
+/* ---------------------------------------------------------------- light, the default */
+
+:root {
+  --ink-00: #ffffff;
+  --ink-01: #fbfbfa;
+  --ink-02: #f6f5f4;
+  --ink-03: #f0eeec;
+  --ink-04: #e8e6e3;
+  --ink-05: #dbd9d5;
+  --ink-06: #c2bfba;
+  --ink-07: #a39f9a;
+  --ink-08: #85817b;
+  --ink-09: #635e58;
+  --ink-10: #48433d;
+  --ink-11: #2e2924;
+  --ink-12: #16130f;
+
+  --accent-solid: #c8331a;
+  --accent-text: #af2d18;
+  --accent-on: #ffffff;
+
+  --state-success: #346c42;
+  --state-warning: #976712;
+  --state-danger: #ac3031;
+  --state-info: #3b6987;
+
+  /* paper is always true white, in both themes. the resume is figure, the app is ground */
+  --paper: #ffffff;
+  --paper-ink: #16130f;
+
+  --shadow-float: 0 1px 2px rgb(22 19 15 / 0.06), 0 4px 12px rgb(22 19 15 / 0.08);
+  --backdrop: rgb(22 19 15 / 0.3);
+}
+
+/* ---------------------------------------------------------------- dark
+
+  A separately tuned ramp, never a mechanical inversion. Elevation is lightness, not shadow:
+  a shadow cast on a dark ground carries no contrast and reads as nothing.
+*/
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --ink-00: #0e0c09;
+    --ink-01: #15120e;
+    --ink-02: #1c1914;
+    --ink-03: #25211c;
+    --ink-04: #2e2924;
+    --ink-05: #39352f;
+    --ink-06: #4c4741;
+    --ink-07: #625d56;
+    --ink-08: #78746d;
+    --ink-09: #96918c;
+    --ink-10: #b4b0ac;
+    --ink-11: #d3d0cd;
+    --ink-12: #f3f1f0;
+
+    --accent-solid: #d7371d;
+    --accent-text: #f47d67;
+    --accent-on: #ffffff;
+
+    --state-success: #7bb587;
+    --state-warning: #d9b06b;
+    --state-danger: #e97871;
+    --state-info: #82b1d3;
+
+    --shadow-float: inset 0 1px 0 rgb(255 255 255 / 0.06);
+    --backdrop: rgb(0 0 0 / 0.6);
+  }
+}
+
+:root[data-theme='dark'] {
+  --ink-00: #0e0c09;
+  --ink-01: #15120e;
+  --ink-02: #1c1914;
+  --ink-03: #25211c;
+  --ink-04: #2e2924;
+  --ink-05: #39352f;
+  --ink-06: #4c4741;
+  --ink-07: #625d56;
+  --ink-08: #78746d;
+  --ink-09: #96918c;
+  --ink-10: #b4b0ac;
+  --ink-11: #d3d0cd;
+  --ink-12: #f3f1f0;
+
+  --accent-solid: #d7371d;
+  --accent-text: #f47d67;
+  --accent-on: #ffffff;
+
+  --state-success: #7bb587;
+  --state-warning: #d9b06b;
+  --state-danger: #e97871;
+  --state-info: #82b1d3;
+
+  --shadow-float: inset 0 1px 0 rgb(255 255 255 / 0.06);
+  --backdrop: rgb(0 0 0 / 0.6);
+}
+
+/* ----------------------------------------------------------------
+  Bridge into Tailwind.
+
+  `inline` is load bearing: it makes the generated utilities reference the custom properties
+  above rather than freezing their computed values, which is what lets the theme switch at
+  runtime from a single attribute on the root element.
+*/
+
+@theme inline {
+  --color-ink-00: var(--ink-00);
+  --color-ink-01: var(--ink-01);
+  --color-ink-02: var(--ink-02);
+  --color-ink-03: var(--ink-03);
+  --color-ink-04: var(--ink-04);
+  --color-ink-05: var(--ink-05);
+  --color-ink-06: var(--ink-06);
+  --color-ink-07: var(--ink-07);
+  --color-ink-08: var(--ink-08);
+  --color-ink-09: var(--ink-09);
+  --color-ink-10: var(--ink-10);
+  --color-ink-11: var(--ink-11);
+  --color-ink-12: var(--ink-12);
+
+  --color-accent: var(--accent-solid);
+  --color-accent-text: var(--accent-text);
+  --color-accent-on: var(--accent-on);
+
+  --color-success: var(--state-success);
+  --color-warning: var(--state-warning);
+  --color-danger: var(--state-danger);
+  --color-info: var(--state-info);
+
+  --color-paper: var(--paper);
+  --color-paper-ink: var(--paper-ink);
+
+  --font-display: 'Newsreader', 'Source Serif 4', Georgia, serif;
+  --font-sans: 'Public Sans', system-ui, -apple-system, sans-serif;
+  --font-mono: 'Geist Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+
+  /* three radii, no others. 0 is the resume surface and every hairline-ruled section */
+  --radius-xs: 2px;
+  --radius-sm: 6px;
+
+  /* tool scale, ratio 1.2 */
+  --text-2xs: 11px;
+  --text-xs: 12px;
+  --text-sm: 13px;
+  --text-base: 14px;
+  --text-md: 16px;
+  --text-lg: 20px;
+  --text-xl: 24px;
+
+  /* marketing scale, ratio 1.333 */
+  --text-d1: 16px;
+  --text-d2: 21px;
+  --text-d3: 28px;
+  --text-d4: 38px;
+  --text-d5: 50px;
+  --text-d6: 67px;
+
+  --shadow-float: var(--shadow-float);
+}
+
+/* ----------------------------------------------------------------
+  Motion. Three durations, two curves, and that is the entire vocabulary.
+  Only transform and opacity may be animated.
+*/
+
+:root {
+  --motion-xs: 100ms;
+  --motion-sm: 160ms;
+  --motion-md: 400ms;
+  --ease-out: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+
+  --hairline: 1px;
+}
+
+/* ----------------------------------------------------------------
+  Reduced motion substitutes, it does not delete.
+  Opacity and focus transitions survive; transforms become crossfades.
+*/
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --motion-md: var(--motion-xs);
+    --motion-sm: var(--motion-xs);
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-property: opacity, color, background-color, border-color, outline-color !important;
+    scroll-behavior: auto !important;
+  }
+}

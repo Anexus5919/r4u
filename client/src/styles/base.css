@@ -1,0 +1,250 @@
+/*
+  Base layer. Element defaults only. Anything reusable belongs in components/ui.
+  No hex literals here: every colour reads a token.
+*/
+
+@layer base {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+    border-color: var(--ink-05);
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+    /* the tool never centres, so no scroll-behavior smooth: it fights keyboard navigation */
+  }
+
+  body {
+    margin: 0;
+    background-color: var(--ink-01);
+    color: var(--ink-11);
+    font-family: var(--font-sans);
+    font-size: var(--text-base);
+    line-height: 1.55;
+    font-variant-numeric: tabular-nums;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  /*
+    The optical-size axis is set explicitly rather than left to font-optical-sizing: auto,
+    so the values are documented and reviewable. See DESIGN-SYSTEM.md section 4.2.
+  */
+  h1,
+  h2,
+  h3,
+  h4 {
+    margin: 0;
+    font-family: var(--font-display);
+    color: var(--ink-12);
+    font-weight: 400;
+    letter-spacing: -0.01em;
+    line-height: 1.2;
+  }
+
+  h1 {
+    font-variation-settings: 'opsz' 60;
+  }
+
+  h2 {
+    font-variation-settings: 'opsz' 36;
+  }
+
+  h3,
+  h4 {
+    font-variation-settings: 'opsz' 24;
+  }
+
+  p {
+    margin: 0;
+    max-width: 75ch;
+  }
+
+  /* labels, captions and table cells sit at the small end of the optical range */
+  small,
+  caption,
+  th,
+  label,
+  figcaption {
+    font-variation-settings: 'opsz' 14;
+  }
+
+  a {
+    color: inherit;
+    text-decoration-color: var(--ink-06);
+    text-underline-offset: 0.2em;
+    transition: text-decoration-color var(--motion-xs) var(--ease-out);
+  }
+
+  a:hover {
+    text-decoration-color: var(--ink-09);
+  }
+
+  button,
+  input,
+  select,
+  textarea {
+    font: inherit;
+    color: inherit;
+    letter-spacing: inherit;
+  }
+
+  button {
+    cursor: pointer;
+    background: none;
+    border: none;
+    padding: 0;
+  }
+
+  /*
+    One focus treatment for the whole product. A ring, never a glow, never a colour change.
+    :focus-visible only, so a mouse click never draws it.
+  */
+  :focus {
+    outline: none;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--ink-07);
+    outline-offset: 2px;
+    border-radius: var(--radius-xs);
+  }
+
+  ::selection {
+    background-color: var(--ink-04);
+    color: var(--ink-12);
+  }
+
+  ::placeholder {
+    color: var(--ink-07);
+    opacity: 1;
+  }
+
+  hr {
+    border: none;
+    border-top: var(--hairline) solid var(--ink-04);
+    margin: 0;
+  }
+
+  table {
+    border-collapse: collapse;
+    width: 100%;
+  }
+
+  img,
+  svg,
+  video {
+    display: block;
+    max-width: 100%;
+  }
+
+  code,
+  kbd,
+  samp,
+  pre {
+    font-family: var(--font-mono);
+    font-size: 0.9em;
+  }
+
+  [hidden] {
+    display: none !important;
+  }
+
+  /*
+    Native dialog gives focus trapping, Escape and inertness from the platform.
+    allow-discrete plus @starting-style produce the exit transition in CSS, which is why R4U
+    needs no animation library for modals.
+  */
+  dialog {
+    padding: 0;
+    border: none;
+    background: transparent;
+    color: inherit;
+    max-width: none;
+    max-height: none;
+  }
+
+  dialog::backdrop {
+    background-color: var(--backdrop);
+  }
+
+  dialog,
+  dialog::backdrop {
+    opacity: 0;
+    transition:
+      opacity var(--motion-md) var(--ease-out),
+      display var(--motion-md) allow-discrete,
+      overlay var(--motion-md) allow-discrete;
+  }
+
+  dialog[open],
+  dialog[open]::backdrop {
+    opacity: 1;
+  }
+
+  @starting-style {
+    dialog[open],
+    dialog[open]::backdrop {
+      opacity: 0;
+    }
+  }
+
+  dialog > * {
+    transform: translateY(4px);
+    transition: transform var(--motion-md) var(--ease-out);
+  }
+
+  dialog[open] > * {
+    transform: translateY(0);
+  }
+
+  @starting-style {
+    dialog[open] > * {
+      transform: translateY(4px);
+    }
+  }
+}
+
+@layer utilities {
+  /* the resume document surface. always true white, in both themes */
+  .paper {
+    background-color: var(--paper);
+    color: var(--paper-ink);
+    border-radius: 0;
+  }
+
+  /* the one permitted elevation, for genuinely floating layers only. never with a border */
+  .float {
+    box-shadow: var(--shadow-float);
+  }
+
+  .rule {
+    border-top: var(--hairline) solid var(--ink-04);
+  }
+
+  .rule-left {
+    border-left: var(--hairline) solid var(--ink-04);
+  }
+
+  /*
+    The entire motion vocabulary. Components use these rather than arbitrary durations, so the
+    three-duration rule is enforced by what is available rather than by discipline.
+  */
+  .t-xs {
+    transition-duration: var(--motion-xs);
+    transition-timing-function: var(--ease-out);
+  }
+
+  .t-sm {
+    transition-duration: var(--motion-sm);
+    transition-timing-function: var(--ease-out);
+  }
+
+  .t-md {
+    transition-duration: var(--motion-md);
+    transition-timing-function: var(--ease-out);
+  }
+}
