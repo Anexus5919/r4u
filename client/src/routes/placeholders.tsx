@@ -1,6 +1,6 @@
+import { useParams } from 'react-router-dom'
 import { useAuth } from '@/context/AuthContext'
 import { ButtonLink } from '@/components/ui/Button'
-import { EmptyState } from '@/components/ui/Card'
 
 /*
   Real copy, never lorem. These say plainly what is not built yet and which phase builds it,
@@ -46,23 +46,42 @@ export function LandingPage() {
   )
 }
 
-export function DashboardPage() {
-  const { user } = useAuth()
+/*
+  The editor and preview surfaces land in phases 5 and 6. They exist as routes now so the
+  dashboard card actions navigate somewhere real rather than into a 404, and so the resume
+  loads and the ownership guard is exercised on the way.
+*/
+function ResumeStub({ heading, body }: { heading: string; body: string }) {
+  const { id } = useParams()
 
   return (
     <div className="max-w-3xl">
-      <h1 className="text-xl text-ink-12">Signed in as {user?.name}</h1>
-      <p className="mt-2 text-sm text-ink-09">
-        Role: {user?.role}. Authentication, role guards and the privacy boundary are in place.
-      </p>
+      <ButtonLink to="/dashboard" variant="ghost" size="sm">
+        Back to my resumes
+      </ButtonLink>
 
-      <div className="mt-10 border-t border-ink-04 pt-8">
-        <EmptyState
-          title="No resumes yet"
-          description="Resume creation, the dashboard grid and the editor arrive in phases 4 and 5."
-        />
-      </div>
+      <h1 className="mt-6 text-xl text-ink-12">{heading}</h1>
+      <p className="mt-2 text-sm text-ink-09">{body}</p>
+      <p className="mt-4 font-mono text-2xs text-ink-07">resume {id}</p>
     </div>
+  )
+}
+
+export function EditorPage() {
+  return (
+    <ResumeStub
+      heading="Resume editor"
+      body="Section forms, drag reordering, validation, autosave and the coaching panel arrive in phase 5."
+    />
+  )
+}
+
+export function PreviewPage() {
+  return (
+    <ResumeStub
+      heading="Preview and export"
+      body="Template switching, the live A4 preview and text-layer PDF export arrive in phases 6 and 7."
+    />
   )
 }
 

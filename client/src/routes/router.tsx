@@ -1,12 +1,20 @@
 import { createBrowserRouter } from 'react-router-dom'
 import { AppShell } from './AppShell'
+import { DashboardPage } from './DashboardPage'
 import { DesignSpecimen } from './DesignSpecimen'
 import { LoginPage } from './LoginPage'
 import { ProfilePage } from './ProfilePage'
 import { RegisterPage } from './RegisterPage'
 import { ResetPage } from './ResetPage'
 import { RequireAuth, RequireGuest, RequireRole } from './guards'
-import { AdminPage, DashboardPage, ForbiddenPage, LandingPage, NotFoundPage } from './placeholders'
+import {
+  AdminPage,
+  EditorPage,
+  ForbiddenPage,
+  LandingPage,
+  NotFoundPage,
+  PreviewPage,
+} from './placeholders'
 
 /*
   Guards are layout routes rather than per-page wrappers, so a new child route inherits its
@@ -38,7 +46,11 @@ export const router = createBrowserRouter([
         children: [
           {
             element: <RequireRole allowed={['user', 'reviewer']} />,
-            children: [{ path: '/dashboard', element: <DashboardPage /> }],
+            children: [
+              { path: '/dashboard', element: <DashboardPage /> },
+              { path: '/resume/:id/edit', element: <EditorPage /> },
+              { path: '/resume/:id', element: <PreviewPage /> },
+            ],
           },
           {
             element: <RequireRole allowed={['admin']} />,
