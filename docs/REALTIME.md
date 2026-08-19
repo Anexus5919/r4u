@@ -12,13 +12,13 @@ every review ever opened leaks. A second namespace also forces an extra connecti
 
 Room names are `entity:id`, lowercase, colon-delimited. **Every join is server-authorised.**
 
-| Room | Joined by | Carries |
-|---|---|---|
-| `user:<userId>` | every socket, on connect | notifications, cross-tab sync, forced logout, and the presence source of truth |
-| `review:<reviewId>` | owner and assigned reviewer only | chat, section comments, typing, room presence |
-| `resume:<resumeId>` | the owner's editor tab | a reviewer's new comment lights the section badge without the owner being in the review room |
-| `presence:<targetUserId>` | watchers of one user's online state | e.g. the owner watching an assigned reviewer |
-| `admin:live` | admin dashboard only | live counters |
+| Room                      | Joined by                           | Carries                                                                                      |
+| ------------------------- | ----------------------------------- | -------------------------------------------------------------------------------------------- |
+| `user:<userId>`           | every socket, on connect            | notifications, cross-tab sync, forced logout, and the presence source of truth               |
+| `review:<reviewId>`       | owner and assigned reviewer only    | chat, section comments, typing, room presence                                                |
+| `resume:<resumeId>`       | the owner's editor tab              | a reviewer's new comment lights the section badge without the owner being in the review room |
+| `presence:<targetUserId>` | watchers of one user's online state | e.g. the owner watching an assigned reviewer                                                 |
+| `admin:live`              | admin dashboard only                | live counters                                                                                |
 
 The implicit `socket.id` room is used for per-tab replies.
 
@@ -33,7 +33,7 @@ The implicit `socket.id` room is used for per-tab replies.
 ```ts
 // client
 const socket = io(API_URL, {
-  auth: (cb) => cb({ token: getAccessToken() }),   // MUST be a function
+  auth: (cb) => cb({ token: getAccessToken() }), // MUST be a function
   timeout: 45000,
   reconnectionAttempts: Infinity,
   reconnectionDelayMax: 10000,
@@ -85,23 +85,23 @@ Server-to-client uses past tense or a `_state` noun.
 
 Each takes one object argument plus an ack callback.
 
-| Event | Payload | Ack |
-|---|---|---|
-| `review:join` | `{ reviewId }` | `{ ok, review, participants: [{ id, name, role, online }], messages: [30 newest], nextCursor, comments }` |
-| `review:leave` | `{ reviewId }` | `{ ok }` |
-| `review:history` | `{ reviewId, before, limit <= 50 }` | `{ messages, nextCursor }` |
-| `review:complete` | `{ reviewId, summary? }` | `{ ok, review }` |
-| `chat:send` | `{ reviewId, clientId, body, replyTo? }` | `{ ok, message }` or `{ ok: false, code }` |
-| `chat:typing` | `{ reviewId, typing }` | none, volatile |
-| `chat:read` | `{ reviewId, upTo }` | `{ ok }` |
-| `comment:create` | `{ reviewId, resumeId, sectionKey, entryId, fieldPath, anchorText, body, clientId }` | `{ ok, comment }` |
-| `comment:resolve` | `{ commentId, resolved }` | `{ ok, comment }` |
-| `comment:delete` | `{ commentId }` | `{ ok }` |
-| `notify:read` | `{ ids: [] }` | `{ ok, unread }` |
-| `notify:read_all` | none | `{ ok, unread }` |
-| `presence:subscribe` | `{ userIds: [] }` | `{ ok, online: [] }` |
-| `presence:unsubscribe` | `{ userIds: [] }` | `{ ok }` |
-| `admin:live_subscribe` | none | `{ ok, snapshot }` |
+| Event                  | Payload                                                                              | Ack                                                                                                       |
+| ---------------------- | ------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------- |
+| `review:join`          | `{ reviewId }`                                                                       | `{ ok, review, participants: [{ id, name, role, online }], messages: [30 newest], nextCursor, comments }` |
+| `review:leave`         | `{ reviewId }`                                                                       | `{ ok }`                                                                                                  |
+| `review:history`       | `{ reviewId, before, limit <= 50 }`                                                  | `{ messages, nextCursor }`                                                                                |
+| `review:complete`      | `{ reviewId, summary? }`                                                             | `{ ok, review }`                                                                                          |
+| `chat:send`            | `{ reviewId, clientId, body, replyTo? }`                                             | `{ ok, message }` or `{ ok: false, code }`                                                                |
+| `chat:typing`          | `{ reviewId, typing }`                                                               | none, volatile                                                                                            |
+| `chat:read`            | `{ reviewId, upTo }`                                                                 | `{ ok }`                                                                                                  |
+| `comment:create`       | `{ reviewId, resumeId, sectionKey, entryId, fieldPath, anchorText, body, clientId }` | `{ ok, comment }`                                                                                         |
+| `comment:resolve`      | `{ commentId, resolved }`                                                            | `{ ok, comment }`                                                                                         |
+| `comment:delete`       | `{ commentId }`                                                                      | `{ ok }`                                                                                                  |
+| `notify:read`          | `{ ids: [] }`                                                                        | `{ ok, unread }`                                                                                          |
+| `notify:read_all`      | none                                                                                 | `{ ok, unread }`                                                                                          |
+| `presence:subscribe`   | `{ userIds: [] }`                                                                    | `{ ok, online: [] }`                                                                                      |
+| `presence:unsubscribe` | `{ userIds: [] }`                                                                    | `{ ok }`                                                                                                  |
+| `admin:live_subscribe` | none                                                                                 | `{ ok, snapshot }`                                                                                        |
 
 ### 3.2 Server to client
 
@@ -115,15 +115,15 @@ already consumed.
 
 **To `review:<id>`:**
 
-| Event | Payload | Note |
-|---|---|---|
-| `chat:message` | `{ message }` | Sent to the **whole room including the sender**. See 5.2. |
-| `chat:typing_state` | `{ reviewId, userId, typing }` | excludes sender |
-| `chat:read_state` | `{ reviewId, userId, upTo, at }` | |
-| `comment:created` / `updated` / `deleted` | `{ comment }` / `{ commentId, reviewId, sectionKey }` | |
-| `review:participant_joined` / `_left` | `{ reviewId, user, at }` | |
-| `review:presence` | `{ reviewId, online: [userId] }` | **full idempotent snapshot** on every membership change. Cheap for 2 or 3 people and immune to drift. |
-| `review:completed` | `{ reviewId, by, at, summary }` | |
+| Event                                     | Payload                                               | Note                                                                                                  |
+| ----------------------------------------- | ----------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
+| `chat:message`                            | `{ message }`                                         | Sent to the **whole room including the sender**. See 5.2.                                             |
+| `chat:typing_state`                       | `{ reviewId, userId, typing }`                        | excludes sender                                                                                       |
+| `chat:read_state`                         | `{ reviewId, userId, upTo, at }`                      |                                                                                                       |
+| `comment:created` / `updated` / `deleted` | `{ comment }` / `{ commentId, reviewId, sectionKey }` |                                                                                                       |
+| `review:participant_joined` / `_left`     | `{ reviewId, user, at }`                              |                                                                                                       |
+| `review:presence`                         | `{ reviewId, online: [userId] }`                      | **full idempotent snapshot** on every membership change. Cheap for 2 or 3 people and immune to drift. |
+| `review:completed`                        | `{ reviewId, by, at, summary }`                       |                                                                                                       |
 
 **To `resume:<id>`:** `comment:created`, `comment:updated`, `comment:deleted`, `review:completed`.
 
@@ -245,7 +245,9 @@ twice.
 Cursor pagination on `_id`, never `skip`:
 
 ```js
-find({ review, _id: { $lt: cursor } }).sort({ _id: -1 }).limit(30)
+find({ review, _id: { $lt: cursor } })
+  .sort({ _id: -1 })
+  .limit(30)
 ```
 
 Skip degrades quadratically and shifts and duplicates rows when new messages arrive between page
@@ -287,7 +289,8 @@ real error state. No spinner beyond a slow opacity change, per the design system
 
 ```ts
 const rooms = io.of('/').adapter.rooms
-let users = 0, reviews = 0
+let users = 0,
+  reviews = 0
 for (const k of rooms.keys()) {
   if (k.startsWith('user:')) users++
   else if (k.startsWith('review:')) reviews++
@@ -338,13 +341,13 @@ over HTTP via Multer.
 
 ### 9.1 Limits
 
-| Field | Limit |
-|---|---|
-| chat body | 1 to 2000 chars, trimmed |
-| comment body | 1 to 1000 chars |
-| `anchorText` | 200 chars |
-| `notify:read` ids | 100 entries |
-| `presence:subscribe` userIds | 50 |
+| Field                        | Limit                    |
+| ---------------------------- | ------------------------ |
+| chat body                    | 1 to 2000 chars, trimmed |
+| comment body                 | 1 to 1000 chars          |
+| `anchorText`                 | 200 chars                |
+| `notify:read` ids            | 100 entries              |
+| `presence:subscribe` userIds | 50                       |
 
 Reject empty-after-trim. Strip C0 control characters except newline. Cap consecutive newlines at 2.
 

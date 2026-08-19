@@ -10,32 +10,32 @@ Guard values: `public`, `guest-only`, `user`, `reviewer`, `owner`, `admin`.
 
 ## 1. Route table
 
-| # | Route | View | Guard |
-|---|---|---|---|
-| 1 | `/` | Landing | public |
-| 2 | `/templates` | Public template gallery | public |
-| 3 | `/about` | About and contact | public |
-| 4 | `/privacy`, `/terms` | Legal (MDX) | public |
-| 5 | `/ats-methodology` | Published rubric (MDX) | public |
-| 6 | `/guides`, `/guides/:slug` | Writing guides (MDX) | public |
-| 7 | `/register` | Registration | guest-only |
-| 8 | `/login` | Login | guest-only |
-| 9 | `/reset` | Forgot and reset password | guest-only |
-| 10 | `/r/:slug` | Public resume view | public |
-| 11 | `/dashboard` | User dashboard | user |
-| 12 | `/resume/new` | Template selection | user |
-| 13 | `/resume/:id/edit` | Resume editor | owner |
-| 14 | `/resume/:id` | Preview and export | owner |
-| 15 | `/resume/:id/ats` | ATS Readiness report | owner |
-| 16 | `/reviews` | Review list | user, reviewer |
-| 17 | `/reviews/:id` | Review room with live chat | owner, reviewer |
-| 18 | `/notifications` | Notification centre | user, reviewer |
-| 19 | `/profile` | Profile and settings | user, reviewer, admin |
-| 20 | `/admin` | Admin overview | admin |
-| 21 | `/admin/users` | Manage users | admin |
-| 22 | `/admin/templates` | Manage templates | admin |
-| 23 | `/admin/reports` | Reported content | admin |
-| 24 | `*` | Error and not found | public |
+| #   | Route                      | View                       | Guard                 |
+| --- | -------------------------- | -------------------------- | --------------------- |
+| 1   | `/`                        | Landing                    | public                |
+| 2   | `/templates`               | Public template gallery    | public                |
+| 3   | `/about`                   | About and contact          | public                |
+| 4   | `/privacy`, `/terms`       | Legal (MDX)                | public                |
+| 5   | `/ats-methodology`         | Published rubric (MDX)     | public                |
+| 6   | `/guides`, `/guides/:slug` | Writing guides (MDX)       | public                |
+| 7   | `/register`                | Registration               | guest-only            |
+| 8   | `/login`                   | Login                      | guest-only            |
+| 9   | `/reset`                   | Forgot and reset password  | guest-only            |
+| 10  | `/r/:slug`                 | Public resume view         | public                |
+| 11  | `/dashboard`               | User dashboard             | user                  |
+| 12  | `/resume/new`              | Template selection         | user                  |
+| 13  | `/resume/:id/edit`         | Resume editor              | owner                 |
+| 14  | `/resume/:id`              | Preview and export         | owner                 |
+| 15  | `/resume/:id/ats`          | ATS Readiness report       | owner                 |
+| 16  | `/reviews`                 | Review list                | user, reviewer        |
+| 17  | `/reviews/:id`             | Review room with live chat | owner, reviewer       |
+| 18  | `/notifications`           | Notification centre        | user, reviewer        |
+| 19  | `/profile`                 | Profile and settings       | user, reviewer, admin |
+| 20  | `/admin`                   | Admin overview             | admin                 |
+| 21  | `/admin/users`             | Manage users               | admin                 |
+| 22  | `/admin/templates`         | Manage templates           | admin                 |
+| 23  | `/admin/reports`           | Reported content           | admin                 |
+| 24  | `*`                        | Error and not found        | public                |
 
 **`guest-only`** redirects an authenticated user to their dashboard. Landing on `/login` while
 already signed in is a dead end otherwise.
@@ -330,19 +330,19 @@ whole editor and lose unsaved work.
 
 ## 6. Navigation flows
 
-| Flow | Sequence |
-|---|---|
-| New user | Landing, Register, guard, Dashboard |
-| Returning user | Landing, Login, guard, Dashboard |
-| Guest draft | Landing, Templates, editor in localStorage, Register, merge, Dashboard |
-| Resume creation | Dashboard, Template selection, Editor, Preview and Export |
-| ATS improvement | Editor, ATS Readiness, deep link back to the failing field, Editor |
-| Sharing | Preview and Export, share link created, recruiter opens `/r/:slug` without a login |
-| Review | Preview and Export or side navigation, reviewer directory modal, request sent, Review Room, Notification Centre |
-| Tailor for a job | Preview and Export, duplicate with JD attached, ATS Readiness in full mode |
-| Account | Side navigation, Profile, Logout to Login |
-| Admin | Login, guard, Admin Overview, Manage Users or Templates, Reports |
-| Recovery | Login, Forgot and Reset, Login |
+| Flow             | Sequence                                                                                                        |
+| ---------------- | --------------------------------------------------------------------------------------------------------------- |
+| New user         | Landing, Register, guard, Dashboard                                                                             |
+| Returning user   | Landing, Login, guard, Dashboard                                                                                |
+| Guest draft      | Landing, Templates, editor in localStorage, Register, merge, Dashboard                                          |
+| Resume creation  | Dashboard, Template selection, Editor, Preview and Export                                                       |
+| ATS improvement  | Editor, ATS Readiness, deep link back to the failing field, Editor                                              |
+| Sharing          | Preview and Export, share link created, recruiter opens `/r/:slug` without a login                              |
+| Review           | Preview and Export or side navigation, reviewer directory modal, request sent, Review Room, Notification Centre |
+| Tailor for a job | Preview and Export, duplicate with JD attached, ATS Readiness in full mode                                      |
+| Account          | Side navigation, Profile, Logout to Login                                                                       |
+| Admin            | Login, guard, Admin Overview, Manage Users or Templates, Reports                                                |
+| Recovery         | Login, Forgot and Reset, Login                                                                                  |
 
 **A protected route never renders before the token is verified.** `AuthContext` carries an explicit
 `checking` state so the application never flashes the login screen on refresh. An unauthenticated
@@ -355,8 +355,8 @@ route their role does not permit is redirected to the error page.
 
 Three breakpoints across every view.
 
-| Width | Behaviour |
-|---|---|
-| Mobile | Single column. Side navigation becomes a drawer. The editor becomes a stacked step-by-step wizard with Back and Next. |
-| Tablet | Two-column split with a collapsible navigation panel. The editor shows form and preview side by side. |
-| Desktop | Full three-panel layout. Working width 1280 to 1440px, never centred. |
+| Width   | Behaviour                                                                                                             |
+| ------- | --------------------------------------------------------------------------------------------------------------------- |
+| Mobile  | Single column. Side navigation becomes a drawer. The editor becomes a stacked step-by-step wizard with Back and Next. |
+| Tablet  | Two-column split with a collapsible navigation panel. The editor shows form and preview side by side.                 |
+| Desktop | Full three-panel layout. Working width 1280 to 1440px, never centred.                                                 |

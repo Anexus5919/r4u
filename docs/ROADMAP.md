@@ -117,8 +117,7 @@ user gets 404 on all of them.
 - Completeness from the rule pass rate
 - Private `notes` field
 
-**Exit criterion.** Reducer unit tests cover reorder, hide and undo. Autosave survives a forced
-409. Two tabs editing disjoint sections both converge.
+**Exit criterion.** Reducer unit tests cover reorder, hide and undo. Autosave survives a forced 409. Two tabs editing disjoint sections both converge.
 
 **FR:** 3.5, 4.1 to 4.6. **AR:** 10.
 

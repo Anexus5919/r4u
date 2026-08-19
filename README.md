@@ -15,12 +15,12 @@ A4 PDF, and publishes as a controlled public link, without the user ever adjusti
 
 Four roles, separated by access control rather than by interface:
 
-| Role | Can |
-|---|---|
-| Guest | Browse, open a valid share link, register |
-| User | Own, edit, template, export, share and submit resumes for review |
+| Role     | Can                                                                           |
+| -------- | ----------------------------------------------------------------------------- |
+| Guest    | Browse, open a valid share link, register                                     |
+| User     | Own, edit, template, export, share and submit resumes for review              |
 | Reviewer | Comment on and chat about a resume shared with them. **Cannot edit content.** |
-| Admin | Manage users, templates and reports. **Cannot read private resume content.** |
+| Admin    | Manage users, templates and reports. **Cannot read private resume content.**  |
 
 ---
 
@@ -49,15 +49,15 @@ dedicated test. See `docs/DECISIONS.md`, ADR-008.
 
 ## Stack
 
-| Layer | Technology |
-|---|---|
+| Layer    | Technology                                                                                                      |
+| -------- | --------------------------------------------------------------------------------------------------------------- |
 | Frontend | React 19, Vite, TypeScript, React Router, Tailwind CSS v4, Axios, Context API with useReducer, Socket.IO client |
-| Backend | Node 22, Express 5, JSON Web Token, bcryptjs, Socket.IO, express-validator, Zod |
-| Database | MongoDB Atlas with Mongoose |
-| PDF | `@react-pdf/renderer` for export, `@page` print CSS as fallback, `html2canvas-pro` for thumbnails |
-| Editor | react-hook-form, dnd-kit |
-| Testing | Vitest, Testing Library, Supertest, mongodb-memory-server, Playwright |
-| Ops | Docker, Docker Compose, GitHub Actions, Vercel, Render, Cloudinary, pino |
+| Backend  | Node 22, Express 5, JSON Web Token, bcryptjs, Socket.IO, express-validator, Zod                                 |
+| Database | MongoDB Atlas with Mongoose                                                                                     |
+| PDF      | `@react-pdf/renderer` for export, `@page` print CSS as fallback, `html2canvas-pro` for thumbnails               |
+| Editor   | react-hook-form, dnd-kit                                                                                        |
+| Testing  | Vitest, Testing Library, Supertest, mongodb-memory-server, Playwright                                           |
+| Ops      | Docker, Docker Compose, GitHub Actions, Vercel, Render, Cloudinary, pino                                        |
 
 **Everything is free.** No paid tier, no subscription, no API key, nothing requiring a card. The
 full audit is in `docs/COST.md` and must be updated before any dependency is added.
@@ -82,20 +82,20 @@ character limit means the client counter and the server rejection can never disa
 
 ## Documentation
 
-| File | Contents |
-|---|---|
-| `docs/DESIGN-SYSTEM.md` | Token set, enforceable ban list, per-surface Gestalt rules |
-| `docs/ARCHITECTURE.md` | Topology, the layout AST, auth, RBAC, autosave |
-| `docs/DECISIONS.md` | Every deviation from the original specification, with evidence |
-| `docs/DATA-MODEL.md` | Fourteen collections, indexes, TTL budget |
-| `docs/API.md` | REST endpoint catalogue, error codes, rate limits |
-| `docs/REALTIME.md` | Socket.IO rooms, event catalogue, presence |
-| `docs/TEMPLATES.md` | The eight templates and document typography |
-| `docs/ATS-RUBRIC.md` | The published 100-point rubric |
-| `docs/REQUIREMENTS.md` | Traceability for all 59 specified requirements |
-| `docs/ROUTES.md` | Twenty-four routes with guards and navigation flows |
-| `docs/ROADMAP.md` | Twelve build phases with exit criteria |
-| `docs/COST.md` | Free-tier audit and licence obligations |
+| File                    | Contents                                                       |
+| ----------------------- | -------------------------------------------------------------- |
+| `docs/DESIGN-SYSTEM.md` | Token set, enforceable ban list, per-surface Gestalt rules     |
+| `docs/ARCHITECTURE.md`  | Topology, the layout AST, auth, RBAC, autosave                 |
+| `docs/DECISIONS.md`     | Every deviation from the original specification, with evidence |
+| `docs/DATA-MODEL.md`    | Fourteen collections, indexes, TTL budget                      |
+| `docs/API.md`           | REST endpoint catalogue, error codes, rate limits              |
+| `docs/REALTIME.md`      | Socket.IO rooms, event catalogue, presence                     |
+| `docs/TEMPLATES.md`     | The eight templates and document typography                    |
+| `docs/ATS-RUBRIC.md`    | The published 100-point rubric                                 |
+| `docs/REQUIREMENTS.md`  | Traceability for all 59 specified requirements                 |
+| `docs/ROUTES.md`        | Twenty-four routes with guards and navigation flows            |
+| `docs/ROADMAP.md`       | Twelve build phases with exit criteria                         |
+| `docs/COST.md`          | Free-tier audit and licence obligations                        |
 
 ---
 
@@ -120,16 +120,16 @@ docker compose up
 
 ### Scripts
 
-| Command | Does |
-|---|---|
-| `npm run dev` | Client and server in watch mode |
-| `npm run build` | Production build of both |
-| `npm run lint` | ESLint across the workspace |
-| `npm run typecheck` | `tsc --noEmit` |
-| `npm run test` | Vitest, client and server projects |
-| `npm run test:e2e` | Playwright |
-| `npm run design-guard` | Fails on any design ban-list violation |
-| `npm run seed` | Templates, and demo user, reviewer and admin accounts |
+| Command                | Does                                                  |
+| ---------------------- | ----------------------------------------------------- |
+| `npm run dev`          | Client and server in watch mode                       |
+| `npm run build`        | Production build of both                              |
+| `npm run lint`         | ESLint across the workspace                           |
+| `npm run typecheck`    | `tsc --noEmit`                                        |
+| `npm run test`         | Vitest, client and server projects                    |
+| `npm run test:e2e`     | Playwright                                            |
+| `npm run design-guard` | Fails on any design ban-list violation                |
+| `npm run seed`         | Templates, and demo user, reviewer and admin accounts |
 
 ---
 

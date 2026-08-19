@@ -13,13 +13,13 @@ whitespace, no gradients". That brief, executed literally, produces a catalogued
 
 The most-cited slop catalogue lists "Cream + Serif + Sage" as tell #0, with exact signatures:
 
-| Signature | Exact values named in the catalogue |
-|---|---|
-| Backgrounds | `#faf8f5`, `#f5f1e8`, `#f3eee3`, `#fdfbf7`, `#f7f3ec`, Tailwind `bg-stone-50`, `bg-stone-100`, `bg-amber-50` |
-| Heading faces | Instrument Serif, Fraunces, Playfair Display, Spectral, Cormorant, DM Serif |
-| Body faces | Inter, Geist, Space Grotesk |
-| Accent | emerald / sage green 700-900 (`#15573a`, `#1a4d3a`) |
-| Geometry | `border-radius: 9999px` on buttons, uniform `rounded-2xl` / `rounded-3xl` |
+| Signature     | Exact values named in the catalogue                                                                          |
+| ------------- | ------------------------------------------------------------------------------------------------------------ |
+| Backgrounds   | `#faf8f5`, `#f5f1e8`, `#f3eee3`, `#fdfbf7`, `#f7f3ec`, Tailwind `bg-stone-50`, `bg-stone-100`, `bg-amber-50` |
+| Heading faces | Instrument Serif, Fraunces, Playfair Display, Spectral, Cormorant, DM Serif                                  |
+| Body faces    | Inter, Geist, Space Grotesk                                                                                  |
+| Accent        | emerald / sage green 700-900 (`#15573a`, `#1a4d3a`)                                                          |
+| Geometry      | `border-radius: 9999px` on buttons, uniform `rounded-2xl` / `rounded-3xl`                                    |
 
 The stated cause is that models auto-complete toward "tasteful" when handed a minimalism brief.
 
@@ -130,39 +130,39 @@ becomes `#faf8f5`, which is the first literal on the catalogue's list.
 
 **Light mode** (contrast measured against `ink-00` `#ffffff`):
 
-| Token | Hex | Contrast | Role (Radix step semantics) |
-|---|---|---|---|
-| `ink-00` | `#ffffff` | 1.00 | Paper. The resume document surface. |
-| `ink-01` | `#fbfbfa` | 1.04 | App background. |
-| `ink-02` | `#f6f5f4` | 1.09 | Subtle background, row hover, card ground. |
-| `ink-03` | `#f0eeec` | 1.16 | UI element background. |
-| `ink-04` | `#e8e6e3` | 1.25 | Hovered UI element background. **Hairline rules.** |
-| `ink-05` | `#dbd9d5` | 1.41 | Active / selected background. Component edges. |
-| `ink-06` | `#c2bfba` | 1.83 | Subtle borders and separators. |
-| `ink-07` | `#a39f9a` | 2.63 | Focus ring. **Disabled text only.** Fails AA for body. |
-| `ink-08` | `#85817b` | 3.87 | Hovered border. **Fails AA for body text.** |
-| `ink-09` | `#635e58` | 6.42 | **Secondary text. The floor for any readable text.** |
-| `ink-10` | `#48433d` | 9.79 | Tertiary emphasis. |
-| `ink-11` | `#2e2924` | 14.40 | Body text. |
-| `ink-12` | `#16130f` | 18.52 | Primary text, headings. |
+| Token    | Hex       | Contrast | Role (Radix step semantics)                            |
+| -------- | --------- | -------- | ------------------------------------------------------ |
+| `ink-00` | `#ffffff` | 1.00     | Paper. The resume document surface.                    |
+| `ink-01` | `#fbfbfa` | 1.04     | App background.                                        |
+| `ink-02` | `#f6f5f4` | 1.09     | Subtle background, row hover, card ground.             |
+| `ink-03` | `#f0eeec` | 1.16     | UI element background.                                 |
+| `ink-04` | `#e8e6e3` | 1.25     | Hovered UI element background. **Hairline rules.**     |
+| `ink-05` | `#dbd9d5` | 1.41     | Active / selected background. Component edges.         |
+| `ink-06` | `#c2bfba` | 1.83     | Subtle borders and separators.                         |
+| `ink-07` | `#a39f9a` | 2.63     | Focus ring. **Disabled text only.** Fails AA for body. |
+| `ink-08` | `#85817b` | 3.87     | Hovered border. **Fails AA for body text.**            |
+| `ink-09` | `#635e58` | 6.42     | **Secondary text. The floor for any readable text.**   |
+| `ink-10` | `#48433d` | 9.79     | Tertiary emphasis.                                     |
+| `ink-11` | `#2e2924` | 14.40    | Body text.                                             |
+| `ink-12` | `#16130f` | 18.52    | Primary text, headings.                                |
 
 **Dark mode** (contrast measured against `ink-00` `#0e0c09`):
 
-| Token | Hex | Contrast | Role |
-|---|---|---|---|
-| `ink-00` | `#0e0c09` | 1.00 | App background. OKLCH L 0.155, inside the endorsed 8-12% band. |
-| `ink-01` | `#15120e` | 1.05 | Subtle background. |
-| `ink-02` | `#1c1914` | 1.11 | Card ground, row hover. |
-| `ink-03` | `#25211c` | 1.22 | UI element background. Popover surface. |
-| `ink-04` | `#2e2924` | 1.36 | Hovered UI element. **Hairline rules.** Modal surface. |
-| `ink-05` | `#39352f` | 1.60 | Active / selected. |
-| `ink-06` | `#4c4741` | 2.13 | Subtle borders. |
-| `ink-07` | `#625d56` | 2.99 | Focus ring, disabled text. |
-| `ink-08` | `#78746d` | 4.20 | Hovered border. |
-| `ink-09` | `#96918c` | 6.26 | **Secondary text floor.** |
-| `ink-10` | `#b4b0ac` | 9.06 | Tertiary emphasis. |
-| `ink-11` | `#d3d0cd` | 12.72 | Body text. |
-| `ink-12` | `#f3f1f0` | 17.35 | Primary text, headings. |
+| Token    | Hex       | Contrast | Role                                                           |
+| -------- | --------- | -------- | -------------------------------------------------------------- |
+| `ink-00` | `#0e0c09` | 1.00     | App background. OKLCH L 0.155, inside the endorsed 8-12% band. |
+| `ink-01` | `#15120e` | 1.05     | Subtle background.                                             |
+| `ink-02` | `#1c1914` | 1.11     | Card ground, row hover.                                        |
+| `ink-03` | `#25211c` | 1.22     | UI element background. Popover surface.                        |
+| `ink-04` | `#2e2924` | 1.36     | Hovered UI element. **Hairline rules.** Modal surface.         |
+| `ink-05` | `#39352f` | 1.60     | Active / selected.                                             |
+| `ink-06` | `#4c4741` | 2.13     | Subtle borders.                                                |
+| `ink-07` | `#625d56` | 2.99     | Focus ring, disabled text.                                     |
+| `ink-08` | `#78746d` | 4.20     | Hovered border.                                                |
+| `ink-09` | `#96918c` | 6.26     | **Secondary text floor.**                                      |
+| `ink-10` | `#b4b0ac` | 9.06     | Tertiary emphasis.                                             |
+| `ink-11` | `#d3d0cd` | 12.72    | Body text.                                                     |
+| `ink-12` | `#f3f1f0` | 17.35    | Primary text, headings.                                        |
 
 **Dark mode is a separately tuned ramp, not a mechanical inversion of the light one.** Inverting
 produces the muddy result where subtle backgrounds become mid-tones with wrong perceptual spacing.
@@ -179,10 +179,10 @@ elevation inexpressible at all.
 
 One accent for the entire product: **print vermillion**, hue 32.
 
-| Token | Light | Dark | Use |
-|---|---|---|---|
+| Token          | Light     | Dark      | Use                                                 |
+| -------------- | --------- | --------- | --------------------------------------------------- |
 | `accent-solid` | `#c8331a` | `#d7371d` | Filled buttons, active section bar, selected state. |
-| `accent-text` | `#af2d18` | `#f47d67` | Accent-coloured text on the page ground. |
+| `accent-text`  | `#af2d18` | `#f47d67` | Accent-coloured text on the page ground.            |
 
 `#c8331a` measures 5.14:1 on paper and 5.32:1 for white text placed on it, so it passes AA in
 both directions. Hue 32 sits nowhere near the AI-purple band (255-280) and nowhere near the sage
@@ -197,12 +197,12 @@ The default expression of a state is a glyph plus a text label in `ink-11`, or a
 rule. Never tint an entire surface with a semantic colour. Tint only a 1px rule, a glyph, or a
 short text run.
 
-| State | Light | Dark |
-|---|---|---|
+| State     | Light            | Dark             |
+| --------- | ---------------- | ---------------- |
 | `success` | `#346c42` (6.02) | `#7bb587` (8.19) |
 | `warning` | `#976712` (4.76) | `#d9b06b` (9.65) |
-| `danger` | `#ac3031` (6.30) | `#e97871` (6.87) |
-| `info` | `#3b6987` (5.70) | `#82b1d3` (8.54) |
+| `danger`  | `#ac3031` (6.30) | `#e97871` (6.87) |
+| `info`    | `#3b6987` (5.70) | `#82b1d3` (8.54) |
 
 Note that `danger` `#ac3031` sits at hue 25, only 7 degrees from the accent. Brand and danger are
 therefore one hue family. **This is why the monochrome rule genuinely survives** rather than being
@@ -222,25 +222,25 @@ maintained by an exception list.
 
 ### 4.1 Families
 
-| Role | Family | Axis | Size | Reason |
-|---|---|---|---|---|
-| Display / headings | **Newsreader** | wght 200-800, opsz 6-72 | 132 KB | Widest optical-size range on Google Fonts. Drawn for on-screen news reading, not for looking pretty in a hero. On no slop list. |
-| UI / body | **Public Sans** | wght 100-900 | 26.8 KB | US government typeface. Large x-height, unambiguous `1`/`l`/`I`. Cheapest serious body face available, and cheaper than Inter (72.9 KB) or DM Sans (62.7 KB). |
-| Numerals / IDs / code | **Geist Mono** | wght 100-900 | 23.1 KB | Tabular numerals for view counts, dates, IDs and the admin table. |
+| Role                  | Family          | Axis                    | Size    | Reason                                                                                                                                                        |
+| --------------------- | --------------- | ----------------------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Display / headings    | **Newsreader**  | wght 200-800, opsz 6-72 | 132 KB  | Widest optical-size range on Google Fonts. Drawn for on-screen news reading, not for looking pretty in a hero. On no slop list.                               |
+| UI / body             | **Public Sans** | wght 100-900            | 26.8 KB | US government typeface. Large x-height, unambiguous `1`/`l`/`I`. Cheapest serious body face available, and cheaper than Inter (72.9 KB) or DM Sans (62.7 KB). |
+| Numerals / IDs / code | **Geist Mono**  | wght 100-900            | 23.1 KB | Tabular numerals for view counts, dates, IDs and the admin table.                                                                                             |
 
 Total Latin roman budget is roughly 182 KB. Drop Newsreader italic unless a resume template needs it.
 
 **Explicitly rejected, with reasons:**
 
-- *Instrument Serif*: on two slop lists, and ships a single static 400 weight with no variable
+- _Instrument Serif_: on two slop lists, and ships a single static 400 weight with no variable
   axis, which makes weight-based hierarchy impossible and forces the flat-hierarchy tell.
-- *DM Serif Display*: named on the catalogue's heading-face list. This is the face used by the
+- _DM Serif Display_: named on the catalogue's heading-face list. This is the face used by the
   reference design file R4U was briefed against.
-- *Playfair Display*: on the slop list. Also, it has **no** optical-size axis on Google Fonts
+- _Playfair Display_: on the slop list. Also, it has **no** optical-size axis on Google Fonts
   despite widespread claims. Requesting `opsz@5..1200` returns HTTP 400 and the font fails to load.
-- *Fraunces*: on the slop list.
-- *Inter*, *Geist*, *Space Grotesk* as the body face: all three on the slop list.
-- *Libre Caslon Text*: static 400/700 only, same hierarchy problem as Instrument Serif.
+- _Fraunces_: on the slop list.
+- _Inter_, _Geist_, _Space Grotesk_ as the body face: all three on the slop list.
+- _Libre Caslon Text_: static 400/700 only, same hierarchy problem as Instrument Serif.
 
 If Newsreader's 132 KB proves too heavy, the one defensible substitute is **Source Serif 4**
 (122 KB, opsz 8-60, wght 200-900), whose optical-size implementation is genuinely typographic:
@@ -252,11 +252,11 @@ develop at large sizes, the behaviour of historical metal type.
 Bind `font-variation-settings: 'opsz'` to the rendered size rather than relying on
 `font-optical-sizing: auto`, so the values are documented and reviewable:
 
-| Context | `opsz` |
-|---|---|
-| Table cells, form labels, captions | 12-16 |
-| Section headings, card headings | 24-36 |
-| Marketing display line | 60-72 |
+| Context                            | `opsz` |
+| ---------------------------------- | ------ |
+| Table cells, form labels, captions | 12-16  |
+| Section headings, card headings    | 24-36  |
+| Marketing display line             | 60-72  |
 
 This is invisible to a casual look and unmistakable to a designer. Almost no generated site has it.
 
@@ -270,9 +270,9 @@ Hierarchy in the tool comes from **weight plus ramp step**. Hierarchy on marketi
 
 ### 4.4 Two scales, one family
 
-| Surface | Ratio | Steps (px) |
-|---|---|---|
-| Tool (dashboard, editor, review, admin) | 1.2 | 12 / 13 / 14 / 16 / 20 / 24 |
+| Surface                                     | Ratio | Steps (px)                  |
+| ------------------------------------------- | ----- | --------------------------- |
+| Tool (dashboard, editor, review, admin)     | 1.2   | 12 / 13 / 14 / 16 / 20 / 24 |
 | Marketing (landing, gallery, public resume) | 1.333 | 16 / 21 / 28 / 38 / 50 / 67 |
 
 Body line-height 1.5 to 1.6. Measure capped at 75ch. Letter-spacing is loose only on short
@@ -304,11 +304,11 @@ accent, the radius set, the motion tokens, the hairline weight.
 
 Only three things vary:
 
-| | Tool surface | Marketing surface |
-|---|---|---|
-| Spacing | Strict 4/8 grid, section gap capped at 48px | Optically tuned large gaps, not snapped to 8 |
-| Type ratio | 1.2 | 1.333 |
-| Measure | Edge to edge, 1280-1440px working width | 680-760px measure inside a 1200px container |
+|            | Tool surface                                | Marketing surface                            |
+| ---------- | ------------------------------------------- | -------------------------------------------- |
+| Spacing    | Strict 4/8 grid, section gap capped at 48px | Optically tuned large gaps, not snapped to 8 |
+| Type ratio | 1.2                                         | 1.333                                        |
+| Measure    | Edge to edge, 1280-1440px working width     | 680-760px measure inside a 1200px container  |
 
 **The rule that ties them together: the tool never centres a page, and the marketing surface never
 uses a card grid with more than two identical siblings.**
@@ -331,11 +331,11 @@ Consistency failure is measurable and is a catalogued tell: `p-3` mixed with `p-
 
 **Three radii, no others:**
 
-| Radius | Applies to |
-|---|---|
-| `2px` | Inputs, buttons, table cells, badges, small controls |
-| `6px` | Cards, panels, popovers, modals |
-| `0px` | The resume document surface, and every hairline-ruled section |
+| Radius | Applies to                                                    |
+| ------ | ------------------------------------------------------------- |
+| `2px`  | Inputs, buttons, table cells, badges, small controls          |
+| `6px`  | Cards, panels, popovers, modals                               |
+| `0px`  | The resume document surface, and every hairline-ruled section |
 
 No pill buttons. No `rounded-full` except the user avatar. Nothing above 8px.
 
@@ -352,11 +352,11 @@ Hairline weight is 1px on screen. In the resume templates it is 0.5pt, since pri
 
 ### 7.1 Three durations, two curves
 
-| Token | Duration | Applies to |
-|---|---|---|
-| `motion-xs` | 100ms | Hover, focus ring, checkbox, button press |
-| `motion-sm` | 160ms | Dropdown, popover, tooltip, toast, panel reveal |
-| `motion-md` | 400ms | Route change, drawer, modal, template preview swap |
+| Token       | Duration | Applies to                                         |
+| ----------- | -------- | -------------------------------------------------- |
+| `motion-xs` | 100ms    | Hover, focus ring, checkbox, button press          |
+| `motion-sm` | 160ms    | Dropdown, popover, tooltip, toast, panel reveal    |
+| `motion-md` | 400ms    | Route change, drawer, modal, template preview swap |
 
 Easing: `cubic-bezier(0.25, 0.46, 0.45, 0.94)` for entrances and most transitions. `linear` for
 progress only. Never spring, never bounce, never elastic.

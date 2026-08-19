@@ -19,7 +19,7 @@ project specification and the evidence behind each one.
                                          |  Mongoose
                                          v
                                     MongoDB Atlas M0
-                                         
+
   Cloudinary  <-- avatars, template thumbnails (never proxied through Render)
 ```
 
@@ -119,10 +119,10 @@ R4U solves it with a restricted intermediate representation.
 
 ```ts
 type LayoutNode =
-  | { type: 'stack';  style: Style; children: LayoutNode[] }
-  | { type: 'row';    style: Style; children: LayoutNode[] }
-  | { type: 'text';   style: Style; value: string }
-  | { type: 'rule';   style: Style }
+  | { type: 'stack'; style: Style; children: LayoutNode[] }
+  | { type: 'row'; style: Style; children: LayoutNode[] }
+  | { type: 'text'; style: Style; value: string }
+  | { type: 'rule'; style: Style }
   | { type: 'spacer'; style: Style }
 ```
 
@@ -199,10 +199,10 @@ MDX is used, but only on the content surface, compiled at build time from files 
 
 ## 5. Authentication
 
-| Token | Form | Lifetime | Storage |
-|---|---|---|---|
-| Access | HS256 JWT, claims `{ sub, role, tv, jti }` only | 15 min | React module variable / Context. **Never localStorage.** |
-| Refresh | Opaque `crypto.randomBytes(32).toString('base64url')` | 30 days | httpOnly cookie, `Path=/api/auth` |
+| Token   | Form                                                  | Lifetime | Storage                                                  |
+| ------- | ----------------------------------------------------- | -------- | -------------------------------------------------------- |
+| Access  | HS256 JWT, claims `{ sub, role, tv, jti }` only       | 15 min   | React module variable / Context. **Never localStorage.** |
+| Refresh | Opaque `crypto.randomBytes(32).toString('base64url')` | 30 days  | httpOnly cookie, `Path=/api/auth`                        |
 
 The access token carries **no email and no name**. JWT payloads are base64, not encrypted, and
 R4U's users are identifiable people attached to a PII document.
@@ -225,9 +225,11 @@ is auth that works perfectly in Chrome and logs users out on every reload in Saf
 talks to one origin:
 
 ```json
-{ "rewrites": [
-  { "source": "/api/:path*", "destination": "https://r4u-api.onrender.com/api/:path*" }
-] }
+{
+  "rewrites": [
+    { "source": "/api/:path*", "destination": "https://r4u-api.onrender.com/api/:path*" }
+  ]
+}
 ```
 
 The cookie is then first-party and Safari is a non-issue. **Socket.IO is unaffected** and connects
@@ -352,12 +354,12 @@ actions.
 
 Four custom hooks, each solving a real bug the naive version has:
 
-| Hook | What it does |
-|---|---|
-| `useApi` | One axios instance, interceptor attaching the JWT, `401` triggers refresh then one retry, `AbortController` tied to unmount |
-| `useAuth` | Context over `{ user, status, error }` with an explicit `checking` state so the app never flashes the login screen on refresh |
-| `useSocket` | **One shared socket instance in Context**, not one per component. Typed emit and subscribe with automatic cleanup, plus a connection-status value the UI renders |
-| `useDebounce` | Drives autosave and the preview render |
+| Hook          | What it does                                                                                                                                                     |
+| ------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `useApi`      | One axios instance, interceptor attaching the JWT, `401` triggers refresh then one retry, `AbortController` tied to unmount                                      |
+| `useAuth`     | Context over `{ user, status, error }` with an explicit `checking` state so the app never flashes the login screen on refresh                                    |
+| `useSocket`   | **One shared socket instance in Context**, not one per component. Typed emit and subscribe with automatic cleanup, plus a connection-status value the UI renders |
+| `useDebounce` | Drives autosave and the preview render                                                                                                                           |
 
 ---
 

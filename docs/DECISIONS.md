@@ -22,10 +22,10 @@ layer, no selectable text, no working hyperlinks. Every ATS extracts an empty do
 
 **Measured, not assumed:**
 
-| Path | File size | Extractable text items |
-|---|---|---|
-| html2canvas + jsPDF | 305 KB | **0** |
-| @react-pdf/renderer | 3 KB | 34, at exact A4 |
+| Path                | File size | Extractable text items |
+| ------------------- | --------- | ---------------------- |
+| html2canvas + jsPDF | 305 KB    | **0**                  |
+| @react-pdf/renderer | 3 KB      | 34, at exact A4        |
 
 Two further defects: `html2canvas@1.4.1` has been unpublished since January 2022 and throws on
 modern CSS colour functions, which matters because Tailwind v4 emits its entire default palette
@@ -118,13 +118,13 @@ The stated cause is that models auto-complete toward "tasteful" when handed a mi
 **Decision.** Keep the register, deviate on every specific, and document each deviation. Full
 detail in `DESIGN-SYSTEM.md`. Summary:
 
-| Aspect | Reference | R4U | Reason |
-|---|---|---|---|
-| Palette | `stone-*` | 13-step warm-ink ramp, chroma 0.001-0.003 at the light end | Reads as near-white paper, not cream. Dodges the cream tell and the slate/zinc tell simultaneously. |
-| Accent | none / sage | `#c8331a` vermillion, hue 32 | Far from the AI-purple band (255-280) and from the sage cliche. `danger` at hue 25 is 7 degrees away, so brand and danger are one hue family, which is why monochrome survives. |
-| Display face | DM Serif Display | Newsreader | On no slop list. `opsz` 6-72, the widest on Google Fonts. Drawn for screen reading. |
-| Body face | DM Sans | Public Sans | 26.8 KB versus 62.7 KB. Large x-height, unambiguous `1`/`l`/`I`. Inter and Geist are both on the slop list. |
-| Radius | `rounded-full`, `rounded-2xl` | 2px / 6px / 0px | Both reference values are individually named on the tell list. |
+| Aspect       | Reference                     | R4U                                                        | Reason                                                                                                                                                                          |
+| ------------ | ----------------------------- | ---------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Palette      | `stone-*`                     | 13-step warm-ink ramp, chroma 0.001-0.003 at the light end | Reads as near-white paper, not cream. Dodges the cream tell and the slate/zinc tell simultaneously.                                                                             |
+| Accent       | none / sage                   | `#c8331a` vermillion, hue 32                               | Far from the AI-purple band (255-280) and from the sage cliche. `danger` at hue 25 is 7 degrees away, so brand and danger are one hue family, which is why monochrome survives. |
+| Display face | DM Serif Display              | Newsreader                                                 | On no slop list. `opsz` 6-72, the widest on Google Fonts. Drawn for screen reading.                                                                                             |
+| Body face    | DM Sans                       | Public Sans                                                | 26.8 KB versus 62.7 KB. Large x-height, unambiguous `1`/`l`/`I`. Inter and Geist are both on the slop list.                                                                     |
+| Radius       | `rounded-full`, `rounded-2xl` | 2px / 6px / 0px                                            | Both reference values are individually named on the tell list.                                                                                                                  |
 
 ---
 
@@ -321,19 +321,19 @@ the documented view count stays honest.
 
 **Status:** accepted
 
-| Concern | Choice | Rejected, and why |
-|---|---|---|
-| Drag and drop | `@dnd-kit/core` 6.3.1 + `sortable` 10.0.0 | `react-beautiful-dnd` is formally deprecated on npm. Native HTML5 DnD has no touch, no keyboard, unstyleable drag image. `@dnd-kit/react` 0.5.0 is a pre-1.0 rewrite with a different API despite the higher-looking version number. |
-| Forms | `react-hook-form` 7.85.0 | Formik is controlled by default and re-renders the whole form per keystroke, which is untenable in a 200-field editor. |
-| Tailwind | v4.3.3 with `@tailwindcss/vite` | v3 has no migration cost advantage on a greenfield project, and v4's CSS-first `@theme` gives the ink ramp as utilities and as `var()` simultaneously. The default oklch palette is overridden with explicit sRGB hex, which is required anyway to keep `html2canvas` from throwing. |
-| Animation | `motion` 13.1.0 behind `LazyMotion` + `m` | Justified only by `AnimatePresence`. Exit animations are the one thing CSS genuinely cannot do. Everything else is a plain CSS transition. If exit animations turn out not to be needed, drop it and save 31 KB. |
-| Toasts | hand-rolled, roughly 60 lines | `react-hot-toast` and `sonner` both ship pill shapes, drop shadows and spring entrances that contradict the design system. Overriding them fully costs more than writing it. |
-| Icons | hand-drawn set of 12 | No icon library. See `DESIGN-SYSTEM.md` section 9. |
-| Dates | none | Only need `Intl.DateTimeFormat` with `{ month: 'short', year: 'numeric' }` plus a string compare. Neither `date-fns` nor `dayjs` earns its place. |
-| Share slugs | `nanoid` 6.0.1 at length 12 | A Mongo ObjectId in a public URL leaks its creation timestamp and is partially sequential. |
-| Password hashing | `bcryptjs`, cost 12 | Native `bcrypt@6` needs python3, make and g++ in the Docker image and in the CI runner. It builds locally and fails in CI on a slim base, a class of failure that costs hours and teaches nothing. |
-| Logging | `pino` 10.3.1 + `pino-http` | `morgan` plus `console.log` leaks credentials into Render's logs. Redact `authorization` and every password field. |
-| Sanitisation | none installed | `express-mongo-sanitize` is abandoned and silently no-ops on Express 5, where `req.query` became a getter. Correct defence is `mongoose.set('sanitizeFilter', true)` plus validated primitives. |
+| Concern          | Choice                                    | Rejected, and why                                                                                                                                                                                                                                                                    |
+| ---------------- | ----------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Drag and drop    | `@dnd-kit/core` 6.3.1 + `sortable` 10.0.0 | `react-beautiful-dnd` is formally deprecated on npm. Native HTML5 DnD has no touch, no keyboard, unstyleable drag image. `@dnd-kit/react` 0.5.0 is a pre-1.0 rewrite with a different API despite the higher-looking version number.                                                 |
+| Forms            | `react-hook-form` 7.85.0                  | Formik is controlled by default and re-renders the whole form per keystroke, which is untenable in a 200-field editor.                                                                                                                                                               |
+| Tailwind         | v4.3.3 with `@tailwindcss/vite`           | v3 has no migration cost advantage on a greenfield project, and v4's CSS-first `@theme` gives the ink ramp as utilities and as `var()` simultaneously. The default oklch palette is overridden with explicit sRGB hex, which is required anyway to keep `html2canvas` from throwing. |
+| Animation        | `motion` 13.1.0 behind `LazyMotion` + `m` | Justified only by `AnimatePresence`. Exit animations are the one thing CSS genuinely cannot do. Everything else is a plain CSS transition. If exit animations turn out not to be needed, drop it and save 31 KB.                                                                     |
+| Toasts           | hand-rolled, roughly 60 lines             | `react-hot-toast` and `sonner` both ship pill shapes, drop shadows and spring entrances that contradict the design system. Overriding them fully costs more than writing it.                                                                                                         |
+| Icons            | hand-drawn set of 12                      | No icon library. See `DESIGN-SYSTEM.md` section 9.                                                                                                                                                                                                                                   |
+| Dates            | none                                      | Only need `Intl.DateTimeFormat` with `{ month: 'short', year: 'numeric' }` plus a string compare. Neither `date-fns` nor `dayjs` earns its place.                                                                                                                                    |
+| Share slugs      | `nanoid` 6.0.1 at length 12               | A Mongo ObjectId in a public URL leaks its creation timestamp and is partially sequential.                                                                                                                                                                                           |
+| Password hashing | `bcryptjs`, cost 12                       | Native `bcrypt@6` needs python3, make and g++ in the Docker image and in the CI runner. It builds locally and fails in CI on a slim base, a class of failure that costs hours and teaches nothing.                                                                                   |
+| Logging          | `pino` 10.3.1 + `pino-http`               | `morgan` plus `console.log` leaks credentials into Render's logs. Redact `authorization` and every password field.                                                                                                                                                                   |
+| Sanitisation     | none installed                            | `express-mongo-sanitize` is abandoned and silently no-ops on Express 5, where `req.query` became a getter. Correct defence is `mongoose.set('sanitizeFilter', true)` plus validated primitives.                                                                                      |
 
 ---
 
@@ -353,9 +353,11 @@ Replaced by a free solution: **proxy the HTTP API through a Vercel rewrite**, so
 ever talks to one origin and the refresh cookie becomes first-party.
 
 ```json
-{ "rewrites": [
-  { "source": "/api/:path*", "destination": "https://r4u-api.onrender.com/api/:path*" }
-] }
+{
+  "rewrites": [
+    { "source": "/api/:path*", "destination": "https://r4u-api.onrender.com/api/:path*" }
+  ]
+}
 ```
 
 Socket.IO is unaffected and connects directly to Render, because the handshake authenticates with

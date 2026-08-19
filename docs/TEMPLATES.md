@@ -100,14 +100,14 @@ per weight, committed to the repository and baked into the Docker image. Render'
 ephemeral and wiped on every spin-down, so anything fetched at runtime is re-fetched on every cold
 start.
 
-| Family | Weights | Used by |
-|---|---|---|
-| Source Serif 4 | 400, 600 | Foundry, Marginalia |
-| Source Sans 3 | 400, 600 | Foundry, Marginalia, Ledger |
-| EB Garamond | 400, 600 | Quire, Broadsheet |
-| IBM Plex Serif | 400, 600 | Ledger |
-| Spectral | 400, 600 | Placard, Verso |
-| Newsreader | 400, 600 | Recto, Broadsheet |
+| Family         | Weights  | Used by                     |
+| -------------- | -------- | --------------------------- |
+| Source Serif 4 | 400, 600 | Foundry, Marginalia         |
+| Source Sans 3  | 400, 600 | Foundry, Marginalia, Ledger |
+| EB Garamond    | 400, 600 | Quire, Broadsheet           |
+| IBM Plex Serif | 400, 600 | Ledger                      |
+| Spectral       | 400, 600 | Placard, Verso              |
+| Newsreader     | 400, 600 | Recto, Broadsheet           |
 
 Public Sans is already loaded for the application chrome and is reused by Placard, Recto and Verso.
 
@@ -291,9 +291,9 @@ omit), and "quantify every bullet" is actively wrong for a publications list.
 ## 6. Section order is per-resume data, not per-template
 
 ```ts
-resume.sections    // ordered array, position is authoritative
+resume.sections // ordered array, position is authoritative
 template.recommendedOrder
-template.slots     // { main: [...], aside: [...] }
+template.slots // { main: [...], aside: [...] }
 ```
 
 **On template switch, never silently reorder.** Prompt: "Apply this template's recommended order?"
@@ -326,13 +326,13 @@ genuinely beautiful two-column templates honestly.
 
 ## 8. The five customisation knobs, and no more
 
-| Knob | Range |
-|---|---|
-| Accent colour | applies to rules and section heads only. Disabled on ATS variants. |
-| Type scale | 9.5 to 11.5pt in 0.5pt steps |
-| Line height | 1.2 / 1.3 / 1.45 |
-| Section spacing | compact / normal / airy |
-| Margins | 16 / 20 / 25 mm |
+| Knob            | Range                                                              |
+| --------------- | ------------------------------------------------------------------ |
+| Accent colour   | applies to rules and section heads only. Disabled on ATS variants. |
+| Type scale      | 9.5 to 11.5pt in 0.5pt steps                                       |
+| Line height     | 1.2 / 1.3 / 1.45                                                   |
+| Section spacing | compact / normal / airy                                            |
+| Margins         | 16 / 20 / 25 mm                                                    |
 
 This matches FR 5.3, maps onto the documented fitting knobs, and prevents users from destroying
 the typographic system.
@@ -387,40 +387,40 @@ ground.
 Runs on every keystroke and feeds the coaching panel. No AI, a JSON word-list file. Full scoring
 rubric in `ATS-RUBRIC.md`; these are the live editor hints.
 
-| Trigger | Message |
-|---|---|
-| Bullet has no numeral | Add a measurable result. Accomplished X as measured by Y by doing Z. |
-| Bullet over 30 words or wrapping to 3 lines | Too long, split it. |
-| Opens with Responsible for / Worked on / Helped with / Duties included / Assisted with | Lead with an action verb. |
-| First-person pronoun | Error. |
-| Present-tense verb in an entry with an end date | Tense error. Inverse for current roles. |
-| Same action verb used more than twice | Repetition warning. |
-| Fewer than 3 or more than 5 bullets on a role | Nudge toward 4. |
-| Under 50% of bullets quantified | Only {k} of {n} bullets are quantified. |
-| Cliche list hit | Strike it. |
-| Summary outside 50 to 100 words | Aim for 3 to 5 sentences. |
-| Inconsistent date formats across entries | Flag. |
-| "References available on request" on a non-CV | Remove. |
+| Trigger                                                                                | Message                                                              |
+| -------------------------------------------------------------------------------------- | -------------------------------------------------------------------- |
+| Bullet has no numeral                                                                  | Add a measurable result. Accomplished X as measured by Y by doing Z. |
+| Bullet over 30 words or wrapping to 3 lines                                            | Too long, split it.                                                  |
+| Opens with Responsible for / Worked on / Helped with / Duties included / Assisted with | Lead with an action verb.                                            |
+| First-person pronoun                                                                   | Error.                                                               |
+| Present-tense verb in an entry with an end date                                        | Tense error. Inverse for current roles.                              |
+| Same action verb used more than twice                                                  | Repetition warning.                                                  |
+| Fewer than 3 or more than 5 bullets on a role                                          | Nudge toward 4.                                                      |
+| Under 50% of bullets quantified                                                        | Only {k} of {n} bullets are quantified.                              |
+| Cliche list hit                                                                        | Strike it.                                                           |
+| Summary outside 50 to 100 words                                                        | Aim for 3 to 5 sentences.                                            |
+| Inconsistent date formats across entries                                               | Flag.                                                                |
+| "References available on request" on a non-CV                                          | Remove.                                                              |
 
 ### 11.1 Character limits
 
 Hard maximums, soft warning at 80%:
 
-| Field | Max | Warn |
-|---|---|---|
-| Name | 60 | |
-| Headline | 80 | |
-| Summary | 600 | 480 |
-| Bullet | 220 | 170 (roughly 30 words) |
-| Role title | 80 | |
-| Organisation | 80 | |
-| Location | 60 | |
-| Project name | 80 | |
-| Skill token | 40 | |
-| Skill group name | 30 | |
-| Certification | 100 | |
-| Achievement | 200 | |
-| Language | 40 | |
+| Field            | Max | Warn                   |
+| ---------------- | --- | ---------------------- |
+| Name             | 60  |                        |
+| Headline         | 80  |                        |
+| Summary          | 600 | 480                    |
+| Bullet           | 220 | 170 (roughly 30 words) |
+| Role title       | 80  |                        |
+| Organisation     | 80  |                        |
+| Location         | 60  |                        |
+| Project name     | 80  |                        |
+| Skill token      | 40  |                        |
+| Skill group name | 30  |                        |
+| Certification    | 100 |                        |
+| Achievement      | 200 |                        |
+| Language         | 40  |                        |
 
 Entry caps: 8 bullets per entry (warn above 5), 12 entries per section, 30 skills (warn above 20),
 6 relevant-coursework items.

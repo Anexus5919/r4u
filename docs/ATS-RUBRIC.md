@@ -39,12 +39,12 @@ definition of a machine-readable resume. That is what this rubric is built on, n
 
 Four severity tiers, abbreviated:
 
-| Tier | Examples |
-|---|---|
-| Fatal (400s) | 412 no sections found / 413 work history absent / 417 non-standard headers, only first work section parsed / 418 date ranges written vertically / 419 employment section lacks dates / 433 columnar data rearranged / 441 neither email nor phone found |
-| Major (300s) | 300 format is PDF / 302 first and last name not located / 311 contact info not at top / 323 multiple sections of identical type / 324 sections with headers but no content / 325 sections found with no header |
-| Data missing (200s) | 211 no email / 212 no phone / 221 positions with no job title / 222 positions with no company / 224 missing start dates / 225 missing end dates |
-| Suggested (100s) | 111 references section unnecessary / 112 skills should appear in the context of work history / 121-124 driving licence, passport, marital status, date of birth are privacy risks / 131-133 more than one address, email or phone / 151 section headers not on their own line |
+| Tier                | Examples                                                                                                                                                                                                                                                                      |
+| ------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Fatal (400s)        | 412 no sections found / 413 work history absent / 417 non-standard headers, only first work section parsed / 418 date ranges written vertically / 419 employment section lacks dates / 433 columnar data rearranged / 441 neither email nor phone found                       |
+| Major (300s)        | 300 format is PDF / 302 first and last name not located / 311 contact info not at top / 323 multiple sections of identical type / 324 sections with headers but no content / 325 sections found with no header                                                                |
+| Data missing (200s) | 211 no email / 212 no phone / 221 positions with no job title / 222 positions with no company / 224 missing start dates / 225 missing end dates                                                                                                                               |
+| Suggested (100s)    | 111 references section unnecessary / 112 skills should appear in the context of work history / 121-124 driving licence, passport, marital status, date of birth are privacy risks / 131-133 more than one address, email or phone / 151 section headers not on their own line |
 
 Textkernel states plainly: "Every section should have a clear, unambiguous, commonly-used header
 on a separate line directly above the content associated with it."
@@ -85,14 +85,14 @@ Store only this, per ADR-008 and ADR-011:
 
 ### 2.2 Total
 
-| Dimension | Points |
-|---|---|
-| A. Parseability and export safety | 30 |
-| B. Structure and sections | 20 |
-| C. Contact and identity | 10 |
-| D. Content quality | 20 |
-| E. Job-description match | 20 |
-| **Total** | **100** |
+| Dimension                         | Points  |
+| --------------------------------- | ------- |
+| A. Parseability and export safety | 30      |
+| B. Structure and sections         | 20      |
+| C. Contact and identity           | 10      |
+| D. Content quality                | 20      |
+| E. Job-description match          | 20      |
+| **Total**                         | **100** |
 
 With no job description pasted, report `round(earned / 80 * 100)` and label the mode
 **"Format only"** in the UI. Never silently zero dimension E.
@@ -101,16 +101,16 @@ With no job description pasted, report `round(earned / 80 * 100)` and label the 
 
 ## 3. Dimension A: parseability and export safety (30)
 
-| ID | Pts | Check |
-|---|---|---|
-| A1 | 8 | Export produces a real text layer |
-| A2 | 6 | Single-column reading order |
-| A3 | 3 | No tables, text boxes or absolutely positioned blocks |
-| A4 | 3 | No images, photo, logos, icon glyphs or skill bars |
-| A5 | 3 | Contact block is in the body flow, not a page header or footer |
-| A6 | 3 | Body font is on the safe list and embedded with a complete ToUnicode CMap |
-| A7 | 2 | Body 10-12pt, headings 14-16pt, margins at least 0.5in, at most 2 pages |
-| A8 | 2 | Bullet glyph is one of the plain set |
+| ID  | Pts | Check                                                                     |
+| --- | --- | ------------------------------------------------------------------------- |
+| A1  | 8   | Export produces a real text layer                                         |
+| A2  | 6   | Single-column reading order                                               |
+| A3  | 3   | No tables, text boxes or absolutely positioned blocks                     |
+| A4  | 3   | No images, photo, logos, icon glyphs or skill bars                        |
+| A5  | 3   | Contact block is in the body flow, not a page header or footer            |
+| A6  | 3   | Body font is on the safe list and embedded with a complete ToUnicode CMap |
+| A7  | 2   | Body 10-12pt, headings 14-16pt, margins at least 0.5in, at most 2 pages   |
+| A8  | 2   | Bullet glyph is one of the plain set                                      |
 
 **A2 is graded, not binary.** 6 if `columns === 1`. 3 if two columns and the sidebar holds only
 contact details and a skills list. 0 if any experience, education or summary content sits in a
@@ -157,15 +157,15 @@ or any element carries `opacity: 0` or `visibility: hidden` while containing tex
 
 ## 4. Dimension B: structure and sections (20)
 
-| ID | Pts | Check |
-|---|---|---|
-| B1 | 5 | Experience heading matches the whitelist |
-| B2 | 3 | Education heading matches the whitelist |
-| B3 | 3 | Skills heading matches the whitelist |
-| B4 | 2 | Every heading sits on its own line directly above its content |
-| B5 | 2 | No duplicate section types, no heading with zero visible entries |
-| B6 | 2 | Experience and education in reverse-chronological order by start date |
-| B7 | 3 | Every experience entry has dates, a title and an employer |
+| ID  | Pts | Check                                                                 |
+| --- | --- | --------------------------------------------------------------------- |
+| B1  | 5   | Experience heading matches the whitelist                              |
+| B2  | 3   | Education heading matches the whitelist                               |
+| B3  | 3   | Skills heading matches the whitelist                                  |
+| B4  | 2   | Every heading sits on its own line directly above its content         |
+| B5  | 2   | No duplicate section types, no heading with zero visible entries      |
+| B6  | 2   | Experience and education in reverse-chronological order by start date |
+| B7  | 3   | Every experience entry has dates, a title and an employer             |
 
 **Whitelists.**
 
@@ -204,13 +204,13 @@ code 418 and is a common casualty of right-aligned date columns.
 
 ## 5. Dimension C: contact and identity (10)
 
-| ID | Pts | Check |
-|---|---|---|
-| C1 | 3 | Exactly one valid email in plain text, not an icon, not a mailto-only link |
-| C2 | 2 | Exactly one phone number, digits and separators only, no icon prefix |
-| C3 | 2 | Name is the first text line of the body, at least two tokens, plain text |
-| C4 | 1 | City and state or country present, no full street address |
-| C5 | 2 | No date of birth, marital status, passport, driving licence, gender, nationality or photo |
+| ID  | Pts | Check                                                                                     |
+| --- | --- | ----------------------------------------------------------------------------------------- |
+| C1  | 3   | Exactly one valid email in plain text, not an icon, not a mailto-only link                |
+| C2  | 2   | Exactly one phone number, digits and separators only, no icon prefix                      |
+| C3  | 2   | Name is the first text line of the body, at least two tokens, plain text                  |
+| C4  | 1   | City and state or country present, no full street address                                 |
+| C5  | 2   | No date of birth, marital status, passport, driving licence, gender, nationality or photo |
 
 - **C1:** "A resume with no readable email cannot become a candidate record. Textkernel treats a
   missing email and phone as a fatal parse (code 441). List exactly one address (code 132)."
@@ -224,15 +224,15 @@ code 418 and is a common casualty of right-aligned date columns.
 
 ## 6. Dimension D: content quality (20)
 
-| ID | Pts | Check |
-|---|---|---|
-| D1 | 3 | Each experience entry carries 3 to 6 bullets |
-| D2 | 4 | Share of bullets opening with a strong action verb |
-| D3 | 4 | Share of bullets containing a quantification token |
-| D4 | 3 | No bullet opens with a weak or passive phrase |
-| D5 | 2 | No first-person pronouns |
-| D6 | 2 | Mean bullet length 8 to 35 words |
-| D7 | 2 | Total word count 400 to 1600, at most 2 pages |
+| ID  | Pts | Check                                              |
+| --- | --- | -------------------------------------------------- |
+| D1  | 3   | Each experience entry carries 3 to 6 bullets       |
+| D2  | 4   | Share of bullets opening with a strong action verb |
+| D3  | 4   | Share of bullets containing a quantification token |
+| D4  | 3   | No bullet opens with a weak or passive phrase      |
+| D5  | 2   | No first-person pronouns                           |
+| D6  | 2   | Mean bullet length 8 to 35 words                   |
+| D7  | 2   | Total word count 400 to 1600, at most 2 pages      |
 
 **D2 awards `4 * min(1, share / 0.8)`.** Full marks at 80%, not 100%.
 **D3 awards `4 * min(1, share / 0.5)`.** Full marks at 50%.
@@ -252,14 +252,14 @@ contributed to|handled|dealt with)\b/i
 Roughly 180 verbs in six buckets. Check **only the first token** of each bullet, after stripping
 leading punctuation, and allow present tense only when `entry.isCurrent`.
 
-| Bucket | Verbs |
-|---|---|
-| Leadership | led, directed, managed, coordinated, oversaw, supervised, chaired, spearheaded, orchestrated, mentored |
-| Build | built, developed, engineered, designed, architected, implemented, deployed, programmed, prototyped, migrated, refactored, integrated, containerised |
-| Improve | optimized, optimised, improved, reduced, increased, accelerated, streamlined, automated, scaled, consolidated, standardised, hardened |
-| Analyse | analyzed, evaluated, researched, modeled, forecasted, diagnosed, audited, benchmarked, profiled |
-| Deliver | delivered, launched, shipped, executed, completed, achieved, won, secured, closed |
-| Communicate | presented, authored, documented, negotiated, trained, facilitated, published |
+| Bucket      | Verbs                                                                                                                                               |
+| ----------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Leadership  | led, directed, managed, coordinated, oversaw, supervised, chaired, spearheaded, orchestrated, mentored                                              |
+| Build       | built, developed, engineered, designed, architected, implemented, deployed, programmed, prototyped, migrated, refactored, integrated, containerised |
+| Improve     | optimized, optimised, improved, reduced, increased, accelerated, streamlined, automated, scaled, consolidated, standardised, hardened               |
+| Analyse     | analyzed, evaluated, researched, modeled, forecasted, diagnosed, audited, benchmarked, profiled                                                     |
+| Deliver     | delivered, launched, shipped, executed, completed, achieved, won, secured, closed                                                                   |
+| Communicate | presented, authored, documented, negotiated, trained, facilitated, published                                                                        |
 
 **Blocklist**, from Rezi's 102,944-resume corpus: worked, work, make, study, made, took, show,
 take, leave, showed, helped, assisted.
@@ -298,23 +298,23 @@ rockstar, proven track record, excellent communication skills.
   Built, Designed, Implemented, Reduced, Automated, Negotiated, Migrated."
 - **D3:** "Only {k} of {n} bullets contain a number. Use Google's X-Y-Z shape, accomplished X as
   measured by Y by doing Z. For example: `Reduced page load time by 40% by adding server-side
-  caching.`"
+caching.`"
 - **D4:** "Bullet {n} opens with `{phrase}`, which describes an assignment, not an outcome.
   Rewrite it starting with what you did."
 - **D5:** "Remove pronouns. Resume bullets are written in implied first person: `Managed a team of
-  six`, not `I managed a team of six`."
+six`, not `I managed a team of six`."
 
 ---
 
 ## 7. Dimension E: job-description match (20)
 
-| ID | Pts | Check |
-|---|---|---|
-| E1 | 10 | Hard-skill coverage |
-| E2 | 3 | Job-title alignment |
-| E3 | 3 | Required qualifications present |
-| E4 | 2 | General and soft keyword coverage |
-| E5 | 2 | Placement and context |
+| ID  | Pts | Check                             |
+| --- | --- | --------------------------------- |
+| E1  | 10  | Hard-skill coverage               |
+| E2  | 3   | Job-title alignment               |
+| E3  | 3   | Required qualifications present   |
+| E4  | 2   | General and soft keyword coverage |
+| E5  | 2   | Placement and context             |
 
 **E1:** `10 * min(1, matchedHardSkills / max(1, ceil(0.75 * totalHardSkillsInJD)))`.
 Matching 75% of the posting's hard skills earns full marks. Demanding 100% is what drives stuffing.

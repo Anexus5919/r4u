@@ -13,11 +13,11 @@ create indexes explicitly in a migration script.
 
 Four collections grow without bound and carry TTL indexes:
 
-| Collection | TTL |
-|---|---|
-| `Notification.createdAt` | 90 days |
-| `ActivityLog.at` | 180 days |
-| `ShareView.createdAt` | 48 hours |
+| Collection               | TTL                            |
+| ------------------------ | ------------------------------ |
+| `Notification.createdAt` | 90 days                        |
+| `ActivityLog.at`         | 180 days                       |
+| `ShareView.createdAt`    | 48 hours                       |
 | `RefreshToken.expiresAt` | 0 (expires at the stored time) |
 
 Without these, an admin activity log plus a free-tier cluster is how the database dies.
@@ -257,7 +257,9 @@ Indexes: `{ review: 1, _id: -1 }` for cursor pagination.
 Paginate with an ObjectId cursor, never `skip`:
 
 ```js
-find({ review, _id: { $lt: cursor } }).sort({ _id: -1 }).limit(30)
+find({ review, _id: { $lt: cursor } })
+  .sort({ _id: -1 })
+  .limit(30)
 ```
 
 Skip-based pagination degrades quadratically and, worse, shifts and duplicates rows when new
