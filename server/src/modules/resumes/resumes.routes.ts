@@ -7,9 +7,12 @@ import * as controller from './resumes.controller.js'
 import {
   createRules,
   duplicateRules,
+  importRules,
   listRules,
   renameRules,
   resumeIdRule,
+  versionIdRule,
+  versionLabelRules,
 } from './resumes.validators.js'
 
 export const resumesRouter = Router()
@@ -18,6 +21,17 @@ resumesRouter.use(requireAuth)
 
 resumesRouter.get('/', validate(listRules), controller.list)
 resumesRouter.post('/', validate(createRules), controller.create)
+
+/*
+  Import creates a new resume, so it sits beside create rather than under an id. It carries the
+  larger body limit because an incoming JSON Resume can be a full career.
+*/
+resumesRouter.post(
+  '/import',
+  express.json({ limit: '1mb' }),
+  validate(importRules),
+  controller.importJson
+)
 
 /*
   Ownership is enforced inside the service by filtering on owner, and a miss returns 404 rather
@@ -40,3 +54,13 @@ resumesRouter.patch(
 resumesRouter.patch('/:id/title', validate(renameRules), controller.rename)
 resumesRouter.delete('/:id', validate([resumeIdRule]), controller.remove)
 resumesRouter.post('/:id/duplicate', validate(duplicateRules), controller.duplicate)
+
+resumesRouter.get('/:id/export.json', validate([resumeIdRule]), controller.exportJson)
+
+resumesRouter.get('/:id/versions', validate([resumeIdRule]), controller.listVersions)
+resumesRouter.post('/:id/versions', validate(versionLabelRules), controller.createVersion)
+resumesRouter.post(
+  '/:id/versions/:versionId/restore',
+  validate([resumeIdRule, versionIdRule]),
+  controller.restoreVersion
+)

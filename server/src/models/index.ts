@@ -9,3 +9,6 @@ export type { PasswordResetToken } from './PasswordResetToken.js'
 
 export { ResumeModel, PROTECTED_CONTENT_PATHS } from './Resume.js'
 export type { Resume } from './Resume.js'
+
+export { ResumeVersionModel } from './ResumeVersion.js'
+export type { ResumeVersion, ResumeVersionDoc, VersionTrigger } from './ResumeVersion.js'

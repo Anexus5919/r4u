@@ -4,6 +4,7 @@ import type { Resume as ResumeShape, ResumeOp } from '@r4u/shared'
 import { AppError, notFound } from '../../lib/AppError.js'
 import { ResumeModel } from '../../models/index.js'
 import { readResumeContent } from './resumes.access.js'
+import { snapshot } from './resumes.versions.js'
 import type { Principal } from './resumes.access.js'
 import type { ResumeDoc } from '../../models/Resume.js'
 
@@ -162,6 +163,22 @@ export async function applyOps(
   const doc = await currentOrThrow(resumeId, principal)
 
   if (doc.version !== version) throw new VersionConflict(doc)
+
+  /*
+    A template change is a milestone, so the state before it becomes a version. It is the one
+    edit that can visibly rearrange the whole document, and the one people most often want to
+    undo an hour later rather than an action later.
+
+    Taken before the write, and only when the key actually changes, so re-selecting the current
+    template does not fill the history with duplicates.
+  */
+  const switching = ops.find(
+    (op): op is Extract<ResumeOp, { op: 'setTemplate' }> =>
+      op.op === 'setTemplate' && op.value !== doc.templateKey
+  )
+  if (switching) {
+    await snapshot(resumeId, principal, 'template', `Before switching to ${switching.value}`)
+  }
 
   if (ops.some(isStructural)) {
     applyStructural(doc, ops)

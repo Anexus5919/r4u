@@ -1,9 +1,12 @@
 import type { Request, Response } from 'express'
+import { fromJsonResume, toJsonResume } from '@r4u/shared'
 import type { ResumeOp, ResumeType } from '@r4u/shared'
 import { AppError } from '../../lib/AppError.js'
 import { resumeDetail, resumeSummary } from '../../lib/serializers.js'
+import { ResumeModel } from '../../models/index.js'
 import { VersionConflict, applyOps } from './resumes.autosave.js'
 import * as service from './resumes.service.js'
+import * as versionService from './resumes.versions.js'
 import type { Principal } from './resumes.access.js'
 
 function principal(req: Request): Principal {
@@ -87,6 +90,77 @@ export async function duplicate(req: Request, res: Response) {
   const resume = await service.duplicate(id, principal(req), title)
 
   res.status(201).json({ data: { resume: resumeDetail(resume) } })
+}
+
+/* ---------------------------------------------------------------- version history */
+
+export async function listVersions(req: Request, res: Response) {
+  const { id } = req.validated as { id: string }
+  const versions = await versionService.listVersions(id, principal(req))
+
+  res.json({
+    data: {
+      versions: versions.map((version) => ({
+        id: version.id,
+        label: version.label,
+        trigger: version.trigger,
+        createdAt: version.createdAt.toISOString(),
+      })),
+    },
+  })
+}
+
+export async function createVersion(req: Request, res: Response) {
+  const { id, label } = req.validated as { id: string; label?: string }
+  const version = await versionService.snapshot(id, principal(req), 'manual', label)
+
+  res.status(201).json({ data: { version: { id: version.id, label: version.label } } })
+}
+
+export async function restoreVersion(req: Request, res: Response) {
+  const { id, versionId } = req.validated as { id: string; versionId: string }
+  const resume = await versionService.restoreVersion(id, versionId, principal(req))
+
+  res.json({ data: { resume: resumeDetail(resume) } })
+}
+
+/* ---------------------------------------------------------------- interchange */
+
+export async function exportJson(req: Request, res: Response) {
+  const { id } = req.validated as { id: string }
+  const resume = await service.read(id, principal(req))
+
+  const filename = resume.title.replace(/[^a-z0-9]+/gi, '-').toLowerCase() || 'resume'
+  res.setHeader('Content-Disposition', `attachment; filename="${filename}.json"`)
+
+  // the interchange document itself, not wrapped in the API envelope: it is a file
+  res.json(toJsonResume(resume.toObject() as never))
+}
+
+/*
+  Import creates a new resume rather than overwriting one. An import that silently replaces what
+  is already there is a second way to lose work, and the user has no way back from it.
+*/
+export async function importJson(req: Request, res: Response) {
+  const { title, document } = req.validated as { title?: string; document: Record<string, unknown> }
+  const owner = principal(req)
+
+  const { personal, sections, skipped } = fromJsonResume(document)
+
+  const resume = await service.create(owner.id, {
+    title: title ?? String(personal.fullName || 'Imported resume'),
+    resumeType: 'professional',
+  })
+
+  await ResumeModel.updateOne(
+    { _id: resume._id, owner: owner.id },
+    { $set: { personal, sections }, $inc: { version: 1 } }
+  )
+
+  await versionService.snapshot(resume.id, owner, 'import')
+
+  const saved = await service.read(resume.id, owner)
+  res.status(201).json({ data: { resume: resumeDetail(saved), skipped } })
 }
 
 export async function remove(req: Request, res: Response) {
