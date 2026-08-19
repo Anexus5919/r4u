@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>R4U</title>
+    <meta
+      name="description"
+      content="Build a resume that survives applicant tracking systems. Live A4 preview, real text-layer PDF export, and a published ATS readiness rubric."
+    />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,200..800&family=Public+Sans:wght@100..900&family=Geist+Mono:wght@100..900&display=swap"
+    />
+
+    <!-- resolve the theme before first paint, otherwise a dark-mode user sees a white flash -->
+    <script>
+      ;(function () {
+        try {
+          var stored = localStorage.getItem('r4u.theme')
+          if (stored === 'light' || stored === 'dark') {
+            document.documentElement.setAttribute('data-theme', stored)
+          }
+        } catch (e) {
+          /* private mode, fall through to the system preference */
+        }
+      })()
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
