@@ -16,6 +16,7 @@ export const FIELD_OPS = [
   'setPersonal',
   'setDesign',
   'setNotes',
+  'setTemplate',
   'setSectionTitle',
   'toggleSection',
   'toggleEntry',
@@ -36,6 +37,7 @@ export type ResumeOp =
   | { op: 'setPersonal'; field: string; value: unknown }
   | { op: 'setDesign'; field: string; value: unknown }
   | { op: 'setNotes'; value: string }
+  | { op: 'setTemplate'; value: string }
   | { op: 'setSectionTitle'; sectionId: string; value: string }
   | { op: 'toggleSection'; sectionId: string; hidden: boolean }
   | { op: 'toggleEntry'; sectionId: string; entryId: string; hidden: boolean }
@@ -112,6 +114,8 @@ function targetOf(op: ResumeOp, index: number): string {
       return `design.${op.field}`
     case 'setNotes':
       return 'notes'
+    case 'setTemplate':
+      return 'templateKey'
     case 'setSectionTitle':
       return `section.${op.sectionId}.title`
     case 'toggleSection':
@@ -168,6 +172,7 @@ export const ResumeOpSchema = z.discriminatedUnion('op', [
   z.object({ op: z.literal('setPersonal'), field: z.enum(PERSONAL_KEYS), value: opValue }),
   z.object({ op: z.literal('setDesign'), field: z.enum(DESIGN_KEYS), value: opValue }),
   z.object({ op: z.literal('setNotes'), value: z.string().max(4000) }),
+  z.object({ op: z.literal('setTemplate'), value: z.string().min(1).max(40) }),
   z.object({
     op: z.literal('setSectionTitle'),
     sectionId: objectId,

@@ -98,6 +98,10 @@ export function diffResume(base: EditorResume, next: EditorResume): ResumeOp[] {
 
   if (base.notes !== next.notes) ops.push({ op: 'setNotes', value: next.notes })
 
+  if (base.templateKey !== next.templateKey) {
+    ops.push({ op: 'setTemplate', value: next.templateKey })
+  }
+
   const baseSections = new Map(base.sections.map((s) => [s._id, s]))
 
   if (!sameValue(idsOf(base.sections), idsOf(next.sections))) {

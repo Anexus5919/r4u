@@ -1,16 +1,17 @@
 import { useEffect, useMemo, useReducer, useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { computeMeta, lintResume } from '@r4u/shared'
-import type { ResumeDetail } from '@r4u/shared'
+import { getTemplate, lintResume, reorderForTemplate, wouldReorder } from '@r4u/shared'
+import type { ResumeDetail, ResumeTemplate } from '@r4u/shared'
 import { api, apiGet, toApiFailure } from '@/lib/api'
 import { cn } from '@/lib/cn'
 import { useToast } from '@/context/ToastContext'
 import { Banner } from '@/components/ui/Banner'
 import { Button, ButtonLink } from '@/components/ui/Button'
-import { Icon } from '@/components/ui/Icon'
 import { Input } from '@/components/ui/Input'
 import { Skeleton } from '@/components/ui/Card'
-import { CoachPanel, SaveIndicator } from '@/components/editor/CoachPanel'
+import { SaveIndicator } from '@/components/editor/CoachPanel'
+import { DocumentPanel } from '@/components/editor/DocumentPanel'
+import { Modal } from '@/components/ui/Modal'
 import { PersonalForm } from '@/components/editor/PersonalForm'
 import { SectionForm } from '@/components/editor/SectionForm'
 import { SectionList } from '@/components/editor/SectionList'
@@ -67,6 +68,7 @@ function Editor({ loaded }: { loaded: EditorResume }) {
   const [state, dispatch] = useReducer(editorReducer, loaded, initialState)
   const [activeId, setActiveId] = useState<string>(PERSONAL)
   const [title, setTitle] = useState(loaded.title)
+  const [pendingOrder, setPendingOrder] = useState<ResumeTemplate | null>(null)
 
   const { dirty } = useAutosave(state, dispatch)
 
@@ -81,13 +83,6 @@ function Editor({ loaded }: { loaded: EditorResume }) {
     return counts
   }, [findings])
 
-  /*
-    The same functions the server uses to denormalise meta, not a second implementation. Two
-    copies would drift, and the number the editor shows while typing would stop matching the one
-    the dashboard reads back.
-  */
-  const meta = useMemo(() => computeMeta(state.resume as never), [state.resume])
-
   // a rebase is the one moment the screen changes under the user, so it has to be announced
   useEffect(() => {
     if (state.conflict) {
@@ -96,6 +91,39 @@ function Editor({ loaded }: { loaded: EditorResume }) {
   }, [state.conflict, toast])
 
   const active = state.resume.sections.find((section) => section._id === activeId)
+
+  /*
+    The switch itself is immediate and always safe: reorderForTemplate never drops a section, and
+    a section the template does not mention keeps its place. Only the reorder needs asking about.
+  */
+  function chooseTemplate(key: string) {
+    dispatch({ type: 'template_set', value: key })
+
+    const template = getTemplate(key)
+    if (wouldReorder(state.resume.sections, template)) setPendingOrder(template)
+  }
+
+  function applyRecommendedOrder() {
+    if (!pendingOrder) return
+
+    const order = reorderForTemplate(state.resume.sections, pendingOrder).map((s) => s._id)
+    dispatch({ type: 'section_reorder', order })
+    setPendingOrder(null)
+  }
+
+  // type scale first, then section gap, and margins last. content before design
+  function fitToPage() {
+    const { typeScale, sectionSpacing } = state.resume.design
+
+    if (typeScale > 9.5) {
+      dispatch({ type: 'design_set', field: 'typeScale', value: Math.max(9.5, typeScale - 0.5) })
+      return
+    }
+
+    if (sectionSpacing !== 'compact') {
+      dispatch({ type: 'design_set', field: 'sectionSpacing', value: 'compact' })
+    }
+  }
 
   async function saveTitle() {
     if (title.trim() === loaded.title || !title.trim()) return
@@ -226,39 +254,56 @@ function Editor({ loaded }: { loaded: EditorResume }) {
             ) : (
               <p className="text-sm text-ink-09">Choose a section on the left.</p>
             )}
+
+            {/* content-adjacent, so it sits with the writing rather than beside the paper */}
+            <div className="mt-10 border-t border-ink-04 pt-6">
+              <p className="mb-2 text-xs text-ink-09">
+                Private notes. Never rendered into the resume, never included in a share link.
+              </p>
+              <textarea
+                value={state.resume.notes}
+                maxLength={4000}
+                aria-label="Private notes"
+                rows={3}
+                placeholder="mention the Kafka migration"
+                onChange={(e) => dispatch({ type: 'notes_set', value: e.target.value })}
+                className="w-full resize-y rounded-xs border border-ink-05 bg-ink-00 px-2.5 py-2 text-xs text-ink-12 placeholder:text-ink-07"
+              />
+            </div>
           </div>
         </main>
 
-        <aside className="shrink-0 border-t border-ink-04 px-6 py-8 lg:w-72 lg:border-t-0 lg:border-l">
-          <CoachPanel
-            findings={findings}
-            completeness={meta.completeness}
-            wordCount={meta.wordCount}
-            resumeType={state.resume.resumeType}
+        <aside className="shrink-0 border-t border-ink-04 px-6 py-8 lg:w-80 lg:border-t-0 lg:border-l">
+          <DocumentPanel
+            resume={state.resume}
+            findingCount={findings.length}
             onJump={setActiveId}
+            onTemplate={chooseTemplate}
+            onFit={fitToPage}
           />
-
-          <div className="mt-8 border-t border-ink-04 pt-5">
-            <p className="mb-2 text-xs text-ink-09">
-              Private notes. Never rendered into the resume, never included in a share link.
-            </p>
-            <textarea
-              value={state.resume.notes}
-              maxLength={4000}
-              aria-label="Private notes"
-              rows={4}
-              placeholder="mention the Kafka migration"
-              onChange={(e) => dispatch({ type: 'notes_set', value: e.target.value })}
-              className="w-full resize-y rounded-xs border border-ink-05 bg-ink-00 px-2.5 py-2 text-xs text-ink-12 placeholder:text-ink-07"
-            />
-          </div>
-
-          <p className="mt-6 flex items-center gap-1.5 text-2xs text-ink-07">
-            <Icon name="check" className="size-3" />
-            Preview and export arrive in phases 6 and 7
-          </p>
         </aside>
       </div>
+
+      {/*
+        A template is a suggestion, not an instruction. The user may have ordered their sections
+        deliberately, so the switch happens immediately and the reorder is offered separately.
+      */}
+      <Modal
+        open={Boolean(pendingOrder)}
+        onClose={() => setPendingOrder(null)}
+        title={`Use the order ${pendingOrder?.name ?? ''} recommends?`}
+        description="Your sections stay exactly as they are unless you say so. Nothing is ever removed either way."
+        footer={
+          <>
+            <Button variant="ghost" onClick={() => setPendingOrder(null)}>
+              Keep my order
+            </Button>
+            <Button variant="primary" onClick={applyRecommendedOrder}>
+              Apply the recommended order
+            </Button>
+          </>
+        }
+      />
     </div>
   )
 }

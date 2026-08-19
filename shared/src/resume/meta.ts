@@ -1,3 +1,4 @@
+import { personalOf } from './schema.js'
 import type { Resume, ResumeSection } from './schema.js'
 
 /*
@@ -132,7 +133,7 @@ export const COMPLETENESS_TOTAL = Object.values(WEIGHTS).reduce((sum, n) => sum 
 export function completeness(resume: Partial<Resume>): number {
   let earned = 0
 
-  const personal: Partial<Resume['personal']> = resume.personal ?? {}
+  const personal = personalOf(resume)
   const contactParts = [
     personal.fullName,
     personal.email,

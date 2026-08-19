@@ -52,6 +52,10 @@ function buildFieldUpdate(ops: ResumeOp[]) {
         set.notes = op.value
         break
 
+      case 'setTemplate':
+        set.templateKey = op.value
+        break
+
       case 'setSectionTitle': {
         const s = `s${n++}`
         set[`sections.$[${s}].title`] = op.value

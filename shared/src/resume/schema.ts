@@ -135,6 +135,16 @@ export const ResumeSchema = ResumeBase.check((ctx) => {
   }
 })
 
+/*
+  A typed fallback for the one subdocument that is routinely absent.
+
+  `resume.personal ?? {}` widens to `{}` and every field access on it becomes a type error, which
+  has now been written out by hand in three places. One helper instead.
+*/
+export function personalOf(resume: { personal?: ResumePersonal }): Partial<ResumePersonal> {
+  return resume.personal ?? {}
+}
+
 export type Resume = z.infer<typeof ResumeBase>
 export type ResumeDraft = z.infer<typeof ResumeDraftSchema>
 export type ResumeSection = z.infer<typeof SectionSchema>

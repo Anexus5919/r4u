@@ -28,6 +28,7 @@ export type EditorAction =
   | { type: 'personal_set'; field: string; value: unknown }
   | { type: 'design_set'; field: string; value: unknown }
   | { type: 'notes_set'; value: string }
+  | { type: 'template_set'; value: string }
   | { type: 'field_set'; sectionId: string; entryId: string; field: string; value: unknown }
   | { type: 'section_title_set'; sectionId: string; value: string }
   | { type: 'section_toggle'; sectionId: string }
@@ -64,6 +65,8 @@ function targetOf(action: EditorAction): string | null {
       return `design.${action.field}`
     case 'notes_set':
       return 'notes'
+    case 'template_set':
+      return 'templateKey'
     case 'field_set':
       return `field.${action.sectionId}.${action.entryId}.${action.field}`
     case 'section_title_set':
@@ -117,6 +120,9 @@ function apply(resume: EditorResume, action: EditorAction): EditorResume {
 
     case 'notes_set':
       return { ...resume, notes: action.value }
+
+    case 'template_set':
+      return { ...resume, templateKey: action.value }
 
     case 'field_set':
       return mapEntry(resume, action.sectionId, action.entryId, (entry) => ({
@@ -176,6 +182,7 @@ const MUTATING = new Set<EditorAction['type']>([
   'personal_set',
   'design_set',
   'notes_set',
+  'template_set',
   'field_set',
   'section_title_set',
   'section_toggle',
