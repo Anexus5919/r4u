@@ -226,7 +226,8 @@ links to the right field.
 - MDX pipeline, `/about`, `/privacy`, `/terms`, `/guides`, `/ats-methodology`
 - Per-check explainers with `<BeforeAfter />`
 - ESCO and O*NET attribution
-- The landing page, built last, when there is a real product to screenshot
+- The landing page and the hero lockup, built last, when there is a real product to screenshot.
+  Full spec in `LANDING.md`, including the two named exceptions it takes to the design system
 - DOCX export
 - `prefers-reduced-motion` audit, focus order, keyboard paths, `@axe-core/playwright`
 - One Playwright E2E: register, create, fill, reorder by drag, share, open in a second context,

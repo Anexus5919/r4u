@@ -63,6 +63,10 @@ Alex Mercer fixture rendered through Foundry at real A4 proportion.
 **Copy.** States plainly that there is no paywall at download. The loudest complaint in the entire
 category is the download paywall, and refusing it is free differentiation.
 
+**Hero.** The wordmark expands out of itself: the 4 holds as a fixed pivot, the R travels left
+into RESUME and the U travels right into YOU. Full specification, including the accessibility and
+reduced-motion requirements, in `LANDING.md`.
+
 **Output.** Responsive marketing page, all actions working, no layout shift on font load.
 
 ### 2.2 Public template gallery (`/templates`)

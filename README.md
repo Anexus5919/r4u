@@ -93,6 +93,7 @@ character limit means the client counter and the server rejection can never disa
 | `docs/TEMPLATES.md`     | The eight templates and document typography                    |
 | `docs/ATS-RUBRIC.md`    | The published 100-point rubric                                 |
 | `docs/REQUIREMENTS.md`  | Traceability for all 59 specified requirements                 |
+| `docs/LANDING.md`       | Hero lockup and marketing surface specification                |
 | `docs/ROUTES.md`        | Twenty-four routes with guards and navigation flows            |
 | `docs/ROADMAP.md`       | Twelve build phases with exit criteria                         |
 | `docs/COST.md`          | Free-tier audit and licence obligations                        |
