@@ -3,6 +3,7 @@ import { PAGE_TARGET, TEMPLATE_LIST, computeMeta } from '@r4u/shared'
 import type { Resume } from '@r4u/shared'
 import { cn } from '@/lib/cn'
 import { Button } from '@/components/ui/Button'
+import { DesignKnobs } from './DesignKnobs'
 import { ResumePreview } from '@/render/ResumePreview'
 import type { PreviewMetrics } from '@/render/ResumePreview'
 import type { EditorResume } from '@/editor/types'
@@ -84,12 +85,14 @@ export function DocumentPanel({
   findingCount,
   onJump,
   onTemplate,
+  onDesign,
   onFit,
 }: {
   resume: EditorResume
   findingCount: number
   onJump: (sectionId: string) => void
   onTemplate: (key: string) => void
+  onDesign: (field: string, value: unknown) => void
   onFit: () => void
 }) {
   const [metrics, setMetrics] = useState<PreviewMetrics>({ overflowMm: 0, fill: 0 })
@@ -143,6 +146,10 @@ export function DocumentPanel({
             </span>
           </p>
         ) : null}
+      </div>
+
+      <div className="border-t border-ink-04 pt-4">
+        <DesignKnobs design={resume.design} onChange={onDesign} />
       </div>
 
       <dl className="flex flex-col gap-2 border-t border-ink-04 pt-4 text-xs">

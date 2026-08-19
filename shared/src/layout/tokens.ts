@@ -41,3 +41,21 @@ export const DOC_COLORS = {
   /** ink-02. Verso's sidebar ground, four percent of ink so the edge reads without a rule */
   tint: '#f6f5f4',
 } as const
+
+/*
+  The accent choices offered on a resume, and the whole list.
+
+  Deliberately five, deliberately muted, and deliberately print colours rather than screen ones.
+  A free colour picker produces the neon resume, and the accent only ever touches rules and
+  section headings, so a saturated value would be loud without being legible.
+
+  "None" is first and is the default, because a document that arrives uncoloured is a document
+  nobody has imposed on.
+*/
+export const ACCENT_CHOICES = [
+  { key: '', name: 'None', value: DOC_COLORS.fallbackAccent },
+  { key: '#7a2e1f', name: 'Oxide', value: '#7a2e1f' },
+  { key: '#1f4a5c', name: 'Slate blue', value: '#1f4a5c' },
+  { key: '#2f4a32', name: 'Moss', value: '#2f4a32' },
+  { key: '#5c3a6b', name: 'Aubergine', value: '#5c3a6b' },
+] as const

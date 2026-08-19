@@ -279,6 +279,7 @@ function Editor({ loaded }: { loaded: EditorResume }) {
             findingCount={findings.length}
             onJump={setActiveId}
             onTemplate={chooseTemplate}
+            onDesign={(field, value) => dispatch({ type: 'design_set', field, value })}
             onFit={fitToPage}
           />
         </aside>
