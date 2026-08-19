@@ -221,12 +221,25 @@ Vercel and Render are different sites, so the refresh cookie is a third-party co
 `SameSite=None; Secure`. Safari's ITP blocks that outright regardless of the value. The symptom
 is auth that works perfectly in Chrome and logs users out on every reload in Safari.
 
-**Preferred fix:** a custom domain, `app.r4u.dev` plus `api.r4u.dev`, cookie scoped
-`Domain=.r4u.dev; SameSite=Lax; Secure; HttpOnly; Path=/api/auth`. This makes the cookie
-first-party and the problem vanishes.
+**Fix, and it is free.** Proxy the HTTP API through a Vercel rewrite so the browser only ever
+talks to one origin:
 
-**Fallback if no domain is purchased:** `SameSite=None; Secure; Partitioned`, with the Safari
-limitation documented rather than hidden.
+```json
+{ "rewrites": [
+  { "source": "/api/:path*", "destination": "https://r4u-api.onrender.com/api/:path*" }
+] }
+```
+
+The cookie is then first-party and Safari is a non-issue. **Socket.IO is unaffected** and connects
+directly to Render, because the handshake authenticates with the in-memory access token via
+`auth`, not with a cookie. Nothing in the real-time layer depends on the proxy.
+
+**Risk to measure in Phase 1:** Vercel's proxy has its own request timeout and a Render cold start
+runs 30 to 60 seconds, so the first request after idle may time out through the proxy. Fallbacks,
+in order: a free domain from the GitHub Student Developer Pack, then
+`SameSite=None; Secure; Partitioned` with the limitation documented rather than hidden.
+
+See `COST.md`.
 
 ### 5.2 CSRF
 

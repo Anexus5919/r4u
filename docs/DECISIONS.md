@@ -337,15 +337,48 @@ the documented view count stays honest.
 
 ---
 
-## ADR-014: Recommended, pending a decision
+## ADR-014: Zero cost is a hard constraint
+
+**Status:** accepted
+
+**Decision.** R4U must cost nothing to build, run and demonstrate. No paid tier, no subscription,
+no trial that expires into a bill, and nothing on the critical path that requires a card.
+
+Full audit in `COST.md`, which must be updated **before** any dependency or service is added.
+
+**Consequence: the proposed domain purchase is withdrawn.** It was going to solve a real problem,
+the cross-site refresh cookie that Safari's ITP blocks, but it cost roughly 12 USD per year.
+
+Replaced by a free solution: **proxy the HTTP API through a Vercel rewrite**, so the browser only
+ever talks to one origin and the refresh cookie becomes first-party.
+
+```json
+{ "rewrites": [
+  { "source": "/api/:path*", "destination": "https://r4u-api.onrender.com/api/:path*" }
+] }
+```
+
+Socket.IO is unaffected and connects directly to Render, because the handshake authenticates with
+the in-memory access token via `auth`, not with a cookie.
+
+**Open risk to measure in Phase 1, not assume:** Vercel's proxy has its own request timeout, and a
+Render cold start runs 30 to 60 seconds. The first request after an idle period may time out
+through the proxy. If it proves unworkable, fall back to a free domain from the GitHub Student
+Developer Pack, then to `SameSite=None; Secure; Partitioned` with the limitation documented.
+
+**No paid AI API anywhere.** Every intelligent feature is deterministic: the ATS checker is a
+published rule set, the content linter is regex plus word lists, keyword matching is dictionary
+lookup plus set intersection. This is not a budget compromise. It is what makes the scores
+explainable and reproducible, which is the actual differentiator.
+
+---
+
+## ADR-015: DOCX export alongside PDF
 
 **Status:** proposed
 
-- **Buy a domain** (roughly 12 USD per year). Without it the refresh cookie is cross-site,
-  requiring `SameSite=None; Secure`, which Safari's ITP blocks outright. Auth then works in Chrome
-  and logs users out on every reload in Safari, plausibly including on the examiner's laptop.
-  With `app.r4u.dev` and `api.r4u.dev` the cookie is first-party and the issue disappears.
-  Fallback if declined: `SameSite=None; Secure; Partitioned`, documented honestly.
-- **DOCX export** via the `docx` package. Textkernel logs "document format is PDF" as a code-300
-  major issue, so a text-layer DOCX is measurably safer for ATS than any PDF, and no competitor
-  in this class ships it.
+Add DOCX export via the `docx` package (MIT, free). Textkernel logs "document format is PDF" as a
+code-300 major issue, so a text-layer DOCX is measurably safer for ATS than any PDF, and no
+competitor in this class ships it.
+
+Deferred to Phase 6 so it does not compete with the core export path in ADR-001.
