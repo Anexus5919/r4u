@@ -59,7 +59,7 @@ function Section({
   )
 }
 
-export function App() {
+export function DesignSpecimen() {
   const { theme, resolved, setTheme } = useTheme()
   const { toast } = useToast()
   const [modalOpen, setModalOpen] = useState(false)
