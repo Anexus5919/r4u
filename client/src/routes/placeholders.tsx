@@ -67,15 +67,6 @@ function ResumeStub({ heading, body }: { heading: string; body: string }) {
   )
 }
 
-export function EditorPage() {
-  return (
-    <ResumeStub
-      heading="Resume editor"
-      body="Section forms, drag reordering, validation, autosave and the coaching panel arrive in phase 5."
-    />
-  )
-}
-
 export function PreviewPage() {
   return (
     <ResumeStub
