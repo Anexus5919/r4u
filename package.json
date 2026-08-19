@@ -28,7 +28,8 @@
     "test:e2e": "playwright test",
     "design-guard": "bash scripts/design-guard.sh",
     "verify": "npm run design-guard && npm run lint && npm run typecheck && npm run test",
-    "prepare": "husky"
+    "prepare": "husky",
+    "dev:server:memory": "npm run dev:memory --workspace=server"
   },
   "lint-staged": {
     "*.{ts,tsx,js,jsx}": [
