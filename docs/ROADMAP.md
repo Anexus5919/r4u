@@ -138,6 +138,12 @@ user gets 404 on all of them.
 
 ## Phase 6: Templates and live preview
 
+**Status: mostly done.** Built: the layout AST, `renderToDom()`, all eight templates, the five
+knobs, template switching with the reorder prompt, `ResumeVersion` with restore, JSON Resume
+import and export, and the overflow warning. Still open: the `Template` model with a seeded
+registry, and guest drafts carried over from phase 4. The interface itself moved to the product
+register in ADR-018, and `/resume/:id` gained a print fallback ahead of phase 7.
+
 - The `LayoutNode` union and the restricted `Style` type
 - `renderToDom()`
 - The eight templates: Foundry, Quire, Ledger, Placard, Recto, Verso, Marginalia, Broadsheet
