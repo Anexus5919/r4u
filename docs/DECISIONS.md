@@ -104,7 +104,7 @@ by starting at `strict: true` with `noImplicitAny: false` and tightening later.
 
 ## ADR-004: Named deviations from the supplied design reference
 
-**Status:** accepted
+**Status:** superseded by ADR-018 for palette, accent, faces and radius
 
 **Context.** R4U was briefed against a reference design file using the Tailwind `stone-*` palette,
 DM Serif Display, `rounded-full` buttons and `rounded-2xl` cards, with a stated goal of avoiding
@@ -445,3 +445,35 @@ It is anchored at the left trim and takes `width` and `backgroundColor`, nothing
 
 Because the ground measures against the page and a column measures against the content box, Verso
 computes its sidebar width in points from `theme.pageWidth`, not as a shared percentage.
+
+---
+
+## ADR-018: A professional product register replaces the editorial one
+
+**Status:** accepted. Supersedes ADR-004 for palette, accent, faces and radius.
+
+**Context.** ADR-004 steered every visual specific away from a catalogue of AI tells: a warm ink
+ramp, a vermillion accent, Newsreader headings over Public Sans, 2px and 6px corners, and a
+13 to 14px tool scale. Built out across the auth, dashboard and editor screens, the result read to
+the product owner as unfinished: small grey text, a newspaper serif on tool headings, a brown-black
+dark theme, and a red primary button that reads as a warning. A resume builder sells confidence in
+the output, and the chrome was not projecting it.
+
+**Decision.** Optimise for a credible, conventional product register over novelty.
+
+| Aspect  | ADR-004                    | Now                                         | Reason                                                                   |
+| ------- | -------------------------- | ------------------------------------------- | ------------------------------------------------------------------------ |
+| Faces   | Newsreader and Public Sans | Geist for interface and headings            | One sans family, drawn for UI, pairs with the Geist Mono already shipped |
+| Neutral | Warm ink ramp              | Cool ink ramp with a faint blue cast        | Crisp on screen; the dark theme no longer reads brown                    |
+| Accent  | Vermillion `#c8331a`       | Blue `#2356e0`, with a subtle tint and edge | Primary action no longer shares a hue with danger                        |
+| Radius  | 2px and 6px                | 6px controls, 12px cards                    | Current product convention; still two values, still no pills             |
+| Scale   | 14px base, 13px labels     | 15px base, 14px labels at medium weight     | Labels and body text read at arm's length                                |
+
+**Unchanged.** The token architecture, `ink-*` naming, the single hex file, the gradient ban, the
+purple ban, the motion vocabulary, true-white paper in both themes, and every rule in
+`design-guard.sh`. The resume templates are untouched: document faces and colours live in
+`shared/src/layout/tokens.ts`, not here.
+
+**Consequence.** `DESIGN-SYSTEM.md` sections 3, 4 and 6 describe the superseded values where they
+conflict with `tokens.css`; this ADR and the token file win. The favicon is a static SVG that
+cannot read custom properties, so it carries the accent and paper values as literals.

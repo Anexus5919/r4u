@@ -68,12 +68,12 @@ reproducible, which is the actual product differentiator. See `ATS-RUBRIC.md`.
 
 ## 3. Fonts and data
 
-| Asset                                                                                         | Source       | Licence                   | Obligation                                   |
-| --------------------------------------------------------------------------------------------- | ------------ | ------------------------- | -------------------------------------------- |
-| Newsreader, Public Sans, Source Serif 4, Source Sans 3, EB Garamond, IBM Plex Serif, Spectral | Google Fonts | SIL Open Font License 1.1 | None beyond keeping the licence file         |
-| Geist Mono                                                                                    | Vercel       | SIL OFL 1.1               | None                                         |
-| Skills taxonomy                                                                               | ESCO         | Free                      | **Must acknowledge the European Commission** |
-| Occupation data                                                                               | O*NET        | CC BY 4.0                 | **Must ship an attribution notice**          |
+| Asset                                                                       | Source       | Licence                   | Obligation                                   |
+| --------------------------------------------------------------------------- | ------------ | ------------------------- | -------------------------------------------- |
+| Geist, Source Serif 4, Source Sans 3, EB Garamond, IBM Plex Serif, Spectral | Google Fonts | SIL Open Font License 1.1 | None beyond keeping the licence file         |
+| Geist Mono                                                                  | Vercel       | SIL OFL 1.1               | None                                         |
+| Skills taxonomy                                                             | ESCO         | Free                      | **Must acknowledge the European Commission** |
+| Occupation data                                                             | O*NET        | CC BY 4.0                 | **Must ship an attribution notice**          |
 
 Both attribution lines appear in the ATS methodology panel. A licence violation in a graded
 project is an avoidable own goal.

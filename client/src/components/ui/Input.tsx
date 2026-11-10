@@ -6,11 +6,12 @@ import { cn } from '@/lib/cn'
 */
 
 const SHELL =
-  'w-full rounded-xs border bg-ink-00 text-ink-12 transition-colors t-xs ' +
+  'w-full rounded-xs border bg-ink-00 text-ink-12 transition-colors t-xs lift ' +
   'placeholder:text-ink-07 disabled:opacity-45 disabled:pointer-events-none ' +
-  'border-ink-05 hover:border-ink-06'
+  'border-ink-05 hover:border-ink-06 ' +
+  'focus-visible:outline-none focus-visible:border-accent focus-visible:ring-3 focus-visible:ring-accent-subtle'
 
-const INVALID = 'border-danger hover:border-danger'
+const INVALID = 'border-danger hover:border-danger focus-visible:border-danger'
 
 export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   invalid?: boolean
@@ -20,7 +21,7 @@ export function Input({ invalid, className, ...rest }: InputProps) {
   return (
     <input
       aria-invalid={invalid || undefined}
-      className={cn(SHELL, 'h-9 px-2.5 text-sm', invalid && INVALID, className)}
+      className={cn(SHELL, 'h-10 px-3 text-sm', invalid && INVALID, className)}
       {...rest}
     />
   )
@@ -37,7 +38,7 @@ export function Textarea({ invalid, className, rows = 4, ...rest }: TextareaProp
       aria-invalid={invalid || undefined}
       className={cn(
         SHELL,
-        'resize-y px-2.5 py-2 text-sm leading-relaxed',
+        'resize-y px-3 py-2.5 text-sm leading-relaxed',
         invalid && INVALID,
         className
       )}

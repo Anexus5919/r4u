@@ -29,10 +29,7 @@
     text-rendering: optimizeLegibility;
   }
 
-  /*
-    The optical-size axis is set explicitly rather than left to font-optical-sizing: auto,
-    so the values are documented and reviewable. See DESIGN-SYSTEM.md section 4.2.
-  */
+  /* tracking tightens as size grows, which is what keeps large sans headings from looking loose */
   h1,
   h2,
   h3,
@@ -40,36 +37,19 @@
     margin: 0;
     font-family: var(--font-display);
     color: var(--ink-12);
-    font-weight: 400;
-    letter-spacing: -0.01em;
+    font-weight: 600;
+    letter-spacing: -0.02em;
     line-height: 1.2;
   }
 
   h1 {
-    font-variation-settings: 'opsz' 60;
-  }
-
-  h2 {
-    font-variation-settings: 'opsz' 36;
-  }
-
-  h3,
-  h4 {
-    font-variation-settings: 'opsz' 24;
+    letter-spacing: -0.03em;
+    line-height: 1.1;
   }
 
   p {
     margin: 0;
     max-width: 75ch;
-  }
-
-  /* labels, captions and table cells sit at the small end of the optical range */
-  small,
-  caption,
-  th,
-  label,
-  figcaption {
-    font-variation-settings: 'opsz' 14;
   }
 
   a {
@@ -108,13 +88,13 @@
   }
 
   :focus-visible {
-    outline: 2px solid var(--ink-07);
+    outline: 2px solid var(--accent-solid);
     outline-offset: 2px;
     border-radius: var(--radius-xs);
   }
 
   ::selection {
-    background-color: var(--ink-04);
+    background-color: var(--accent-edge);
     color: var(--ink-12);
   }
 
@@ -216,9 +196,19 @@
     border-radius: 0;
   }
 
-  /* the one permitted elevation, for genuinely floating layers only. never with a border */
+  /* menus, popovers and dialogs */
   .float {
     box-shadow: var(--shadow-float);
+  }
+
+  /* resting cards: a hairline plus the faintest lift, so white cards separate from the ground */
+  .lift {
+    box-shadow: var(--shadow-card);
+  }
+
+  /* a rendered resume sitting on the page as a physical sheet */
+  .sheet {
+    box-shadow: var(--shadow-paper);
   }
 
   .rule {

@@ -14,7 +14,7 @@ export function Card({ interactive, className, ...rest }: CardProps) {
   return (
     <div
       className={cn(
-        'rounded-sm border border-ink-05 bg-ink-00',
+        'lift rounded-sm border border-ink-04 bg-ink-00',
         interactive && 't-xs transition-colors hover:border-ink-06',
         className
       )}

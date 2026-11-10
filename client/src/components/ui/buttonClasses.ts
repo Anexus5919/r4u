@@ -1,26 +1,21 @@
 import { cn } from '@/lib/cn'
 
-/*
-  radius 2px, 1px edge, no shadow, no scale on hover, no pill shapes.
-  The only coloured ground in the system is accent-solid on the primary variant.
-
-  Kept out of Button.tsx so that file exports components only, which is what React Fast Refresh
-  needs to preserve state on edit.
-*/
+// kept out of Button.tsx so that file exports components only, which Fast Refresh needs
 
 export type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger'
-export type ButtonSize = 'sm' | 'md'
+export type ButtonSize = 'sm' | 'md' | 'lg'
 
 const VARIANTS: Record<ButtonVariant, string> = {
-  primary: 'bg-accent text-accent-on border-transparent hover:opacity-90',
-  secondary: 'bg-transparent text-ink-11 border-ink-05 hover:bg-ink-02 hover:border-ink-06',
-  ghost: 'bg-transparent text-ink-09 border-transparent hover:bg-ink-02 hover:text-ink-11',
-  danger: 'bg-transparent text-danger border-ink-05 hover:bg-ink-02 hover:border-danger',
+  primary: 'bg-accent text-accent-on border-transparent hover:bg-accent-hover lift',
+  secondary: 'bg-ink-00 text-ink-12 border-ink-05 hover:bg-ink-02 hover:border-ink-06 lift',
+  ghost: 'bg-transparent text-ink-10 border-transparent hover:bg-ink-03 hover:text-ink-12',
+  danger: 'bg-ink-00 text-danger border-ink-05 hover:bg-ink-02 hover:border-danger',
 }
 
 const SIZES: Record<ButtonSize, string> = {
-  sm: 'h-7 px-2.5 text-xs gap-1.5',
-  md: 'h-9 px-3.5 text-sm gap-2',
+  sm: 'h-8 px-3 text-sm gap-1.5',
+  md: 'h-10 px-4 text-sm gap-2',
+  lg: 'h-12 px-6 text-md gap-2',
 }
 
 const BASE =
