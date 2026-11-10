@@ -8,7 +8,8 @@ services:
     dockerfilePath: ./server/Dockerfile
     dockerContext: .
     healthCheckPath: /api/health
-    autoDeploy: false
+    # redeploy on a push to main only after every GitHub Actions check on that commit has passed
+    autoDeployTrigger: checksPass
     envVars:
       - key: NODE_ENV
         value: production
