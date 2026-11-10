@@ -12,3 +12,18 @@ export type { Resume } from './Resume.js'
 
 export { ResumeVersionModel } from './ResumeVersion.js'
 export type { ResumeVersion, ResumeVersionDoc, VersionTrigger } from './ResumeVersion.js'
+
+export { TemplateModel } from './Template.js'
+export type { Template, TemplateDoc } from './Template.js'
+
+export { ShareLinkModel, ShareViewModel, ShareDailyModel } from './ShareLink.js'
+export type { ShareLink, ShareLinkDoc } from './ShareLink.js'
+
+export { ReviewModel, CommentModel, MessageModel } from './Review.js'
+export type { ReviewDoc, CommentDoc, MessageDoc } from './Review.js'
+
+export { NotificationModel } from './Notification.js'
+export type { NotificationDoc } from './Notification.js'
+
+export { ActivityLogModel, ReportModel } from './Moderation.js'
+export type { ReportDoc } from './Moderation.js'
