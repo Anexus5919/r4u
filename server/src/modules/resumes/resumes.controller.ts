@@ -157,6 +157,8 @@ export async function importJson(req: Request, res: Response) {
     { $set: { personal, sections }, $inc: { version: 1 } }
   )
 
+  // written straight to the document, so the denormalised summary has to be brought up to date
+  await service.refreshMeta(resume.id, owner)
   await versionService.snapshot(resume.id, owner, 'import')
 
   const saved = await service.read(resume.id, owner)

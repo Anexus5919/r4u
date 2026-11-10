@@ -95,6 +95,18 @@ describe('POST /api/resumes/import', () => {
     expect(list.body.data.resumes).toHaveLength(2)
   })
 
+  // the dashboard reads meta from the summary, so an import must not list as an empty resume
+  it('lists the imported resume with its real completeness and word count', async () => {
+    const token = await signUp()
+    await request(app).post('/api/resumes/import').set(auth(token)).send({ document: SOURCE })
+
+    const list = await request(app).get('/api/resumes').set(auth(token))
+    const [summary] = list.body.data.resumes
+
+    expect(summary.meta.wordCount).toBeGreaterThan(0)
+    expect(summary.meta.completeness).toBeGreaterThan(0)
+  })
+
   it('rejects a body that is not a document', async () => {
     const token = await signUp()
     const res = await request(app)
