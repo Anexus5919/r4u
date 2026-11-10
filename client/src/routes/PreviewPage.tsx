@@ -11,6 +11,10 @@ import { Banner } from '@/components/ui/Banner'
 import { Button, ButtonLink } from '@/components/ui/Button'
 import { Card, Skeleton } from '@/components/ui/Card'
 import { Icon } from '@/components/ui/Icon'
+import { Segmented } from '@/components/ui/Segmented'
+import { SharePanel } from '@/components/share/SharePanel'
+import { RequestReviewModal } from '@/components/review/RequestReviewModal'
+import { downloadPdf } from '@/lib/pdf'
 
 type Load =
   | { status: 'loading' }
@@ -22,6 +26,16 @@ const ATS_COPY = {
   caution: 'Mostly parseable. Check the plain-text order before you apply through an ATS.',
   unsafe: 'A designed layout. Best when a person reads it before a parser does.',
 } as const
+
+type Width = 'phone' | 'tablet' | 'page'
+
+// FR 5.5: the share page reflows the sheet to the visitor's screen, so the owner can check it
+const WIDTHS: { value: Width; label: string }[] = [
+  { value: 'phone', label: 'Phone' },
+  { value: 'tablet', label: 'Tablet' },
+  { value: 'page', label: 'Desktop' },
+]
+const WIDTH_PX: Record<Width, number> = { phone: 343, tablet: 704, page: 794 }
 
 function fileName(title: string) {
   return (
@@ -37,6 +51,21 @@ export function PreviewPage() {
   const { toast } = useToast()
   const [load, setLoad] = useState<Load>({ status: 'loading' })
   const [downloading, setDownloading] = useState(false)
+  const [exporting, setExporting] = useState(false)
+  const [requesting, setRequesting] = useState(false)
+  const [width, setWidth] = useState<Width>('page')
+
+  async function exportPdf(doc: Partial<Resume>) {
+    setExporting(true)
+    try {
+      await downloadPdf(doc)
+      toast('success', 'PDF downloaded')
+    } catch {
+      toast('warning', 'The PDF could not be built here. Print, then choose Save as PDF.')
+    } finally {
+      setExporting(false)
+    }
+  }
 
   useEffect(() => {
     const controller = new AbortController()
@@ -120,17 +149,38 @@ export function PreviewPage() {
           >
             Download JSON
           </Button>
-          <Button variant="primary" onClick={() => window.print()}>
+          <Button variant="secondary" onClick={() => window.print()}>
+            Print
+          </Button>
+          <Button variant="secondary" onClick={() => setRequesting(true)}>
+            Request review
+          </Button>
+          <Button variant="primary" loading={exporting} onClick={() => void exportPdf(doc)}>
             <Icon name="download" />
-            Print or save as PDF
+            Download PDF
           </Button>
         </div>
       </div>
 
       <div className="mt-8 grid grid-cols-1 items-start gap-8 lg:grid-cols-[1fr_320px] print:mt-0 print:block">
-        <div className="flex justify-center rounded-sm border border-ink-04 bg-ink-02 p-4 sm:p-10 print:border-0 print:bg-transparent print:p-0">
-          <div className="print-root sheet w-full max-w-[794px] print:max-w-none">
-            <ResumePreview resume={doc} />
+        <div className="flex flex-col gap-3 print:block">
+          <div className="flex flex-wrap items-center justify-between gap-2 print:hidden">
+            <p className="text-sm text-ink-09">How a recruiter sees it on</p>
+            <Segmented
+              label="Preview width"
+              value={width}
+              onChange={setWidth}
+              options={WIDTHS}
+              size="sm"
+            />
+          </div>
+          <div className="flex justify-center rounded-sm border border-ink-04 bg-ink-02 p-4 sm:p-10 print:border-0 print:bg-transparent print:p-0">
+            <div
+              className="print-root sheet w-full print:max-w-none"
+              style={{ maxWidth: WIDTH_PX[width] }}
+            >
+              <ResumePreview resume={doc} />
+            </div>
           </div>
         </div>
 
@@ -159,24 +209,23 @@ export function PreviewPage() {
             </dl>
           </Card>
 
-          <Card className="p-5">
-            <p className="text-sm font-semibold text-ink-12">Save as PDF</p>
-            <p className="mt-2 text-sm text-ink-09">
-              Opens your browser&apos;s print dialog with the page set to A4. Choose Save as PDF as
-              the destination; the text stays selectable for applicant tracking systems.
-            </p>
-          </Card>
+          <SharePanel resumeId={resume.id} />
 
           <Card className="p-5">
-            <p className="text-sm font-semibold text-ink-12">Coming next</p>
-            <ul className="mt-2 flex flex-col gap-1.5 text-sm text-ink-09">
-              <li>One-click PDF export</li>
-              <li>Share links with expiry and view counts</li>
-              <li>Mentor review with live chat</li>
-            </ul>
+            <p className="text-sm font-semibold text-ink-12">About the PDF</p>
+            <p className="mt-2 text-sm text-ink-09">
+              A real A4 document with selectable text, so applicant tracking systems read every
+              word. Print uses your browser instead, and is there as a fallback.
+            </p>
           </Card>
         </aside>
       </div>
+
+      <RequestReviewModal
+        open={requesting}
+        resumeId={resume.id}
+        onClose={() => setRequesting(false)}
+      />
     </div>
   )
 }
