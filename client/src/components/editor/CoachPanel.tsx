@@ -22,20 +22,18 @@ export function Completeness({ value }: { value: number }) {
   )
 }
 
+// idle means nothing in flight, which on a fresh load is a clean document, not an unsaved one
 const SAVE_LABEL: Record<SaveStatus, string> = {
-  idle: 'Unsaved changes',
+  idle: 'All changes saved',
   saving: 'Saving',
   saved: 'Saved',
   error: 'Could not save',
 }
 
-/*
-  Four states, as text. A spinner would be motion on a surface that changes constantly, and the
-  user needs to know which of the four it is, not that something is happening.
-*/
+// states as text, never a spinner: the user needs to know which state, not that something moves
 export function SaveIndicator({ status, dirty }: { status: SaveStatus; dirty: boolean }) {
   const label =
-    dirty && status !== 'saving' && status !== 'error' ? SAVE_LABEL.idle : SAVE_LABEL[status]
+    dirty && status !== 'saving' && status !== 'error' ? 'Unsaved changes' : SAVE_LABEL[status]
 
   return (
     <span
