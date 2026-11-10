@@ -306,7 +306,7 @@ export function ReviewRoomPage() {
 
   if (!review || !resume) {
     return (
-      <div className="mx-auto grid max-w-7xl grid-cols-1 gap-6 lg:grid-cols-[1fr_400px]">
+      <div className="mx-auto grid max-w-7xl grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_400px]">
         <Skeleton className="aspect-[210/297] w-full" />
         <Skeleton className="h-96" />
       </div>
@@ -354,7 +354,7 @@ export function ReviewRoomPage() {
         </Banner>
       ) : null}
 
-      <div className="mt-6 grid grid-cols-1 items-start gap-6 lg:grid-cols-[1fr_420px]">
+      <div className="mt-6 grid grid-cols-1 items-start gap-6 lg:grid-cols-[minmax(0,1fr)_420px]">
         <div className="rounded-sm border border-ink-04 bg-ink-02 p-4 sm:p-8">
           <div className="sheet mx-auto w-full max-w-[794px]">
             <ResumePreview resume={resume as unknown as Partial<Resume>} />

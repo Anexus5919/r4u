@@ -114,7 +114,10 @@ export function PreviewPage() {
 
   if (load.status === 'loading') {
     return (
-      <div className="mx-auto grid max-w-7xl grid-cols-1 gap-8 lg:grid-cols-[1fr_320px]" aria-busy>
+      <div
+        className="mx-auto grid max-w-7xl grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr)_320px]"
+        aria-busy
+      >
         <Skeleton className="aspect-[210/297] w-full max-w-[794px]" />
         <Skeleton className="h-72" />
       </div>
@@ -162,7 +165,7 @@ export function PreviewPage() {
         </div>
       </div>
 
-      <div className="mt-8 grid grid-cols-1 items-start gap-8 lg:grid-cols-[1fr_320px] print:mt-0 print:block">
+      <div className="mt-8 grid grid-cols-1 items-start gap-8 lg:grid-cols-[minmax(0,1fr)_320px] print:mt-0 print:block">
         <div className="flex flex-col gap-3 print:block">
           <div className="flex flex-wrap items-center justify-between gap-2 print:hidden">
             <p className="text-sm text-ink-09">How a recruiter sees it on</p>
