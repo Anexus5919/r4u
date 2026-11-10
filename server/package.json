@@ -11,7 +11,9 @@
     "clean": "rimraf dist *.tsbuildinfo",
     "dev:memory": "tsx watch src/dev.ts",
     "seed": "tsx src/scripts/seed-cli.ts",
-    "seed:prod": "node dist/scripts/seed-cli.js"
+    "seed:prod": "node dist/scripts/seed-cli.js",
+    "migrate": "tsx src/scripts/migrate-cli.ts",
+    "migrate:prod": "node dist/scripts/migrate-cli.js"
   },
   "dependencies": {
     "bcryptjs": "^3.0.3",

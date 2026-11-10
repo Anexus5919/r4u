@@ -12,8 +12,9 @@ mongoose.set('strictQuery', true)
 /*
   Atlas M0 gives 0.5 GB including indexes and 100 operations per second, and this service spins
   down after 15 minutes idle so it boots often. Mongoose rebuilds every index on every boot with
-  autoIndex on, which would spend that operation budget on nothing. Indexes are created once by
-  scripts/create-indexes.ts instead.
+  autoIndex on, which would spend that operation budget on nothing. Instead index.ts calls
+  ensureIndexes() from scripts/indexes.ts once per boot: one createIndexes per collection, each a
+  no-op when the index already exists. npm run migrate does the same on demand.
 */
 if (isProduction) mongoose.set('autoIndex', false)
 
