@@ -5,6 +5,8 @@ controlled share links, real-time mentor review and role-based administration.
 
 Full Stack Development laboratory project. Adarsh Singh, D15A, roll 52.
 
+**Live:** https://r4u-delta.vercel.app
+
 ![R4U landing page](docs/screenshots/landing.png)
 
 The premise: a resume is **structured data, never a formatted file**. One dataset renders through any
@@ -245,7 +247,15 @@ The pipeline is ready; the accounts are yours to connect. All three services hav
    `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID`. Every push to `main` then runs verify, tests, end-to-end,
    the Docker smoke test and the security scan, and deploys only if all of them pass.
 
-Live URLs: not yet published. Add them here once the services above are connected.
+**Live:**
+
+|         | URL                                                  |
+| ------- | ---------------------------------------------------- |
+| Web app | https://r4u-delta.vercel.app                         |
+| API     | https://r4u-api.onrender.com (health: `/api/health`) |
+
+The API runs on Render's free tier, so the first request after 15 idle minutes can take up to a
+minute while it wakes. Vercel deploys every push to `main` through its GitHub integration.
 
 ## API documentation
 
