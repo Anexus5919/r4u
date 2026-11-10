@@ -2,7 +2,13 @@ import request from 'supertest'
 import { describe, expect, it } from 'vitest'
 import { createApp } from '../app.js'
 import { useTestDb } from '../test/db.js'
-import { MessageModel, ReviewModel, ShareLinkModel, TemplateModel } from '../models/index.js'
+import {
+  MessageModel,
+  ReviewModel,
+  ShareLinkModel,
+  TemplateModel,
+  UserModel,
+} from '../models/index.js'
 import { DEMO_ACCOUNTS, DEMO_PASSWORD, seedDemo } from './seed.js'
 
 useTestDb()
@@ -39,6 +45,17 @@ describe('seedDemo', () => {
     expect(await MessageModel.countDocuments()).toBeGreaterThan(0)
     expect(await ShareLinkModel.countDocuments({ enabled: true })).toBe(1)
     expect(await TemplateModel.countDocuments({ builtIn: true })).toBe(8)
+  })
+
+  // a documented admin password on a real database is a public admin console
+  it('creates no admin when asked not to, and still seeds every other role', async () => {
+    const result = await seedDemo({ includeAdmin: false })
+    expect(result.seeded).toBe(true)
+    expect(await UserModel.countDocuments({ role: 'admin' })).toBe(0)
+    expect((await login(DEMO_ACCOUNTS.admin.email)).status).toBe(401)
+    expect((await login(DEMO_ACCOUNTS.reviewer.email)).status).toBe(200)
+
+    expect((await seedDemo({ includeAdmin: false })).seeded).toBe(false)
   })
 
   it('does nothing on a second run', async () => {

@@ -59,11 +59,16 @@ async function sampleResume(ownerId: string, title: string, fullName: string, em
   return doc
 }
 
-/** Idempotent: does nothing beyond syncing templates once the admin account exists. */
-export async function seedDemo(): Promise<SeedResult> {
+export interface SeedOptions {
+  // a documented password on an admin is a public admin console, so production never seeds one
+  includeAdmin?: boolean
+}
+
+/** Idempotent: does nothing beyond syncing templates once the demo user exists. */
+export async function seedDemo({ includeAdmin = true }: SeedOptions = {}): Promise<SeedResult> {
   const templates = await syncTemplates()
 
-  if (await UserModel.exists({ email: DEMO_ACCOUNTS.admin.email })) {
+  if (await UserModel.exists({ email: DEMO_ACCOUNTS.user.email })) {
     return { seeded: false, templates }
   }
 
@@ -71,7 +76,7 @@ export async function seedDemo(): Promise<SeedResult> {
   const make = (account: (typeof DEMO_ACCOUNTS)[keyof typeof DEMO_ACCOUNTS], extra = {}) =>
     UserModel.create({ ...account, passwordHash, ...extra })
 
-  await make(DEMO_ACCOUNTS.admin)
+  if (includeAdmin) await make(DEMO_ACCOUNTS.admin)
   const neha = await make(DEMO_ACCOUNTS.reviewer, {
     headline: 'Engineering manager, 9 years hiring backend teams',
     reviewerProfile: {
