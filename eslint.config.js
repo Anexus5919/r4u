@@ -102,7 +102,7 @@ export default tseslint.config(
 
   // ---------------------------------------------------------------- config files
   {
-    files: ['**/*.config.{js,ts}', 'scripts/**/*.js'],
+    files: ['**/*.config.{js,ts}', 'scripts/**/*.{js,mjs}', 'tests/**/*.ts'],
     languageOptions: { globals: { ...globals.node } },
     rules: { 'no-console': 'off' },
   }
