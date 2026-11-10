@@ -92,6 +92,10 @@ jobs:
       - name: Install Chromium
         run: npx playwright install --with-deps chromium
 
+      # the dev server imports @r4u/shared from its built dist, which a clean checkout lacks
+      - name: Build shared
+        run: npm run build --workspace=shared
+
       - name: Server env
         run: |
           {
