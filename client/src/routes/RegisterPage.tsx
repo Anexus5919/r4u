@@ -48,7 +48,7 @@ export function RegisterPage() {
       footer={
         <>
           Already have an account?{' '}
-          <Link to="/login" className="text-ink-12">
+          <Link to="/login" className="font-medium text-accent-text">
             Sign in
           </Link>
         </>
@@ -114,6 +114,7 @@ export function RegisterPage() {
           <Button
             type="submit"
             variant="primary"
+            className="w-full"
             loading={submitting}
             disabled={!passwordReady || mismatch}
           >

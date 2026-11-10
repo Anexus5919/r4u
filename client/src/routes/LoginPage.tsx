@@ -40,7 +40,7 @@ export function LoginPage() {
       footer={
         <>
           New here?{' '}
-          <Link to="/register" className="text-ink-12">
+          <Link to="/register" className="font-medium text-accent-text">
             Create an account
           </Link>
         </>
@@ -73,14 +73,15 @@ export function LoginPage() {
           )}
         </Field>
 
-        <div className="flex items-center justify-between gap-4">
-          <Button type="submit" variant="primary" loading={submitting}>
-            Sign in
-          </Button>
-          <Link to="/reset" className="text-sm text-ink-09">
+        <div className="-mt-2 flex justify-end">
+          <Link to="/reset" className="text-sm font-medium text-accent-text">
             Forgot your password?
           </Link>
         </div>
+
+        <Button type="submit" variant="primary" loading={submitting} className="w-full">
+          Sign in
+        </Button>
       </form>
     </AuthLayout>
   )

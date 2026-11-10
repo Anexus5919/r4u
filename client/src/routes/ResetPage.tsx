@@ -67,7 +67,7 @@ function RequestLink() {
       </Field>
 
       <div>
-        <Button type="submit" variant="primary" loading={submitting}>
+        <Button type="submit" variant="primary" loading={submitting} className="w-full">
           Send reset link
         </Button>
       </div>
@@ -140,7 +140,13 @@ function SetNewPassword({ token }: { token: string }) {
       </p>
 
       <div>
-        <Button type="submit" variant="primary" loading={submitting} disabled={!ready || mismatch}>
+        <Button
+          type="submit"
+          variant="primary"
+          loading={submitting}
+          disabled={!ready || mismatch}
+          className="w-full"
+        >
           Update password
         </Button>
       </div>
@@ -161,7 +167,7 @@ export function ResetPage() {
           : 'Enter the address on your account and we will send a link.'
       }
       footer={
-        <Link to="/login" className="text-ink-12">
+        <Link to="/login" className="font-medium text-accent-text">
           Back to sign in
         </Link>
       }
