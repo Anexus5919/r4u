@@ -264,7 +264,7 @@ never 403, so ids cannot be enumerated.
 | Suite          | Count       | Covers                                                                                                                                                        |
 | -------------- | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Vitest, shared | 211         | Schema, section registry, linter, quantification guard, JSON Resume, templates                                                                                |
-| Vitest, server | 130         | Auth, roles, the admin content ban, resumes, autosave conflicts, versions, sharing, reviews, notifications, admin, seed, and Socket.IO against a real server  |
+| Vitest, server | 129         | Auth, roles, the admin content ban, resumes, autosave conflicts, versions, sharing, reviews, notifications, admin, seed, and Socket.IO against a real server  |
 | Vitest, client | 66          | Reducer, autosave diff, guards, session restore, preview, DOM adapter, PDF for all eight templates                                                            |
 | Playwright     | 12          | Registration, wrong password, guards, live share counter, PDF download, unknown link, live chat, admin privacy line, three viewport widths, mobile navigation |
 | Postman        | 58 requests | Happy paths plus 401, 403, 404, 409, 410, 422 and 429                                                                                                         |
