@@ -72,10 +72,7 @@ export async function login(
     '+passwordHash'
   )) as UserDoc | null
 
-  /*
-    An unknown email still costs a bcrypt comparison and returns the identical message. Skipping
-    it would let response timing and wording enumerate which addresses are registered.
-  */
+  // an unknown email still costs a bcrypt compare and the same message
   if (!user) {
     await wasteTimeLikeAVerify()
     throw new AppError('INVALID_CREDENTIALS', 'Email or password is incorrect')
@@ -83,10 +80,7 @@ export async function login(
 
   if (user.status === 'blocked') throw new AppError('ACCOUNT_BLOCKED', 'This account is blocked')
 
-  /*
-    Persistent, unlike express-rate-limit's in-memory counters, which a free-tier restart wipes
-    along with an attacker's progress.
-  */
+  // persistent lockout survives the restarts that wipe in-memory rate limits
   if (user.lockUntil && user.lockUntil.getTime() > Date.now()) {
     throw new AppError('RATE_LIMITED', 'Too many attempts. Try again in a few minutes.')
   }
@@ -118,10 +112,7 @@ export async function refresh(token: string, ctx: SessionContext): Promise<Sessi
 
   if (!stored) throw new AppError('TOKEN_INVALID', 'Session expired')
 
-  /*
-    A token that was already consumed is being replayed. That is the signature of a stolen token
-    used alongside the legitimate one, so the whole family dies rather than just this token.
-  */
+  // a consumed token replayed signals theft, so the whole family dies
   if (stored.consumedAt) {
     await RefreshTokenModel.deleteMany({ family: stored.family })
     logger.warn({ family: stored.family }, 'refresh token replay, family revoked')
@@ -148,19 +139,12 @@ export async function logout(token: string | undefined): Promise<void> {
   await RefreshTokenModel.deleteOne({ tokenHash: hashToken(token) })
 }
 
-/*
-  Always resolves, whether or not the address exists. The caller responds 200 either way, so the
-  endpoint cannot be used to discover which addresses are registered.
-*/
+// always resolves, so the endpoint cannot reveal which addresses exist
 export async function forgotPassword(email: string): Promise<void> {
   const user = await UserModel.findOne({ email })
   if (!user) return
 
-  /*
-    trusted() is required whenever a filter contains a server-authored $ operator. sanitizeFilter
-    cannot tell our operators from a client's, so without it this becomes
-    { usedAt: { $eq: { $exists: false } } }, which fails to cast to a Date and throws CastError.
-  */
+  // trusted() or sanitizeFilter rewrites $exists into a CastError
   await PasswordResetTokenModel.deleteMany({
     user: user._id,
     usedAt: trusted({ $exists: false }),
@@ -190,11 +174,7 @@ export async function resetPassword(token: string, password: string): Promise<vo
   if (!user) throw new AppError('TOKEN_INVALID', 'That reset link is no longer valid')
 
   user.passwordHash = await hashPassword(password)
-  /*
-    A reset must end every existing session, which is the entire point of resetting after a
-    compromise. Bumping the version invalidates issued access tokens, and deleting the refresh
-    tokens stops new ones being minted.
-  */
+  // a reset ends every session: bump the version and delete refresh tokens
   user.tokenVersion += 1
   user.failedLoginCount = 0
   user.lockUntil = undefined

@@ -15,12 +15,7 @@ export interface AccessClaims {
   tv: number
 }
 
-/*
-  The payload carries an id, a role and a version. No email, no name.
-
-  A JWT payload is base64, not encryption. Anyone holding the token reads every claim, and this
-  product's users are identifiable people attached to a PII document.
-*/
+// id, role and version only: a JWT payload is readable by whoever holds it
 export function signAccessToken(claims: AccessClaims): string {
   const options: SignOptions = {
     issuer: ISSUER,
@@ -47,10 +42,7 @@ export function verifyAccessToken(token: string): AccessClaims {
   }
 }
 
-/*
-  The refresh token is opaque, not a JWT. It must be checked against the database for revocation
-  regardless, so JWT structure would add nothing and leak claims to whoever holds it.
-*/
+// opaque, not a JWT: the database check is needed anyway and claims would leak
 export interface RefreshTokenParts {
   token: string
   tokenHash: string

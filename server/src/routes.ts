@@ -14,10 +14,7 @@ export const apiRouter = Router()
 
 apiRouter.use('/health', healthRouter)
 
-/*
-  Every route below this line has req.principal set, defaulting to the guest role. Nothing
-  downstream has to handle a null user.
-*/
+// every route below has req.principal, guest by default
 apiRouter.use(attachPrincipal)
 
 apiRouter.use('/auth', authRouter)

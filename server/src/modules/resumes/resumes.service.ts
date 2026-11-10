@@ -21,11 +21,7 @@ const SORTS = {
   title: { title: 1 },
 } as const
 
-/*
-  Atlas M0 has no Atlas Search, so title search is a case-insensitive regex against the owner's
-  own documents. The owner filter runs first and is indexed, so the regex only ever scans one
-  user's resumes, which at realistic volumes is a handful of rows.
-*/
+// no Atlas Search on M0: a regex over the owner's own documents, indexed first
 function escapeRegex(value: string): string {
   return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 }
@@ -33,11 +29,7 @@ function escapeRegex(value: string): string {
 export async function list(ownerId: string, options: ListOptions) {
   const filter: Record<string, unknown> = { owner: ownerId }
 
-  /*
-    trusted() is required on any filter carrying a server-authored $ operator. sanitizeFilter
-    cannot tell ours from a client's, so without it this becomes { $eq: { $regex: ... } } and
-    silently matches nothing. Same trap as the password reset query.
-  */
+  // trusted() or sanitizeFilter wraps $regex in $eq and matches nothing
   if (options.q) {
     filter.title = trusted({ $regex: escapeRegex(options.q), $options: 'i' })
   }
@@ -63,11 +55,7 @@ export async function list(ownerId: string, options: ListOptions) {
   }
 }
 
-/*
-  A new resume is seeded with the section order its career stage calls for, rather than an empty
-  document. Section order is a function of career stage, not of taste: a fresher leading with
-  Experience buries the Education that is actually their strongest asset.
-*/
+// seeded with the section order its career stage calls for
 function seedSections(resumeType: ResumeType) {
   return DEFAULT_SECTION_ORDER[resumeType].map((type) => ({
     type,
@@ -117,11 +105,7 @@ export async function rename(resumeId: string, ownerId: string, title: string) {
   return resume
 }
 
-/*
-  Duplication is how "tailor this for a different role" starts, so it copies the content and
-  resets everything that is specific to the original: status, version, and later the share links
-  and review history, which must never follow a copy.
-*/
+// a copy keeps content but resets status, version, shares and reviews
 export async function duplicate(resumeId: string, principal: Principal, title?: string) {
   const source = await readResumeContent(resumeId, principal)
 
@@ -145,10 +129,7 @@ export async function remove(resumeId: string, ownerId: string) {
   if (!deleted) throw notFound('Resume')
 }
 
-/*
-  Denormalised on every write so admin dashboards and analytics never need a content projection.
-  This is what makes the admin content ban survivable rather than crippling.
-*/
+// denormalised on write so admin views never need a content projection
 export async function refreshMeta(resumeId: string, principal: Principal) {
   const resume = await readResumeContent(resumeId, principal)
   const meta = computeMeta(resume.toObject() as unknown as ResumeShape)

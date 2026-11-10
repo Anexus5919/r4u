@@ -29,11 +29,7 @@ export async function changePassword(req: Request, res: Response) {
 
   await service.changePassword(principalId(req), currentPassword, password)
 
-  /*
-    204 with no session payload. Every refresh token was just deleted and the token version
-    bumped, so the client must sign in again. Returning a fresh session here would quietly
-    undo the point of ending every session.
-  */
+  // 204 with no session: every session just ended, so the client signs in again
   res.status(204).end()
 }
 

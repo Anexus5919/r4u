@@ -1,5 +1,4 @@
-// development entry: an in-memory MongoDB, so local work needs no Atlas connection string
-// never imported by src/index.ts, so mongodb-memory-server stays out of the production image
+// in-memory dev entry, never imported by index.ts, so it stays out of the image
 import { MongoMemoryServer } from 'mongodb-memory-server'
 import mongoose from 'mongoose'
 

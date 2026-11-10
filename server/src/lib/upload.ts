@@ -3,11 +3,7 @@ import { AppError } from './AppError.js'
 
 export const AVATAR_MAX_BYTES = 2 * 1024 * 1024
 
-/*
-  memoryStorage, never diskStorage. Render's filesystem is ephemeral and wiped on every deploy
-  and spin-down, so a file written to disk is gone before anyone asks for it. The buffer streams
-  straight to Cloudinary.
-*/
+// memoryStorage: Render's disk is ephemeral, so the buffer goes to Cloudinary
 export const avatarUpload = multer({
   storage: multer.memoryStorage(),
   limits: { fileSize: AVATAR_MAX_BYTES, files: 1, fields: 2 },
@@ -23,10 +19,7 @@ export const avatarUpload = multer({
 
 export type ImageKind = 'jpeg' | 'png' | 'webp'
 
-/*
-  The client-supplied mimetype is not evidence. A caller can label anything image/png, so the
-  leading bytes are what decide, and anything unrecognised is refused.
-*/
+// the client mimetype is not evidence: the leading bytes decide
 export function sniffImage(buffer: Buffer): ImageKind | null {
   if (buffer.length < 12) return null
 

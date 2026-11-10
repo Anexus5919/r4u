@@ -23,19 +23,12 @@ export function createApp() {
 
   app.disable('x-powered-by')
 
-  /*
-    The exact hop count on Render, never `true`. With `true` Express trusts the leftmost
-    X-Forwarded-For entry, which the client controls, letting one caller forge unlimited
-    addresses and walk straight through every rate limiter.
-  */
+  // the exact hop count, never true: true trusts a client-forged X-Forwarded-For
   app.set('trust proxy', 1)
 
   app.use(
     helmet({
-      /*
-        Helmet's default is same-origin, which blocks the Vercel frontend from loading anything
-        this API serves. It presents as a CORS error and is not fixed by the cors middleware.
-      */
+      // same-origin default blocks the Vercel frontend and looks like a CORS error
       crossOriginResourcePolicy: { policy: 'cross-origin' },
       contentSecurityPolicy: {
         directives: { defaultSrc: ["'none'"], frameAncestors: ["'none'"] },

@@ -60,11 +60,7 @@ export async function read(req: Request, res: Response) {
   res.json({ data: { resume: resumeDetail(resume) } })
 }
 
-/*
-  Autosave. The version in the body is the client's view of the document, and a mismatch is a
-  409 carrying the current state so the client can rebase rather than being told to reload and
-  lose its work.
-*/
+// a version mismatch is a 409 carrying current state, so the client can rebase
 export async function autosave(req: Request, res: Response) {
   const { id, version, ops } = req.validated as {
     id: string
@@ -146,10 +142,7 @@ export async function exportJson(req: Request, res: Response) {
   res.json(toJsonResume(resume.toObject() as never))
 }
 
-/*
-  Import creates a new resume rather than overwriting one. An import that silently replaces what
-  is already there is a second way to lose work, and the user has no way back from it.
-*/
+// import creates a new resume, never overwrites one, so no work is lost
 export async function importJson(req: Request, res: Response) {
   const { title, document } = req.validated as { title?: string; document: Record<string, unknown> }
   const owner = principal(req)

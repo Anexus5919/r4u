@@ -109,11 +109,7 @@ describe('autosave field ops', () => {
     expect(loaded.sections).toHaveLength(resume.sections.length)
   })
 
-  /*
-    Typing produces one op per character. Without coalescing, a forty-character field sends forty
-    writes, and worse, two update paths resolving to the same document position, which Mongo
-    rejects outright.
-  */
+  // coalescing avoids a write per character and conflicting update paths
   it('coalesces repeated edits to one field, keeping the last', async () => {
     const token = await signUp()
     const resume = await newResume(token)
@@ -158,10 +154,7 @@ describe('autosave structural ops', () => {
     expect(loaded.sections.map((s) => s._id)).toEqual(reversed)
   })
 
-  /*
-    A section the client did not mention keeps its place rather than disappearing. A reorder that
-    can silently drop content is the worst possible bug in an editor.
-  */
+  // a reorder must never silently drop a section the client omitted
   it('keeps a section the client omitted from the order', async () => {
     const token = await signUp()
     const resume = await newResume(token)
@@ -195,11 +188,7 @@ describe('autosave structural ops', () => {
   })
 })
 
-/*
-  The exit criterion for this phase. Two tabs holding the same document must not silently
-  overwrite each other, and the loser must be handed enough to recover rather than told to
-  reload and lose its work.
-*/
+// two tabs must not overwrite each other, and the loser must be able to recover
 describe('version conflict', () => {
   it('accepts sequential writes that each carry the current version', async () => {
     const token = await signUp()
@@ -258,10 +247,7 @@ describe('autosave rejects what it should', () => {
     expect(res.status).toBe(422)
   })
 
-  /*
-    The reason the vocabulary is closed rather than JSON Patch. A field name becomes part of a
-    Mongo update path, so a dotted or dollar-prefixed value would reach outside the entry.
-  */
+  // a closed vocabulary because a field name becomes part of a Mongo update path
   it('refuses a path traversal in a field name', async () => {
     const token = await signUp()
     const resume = await newResume(token)

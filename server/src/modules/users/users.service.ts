@@ -71,10 +71,7 @@ export async function changePassword(
   }
 
   user.passwordHash = await hashPassword(nextPassword)
-  /*
-    Same reasoning as a reset: changing a password must end every other session. Bumping the
-    version kills issued access tokens, deleting the refresh tokens stops new ones being minted.
-  */
+  // as with a reset, end every session: bump the version, delete refresh tokens
   user.tokenVersion += 1
   await user.save()
 

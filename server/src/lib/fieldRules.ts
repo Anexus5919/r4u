@@ -1,11 +1,7 @@
 import { body } from 'express-validator'
 import { PASSWORD_MAX, PASSWORD_MIN } from '@r4u/shared'
 
-/*
-  One definition of each rule, shared by every module that validates it. The messages match the
-  requirement list the client renders from the same shared module, so the two can never disagree
-  about what a valid password is.
-*/
+// one definition per rule, so client and server agree on what is valid
 
 export const passwordRule = (field: string) =>
   body(field)

@@ -49,10 +49,7 @@ const resumeSchema = new Schema(
     sections: { type: [sectionSchema], default: [] },
     notes: { type: String, maxlength: 4000, default: '' },
 
-    /*
-      Denormalised on every write so admin dashboards and analytics never need a content
-      projection. This is what makes the content ban survivable rather than crippling.
-    */
+    // denormalised on write so admin views never need a content projection
     meta: {
       completeness: { type: Number, default: 0 },
       wordCount: { type: Number, default: 0 },
@@ -70,18 +67,7 @@ resumeSchema.index({ owner: 1, updatedAt: -1 })
 
 export const PROTECTED_CONTENT_PATHS = ['sections', 'personal', 'notes'] as const
 
-/*
-  THE PRIVACY BOUNDARY.
-
-  Fail closed: every read strips resume content unless the caller explicitly opts in with
-  contentScope: 'full'. That option is reachable from exactly one function, readResumeContent(),
-  which refuses the admin role unconditionally.
-
-  Enforcing this in controllers instead would guarantee a leak, because some future admin
-  analytics endpoint will run Resume.find({}).lean() for a stats query and return everything.
-
-  See docs/DECISIONS.md ADR-008 and the test at resumes.access.test.ts.
-*/
+// privacy boundary, fail closed: only readResumeContent() opts in. see ADR-008
 resumeSchema.pre(/^find/, function (this: Query<unknown, unknown>) {
   if (this.getOptions().contentScope !== 'full') {
     this.select(PROTECTED_CONTENT_PATHS.map((path) => `-${path}`).join(' '))

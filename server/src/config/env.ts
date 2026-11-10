@@ -1,10 +1,7 @@
 import 'dotenv/config'
 import { z } from 'zod'
 
-/*
-  Validated at boot. The process refuses to start on a missing or short secret, which turns
-  "works locally, 500s in production" into a loud failure at the only moment it is cheap to fix.
-*/
+// validated at boot so a missing secret fails loudly, not as a production 500
 
 const EnvSchema = z.object({
   NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
@@ -37,11 +34,7 @@ const EnvSchema = z.object({
 
   BCRYPT_ROUNDS: z.coerce.number().int().min(4).max(15).default(12),
 
-  /*
-    Optional. Avatar upload is the only feature that needs them, and it reports itself as
-    unavailable rather than the whole process refusing to start. Everything else works without
-    a Cloudinary account.
-  */
+  // optional: only avatar upload needs Cloudinary, and it reports itself unavailable
   CLOUDINARY_CLOUD_NAME: z.string().optional(),
   CLOUDINARY_API_KEY: z.string().optional(),
   CLOUDINARY_API_SECRET: z.string().optional(),
@@ -75,10 +68,7 @@ export const cloudinaryConfigured = Boolean(
   env.CLOUDINARY_CLOUD_NAME && env.CLOUDINARY_API_KEY && env.CLOUDINARY_API_SECRET
 )
 
-/*
-  The two secrets must differ. Reusing one means a refresh token verifies as an access token,
-  which collapses the whole point of separating them.
-*/
+// the secrets must differ, or a refresh token verifies as an access token
 if (env.JWT_ACCESS_SECRET === env.JWT_REFRESH_SECRET) {
   throw new Error('JWT_ACCESS_SECRET and JWT_REFRESH_SECRET must be different')
 }

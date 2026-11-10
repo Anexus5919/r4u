@@ -2,20 +2,11 @@ import mongoose from 'mongoose'
 import { env, isProduction } from './env.js'
 import { logger } from './logger.js'
 
-/*
-  sanitizeFilter is the correct Express 5 defence against operator injection. Do NOT install
-  express-mongo-sanitize: it is abandoned and silently breaks, because req.query became a getter.
-*/
+// sanitizeFilter, not express-mongo-sanitize, which breaks on Express 5
 mongoose.set('sanitizeFilter', true)
 mongoose.set('strictQuery', true)
 
-/*
-  Atlas M0 gives 0.5 GB including indexes and 100 operations per second, and this service spins
-  down after 15 minutes idle so it boots often. Mongoose rebuilds every index on every boot with
-  autoIndex on, which would spend that operation budget on nothing. Instead index.ts calls
-  ensureIndexes() from scripts/indexes.ts once per boot: one createIndexes per collection, each a
-  no-op when the index already exists. npm run migrate does the same on demand.
-*/
+// M0 op budget: index.ts runs ensureIndexes() once per boot instead of autoIndex
 if (isProduction) mongoose.set('autoIndex', false)
 
 export async function connectDb(uri: string = env.MONGODB_URI): Promise<typeof mongoose> {

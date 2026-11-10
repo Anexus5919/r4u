@@ -4,10 +4,7 @@ import { afterAll, afterEach, beforeAll } from 'vitest'
 
 let memory: MongoMemoryServer | undefined
 
-/**
- * Call once per suite. Starts an in-memory MongoDB, connects mongoose, and clears every
- * collection between tests so suites cannot leak state into one another.
- */
+/** per suite: in-memory MongoDB, collections cleared between tests */
 export function useTestDb() {
   beforeAll(async () => {
     memory = await MongoMemoryServer.create()

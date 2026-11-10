@@ -2,10 +2,7 @@ import { body } from 'express-validator'
 import { THEMES } from '@r4u/shared'
 import { passwordRule } from '../../lib/fieldRules.js'
 
-/*
-  Every field is optional, and only listed fields survive matchedData. role, status and
-  tokenVersion have no chain here, so they can never arrive through this route.
-*/
+// role, status and tokenVersion have no chain, so matchedData drops them
 export const updateProfileRules = [
   body('name').optional().isString().trim().isLength({ min: 2, max: 80 }),
   body('headline').optional().isString().trim().isLength({ max: 80 }),

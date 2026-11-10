@@ -8,17 +8,9 @@ export interface Principal {
   role: Role
 }
 
-/*
-  The ONLY function in the codebase permitted to pass contentScope: 'full'.
-
-  If a second one ever appears, the fail-closed hook on the Resume schema stops being a boundary
-  and becomes a suggestion. Route every content read through here.
-*/
+// the ONLY function allowed to pass contentScope: 'full'
 export async function readResumeContent(resumeId: string, principal: Principal) {
-  /*
-    Unconditional, and deliberately before the ownership check. An administrator must not be
-    able to distinguish "not yours" from "does not exist" either.
-  */
+  // before the ownership check, so admin cannot tell 'not yours' from 'missing'
   if (principal.role === 'admin') {
     throw new AppError('ADMIN_CONTENT_FORBIDDEN', 'Resume content is not visible to administrators')
   }
@@ -33,10 +25,7 @@ export async function readResumeContent(resumeId: string, principal: Principal) 
   return resume
 }
 
-/**
- * Metadata only. Safe for dashboards, admin statistics and any list view, because the schema
- * hook strips content unless someone opts in, and nothing here does.
- */
+/** metadata only: the schema hook strips content and nothing here opts in */
 export async function listResumesForOwner(ownerId: string) {
   return ResumeModel.find({ owner: ownerId }).sort({ updatedAt: -1 })
 }

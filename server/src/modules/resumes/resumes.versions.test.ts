@@ -69,10 +69,7 @@ describe('POST /api/resumes/import', () => {
     expect(experience.entries[0].data.organisation).toBe('Corvid Messaging')
   })
 
-  /*
-    Named rather than silent. An import that quietly drops half a career is worse than one that
-    refuses, because the user has no way to know.
-  */
+  // skipped sections are named: a silent partial import hides lost content
   it('reports the sections it could not place', async () => {
     const token = await signUp()
 
@@ -221,10 +218,7 @@ describe('version history', () => {
     expect(restored.body.data.resume.personal.fullName).toBe('Alex Mercer')
   })
 
-  /*
-    A restore that discards what it replaced is a second way to lose work, which is the opposite
-    of what history is for.
-  */
+  // a restore must not discard what it replaced
   it('snapshots the current state before restoring, so the restore is undoable', async () => {
     const token = await signUp()
     const resume = await newResume(token)
