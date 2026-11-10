@@ -12,13 +12,7 @@ import {
 } from '../layout/helpers.js'
 import type { DocTheme, LayoutNode, TemplateResume } from '../layout/types.js'
 
-/*
-  Entry renderers shared by every template.
-
-  The eight templates differ on five structural axes: columns, header treatment, divider system,
-  section-head placement and density. They do not differ on what a job entry contains, so that
-  lives here once and a template that reimplements it is a template that will drift.
-*/
+// shared by every template: the eight differ on layout, never on what an entry contains
 
 type Entry = TemplateResume['sections'][number]['entries'][number]
 
@@ -35,11 +29,7 @@ function datesFor(data: Record<string, unknown>, options: BlockOptions): string 
   return options.dates === 'none' ? '' : dateRange(data)
 }
 
-/*
-  A bullet is a row, not a list marker. The glyph sits in its own fixed column so wrapped lines
-  align under the text rather than under the marker, which is the hanging indent a typeset resume
-  has and a word-processed one does not.
-*/
+// a row, not a list marker, so wrapped lines align under the text rather than the glyph
 export function bullets(theme: DocTheme, items: string[], glyph = '•'): LayoutNode[] {
   return items.map((item) =>
     row({ gap: 0, marginTop: theme.bodySize * 0.35 }, [
@@ -176,10 +166,7 @@ export function projectEntry(
   ])
 }
 
-/*
-  Groups on one line each. Never a rating bar, never a set of dots: both are unparseable by every
-  ATS and neither is a claim anyone can verify.
-*/
+// one line per group. never a rating bar: unparseable, and an unverifiable claim
 export function skillsEntry(theme: DocTheme, entry: Entry, options: BlockOptions = {}): LayoutNode {
   const group = str(entry.data, 'group')
   const items = list(entry.data, 'items')
@@ -309,11 +296,7 @@ export function renderEntry(
   }
 }
 
-/* ---------------------------------------------------------------- section heads
-
-  Four divider systems, one per structural axis in TEMPLATES.md. A template picks one and never
-  mixes them, which is what makes the eight read as eight designs rather than one recoloured.
-*/
+// section heads: four divider systems, one per axis in TEMPLATES.md, never mixed
 
 export type HeadStyle =
   'rule-below' | 'rule-above' | 'rule-to-margin' | 'plain' | 'centered' | 'rail'

@@ -109,10 +109,7 @@ describe('entry rules', () => {
   })
 })
 
-/*
-  A linter that flags everything is noise. The sample resume is the worked example the product
-  shows off, so it has to come back clean on the rules that matter.
-*/
+// a linter that flags everything is noise, so the worked example has to come back clean
 describe('the sample resume', () => {
   const findings = lintResume(ResumeBase.parse(SAMPLE_RESUME))
 
@@ -150,10 +147,7 @@ describe('scope', () => {
     expect(findings).toEqual([])
   })
 
-  /*
-    Gating on resumeType is what stops the linter fighting the user. Publications are not bullets,
-    a citation cannot be quantified, and a references section is correct on a CV.
-  */
+  // gating on resumeType is what stops the linter fighting an academic CV
   it('leaves an academic CV alone where the rules do not apply', () => {
     const cv = {
       resumeType: 'academic' as const,

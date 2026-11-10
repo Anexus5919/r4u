@@ -1,9 +1,4 @@
-/*
-  Word lists for the content linter and, in phase 10, for rubric checks D2 and D4.
-
-  A JSON word list rather than a model call. The checks stay explainable, reproducible and free,
-  which is the whole differentiator: a user can see exactly which rule fired and why.
-*/
+// a word list rather than a model call: explainable, reproducible and free
 
 export const ACTION_VERBS = {
   leadership: [
@@ -101,10 +96,7 @@ export const ACTION_VERBS = {
 
 export const ALL_ACTION_VERBS: string[] = Object.values(ACTION_VERBS).flat()
 
-/*
-  From Rezi's 102,944-resume corpus. These are the openers that read as filler even though they
-  are grammatically verbs.
-*/
+// from Rezi's 102,944-resume corpus: grammatically verbs, but they read as filler
 export const WEAK_VERBS = [
   'worked',
   'work',

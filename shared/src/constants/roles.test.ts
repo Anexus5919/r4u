@@ -14,11 +14,7 @@ describe('roles', () => {
     expect(hasRole('guest', [])).toBe(false)
   })
 
-  /*
-    The load-bearing test. A rank ladder where admin outranks everything is the natural way to
-    write authorisation, and it silently grants an admin every user capability, including
-    reading private resume content. See ADR-008.
-  */
+  // a rank ladder would silently grant admin every user capability. see ADR-008
   it('does not let admin satisfy a check it was not granted', () => {
     expect(hasRole('admin', ['user'])).toBe(false)
     expect(hasRole('admin', ['owner' as never])).toBe(false)

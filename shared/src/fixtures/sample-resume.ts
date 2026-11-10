@@ -1,17 +1,6 @@
 import type { Resume } from '../resume/schema.js'
 
-/*
-  The one sample resume in the product.
-
-  It backs the template gallery, the admin template previews, the landing hero and every design
-  review, which is what keeps the rule in DESIGN-SYSTEM.md section 10 honest: no screen is ever
-  reviewed with placeholder content.
-
-  Alex Mercer is fictional and the employers are invented. The bullets are written to score well
-  against the ATS rubric on purpose: every one opens with an action verb and carries a
-  quantification token that survives the year-and-version guard, so the sample doubles as a
-  worked example of what the checker is asking for.
-*/
+// the one sample in the product: no screen is ever reviewed with placeholder content
 export const SAMPLE_RESUME: Resume = {
   title: 'Backend Developer CV',
   resumeType: 'technical',
@@ -201,8 +190,4 @@ export const SAMPLE_RESUME: Resume = {
   ],
 }
 
-/*
-  The certifications section ships hidden on purpose. Every screen that renders the fixture then
-  exercises the hide-without-delete path from FR 4.3, so a regression there is visible during an
-  ordinary design review rather than only under test.
-*/
+// hidden on purpose, so every render exercises the hide-without-delete path of FR 4.3

@@ -46,12 +46,7 @@ describe.each(TEMPLATE_LIST.map((t) => t.key))('template %s', (key) => {
     expect(all).toContain('alex.mercer@example.com')
   })
 
-  /*
-    The collision between severe editorial minimalism and ATS parsing, resolved structurally.
-    Measured, extraction breaks around 0.10, where EXPERIENCE comes back as E X P E R I E N C E
-    and the parser stops recognising the heading. Every template routes tracking through the
-    tracking() helper, and this proves none of them found a way around it.
-  */
+  // editorial minimalism against ATS parsing: past about 0.10 the parser loses the heading
   it('never exceeds the extraction-safe letter-spacing cap', () => {
     walk(nodes, (node) => {
       const style = node.style
@@ -260,10 +255,7 @@ describe('structure the two adapters have to agree on', () => {
   })
 })
 
-/*
-  The exit criterion for this phase. A template switch that can silently drop a section is the
-  worst bug this product could ship, so every ordered pair is checked, not a sample.
-*/
+// every ordered pair, not a sample: a switch that drops a section is the worst bug here
 describe('switching between templates', () => {
   const pairs = TEMPLATE_LIST.flatMap((from) =>
     TEMPLATE_LIST.filter((to) => to.key !== from.key).map((to) => [from.key, to.key] as const)
@@ -302,10 +294,7 @@ describe('switching between templates', () => {
     expect(wouldReorder(ordered, template)).toBe(false)
   })
 
-  /*
-    Anything absent from both slot lists falls into main. Without that default a section has no
-    destination in a two-column template and either duplicates into both or vanishes.
-  */
+  // without the main default a section has no destination in a two-column template
   it('gives every section type a column', () => {
     for (const template of TEMPLATE_LIST) {
       for (const section of resume.sections) {

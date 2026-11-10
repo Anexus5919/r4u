@@ -1,7 +1,4 @@
-/*
-  One table, imported by both sides. The client switches on `code`, never on `message`, so
-  wording can change without breaking behaviour.
-*/
+// one table for both sides. the client switches on code, never on message
 
 export const ERROR_STATUS = {
   VALIDATION_FAILED: 422,

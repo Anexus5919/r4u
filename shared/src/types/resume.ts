@@ -4,10 +4,7 @@ import type { ResumeType } from '../resume/sections.js'
 export const RESUME_STATUSES = ['draft', 'in_review', 'reviewed'] as const
 export type ResumeStatus = (typeof RESUME_STATUSES)[number]
 
-/**
- * What a list returns. Carries no resume content at all, which is what lets the dashboard, the
- * admin statistics and any future analytics read the same shape without a privileged query.
- */
+/** carries no resume content, so the dashboard and admin stats read one shape */
 export interface ResumeSummary {
   id: string
   title: string

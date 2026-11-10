@@ -1,36 +1,13 @@
 import { personalOf } from './schema.js'
 import type { Resume, ResumeSection } from './schema.js'
 
-/*
-  Completeness, word count and the quantification ratio.
+// shared, so the editor updates as the user types and the server denormalises one number
 
-  Lives in shared so the editor can show completeness update as the user types without a round
-  trip, and the server can denormalise the same numbers onto the document. Two implementations
-  would drift, and the admin dashboard reads the server's copy.
-*/
-
-/*
-  Quantification, with the guard that makes the metric mean anything.
-
-  Without stripping years and version numbers first, every bullet in a 2021 to 2023 role counts
-  as quantified, the ratio becomes noise, and users notice immediately when a duty-only bullet
-  scores full marks. See ATS-RUBRIC.md section 6.2.
-
-  Versions are matched narrowly, either an explicit v prefix or three-part semver, so a genuine
-  metric like "3.5x faster" is not mistaken for one.
-*/
+// strip years and versions, or every bullet in a 2021 to 2023 role scores as quantified
 const VERSION = /\bv\d+(\.\d+)*\b|\b\d+\.\d+\.\d+\b/gi
 const YEAR = /\b(19|20)\d{2}\b/g
 
-/*
-  An enumerated noun list was the original approach and it is the wrong shape. Real bullets count
-  services, minutes, deploys, incidents and failures, and any fixed list is one word short of the
-  next resume someone writes.
-
-  A number followed by a plural noun, with up to two words in between, generalises correctly:
-  "38 services", "45 minutes", "3 integration failures", "9 million notifications". The explicit
-  list is kept only for units that are not plural, such as ms and gb.
-*/
+// a number plus a plural noun: any fixed noun list is one word short of the next resume
 const QUANTIFIERS: RegExp[] = [
   /[$£€₹]\s?\d[\d,]*(\.\d+)?\s?(k|m|mn|bn|b|lakh|crore)?/i,
   /\b\d[\d,]*(\.\d+)?\s?%/,
@@ -45,13 +22,7 @@ export function isQuantified(bullet: string): boolean {
   return QUANTIFIERS.some((pattern) => pattern.test(stripped))
 }
 
-/*
-  Everything below tolerates a partial object on purpose.
-
-  The type says Resume, but the real caller is a Mongoose document converted with toObject(),
-  where an untouched subdocument is simply absent rather than defaulted. Destructuring it blind
-  throws, and it throws inside autosave, which is the one path that must never fail.
-*/
+// tolerates a partial object: toObject() leaves an untouched subdocument absent
 function sectionsOf(resume: Partial<Resume>): ResumeSection[] {
   return Array.isArray(resume.sections) ? resume.sections : []
 }
@@ -109,16 +80,7 @@ function hasVisibleEntries(resume: Partial<Resume>, type: string): boolean {
   )
 }
 
-/*
-  Weighted by section, never by filled-field count.
-
-  "Fields filled over total fields" is the student-project version: it moves for reasons the user
-  cannot act on, and it rewards padding. These weights come from TEMPLATES.md section 20.
-
-  Page fit is the seventh dimension and is deliberately absent until phase 7 can measure a real
-  render. Scoring an unmeasured dimension as passing would be dishonest, so the total is
-  normalised over what is actually known.
-*/
+// weighted by section per TEMPLATES.md section 20; page fit is absent until measurable
 const WEIGHTS = {
   contact: 10,
   summary: 10,

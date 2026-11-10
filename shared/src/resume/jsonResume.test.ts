@@ -35,10 +35,7 @@ describe('export', () => {
     expect(json.skills?.[0]?.keywords).toContain('TypeScript')
   })
 
-  /*
-    The fixture ships certifications hidden. An export is what the resume says, so a section the
-    user has hidden must not reappear in it.
-  */
+  // an export is what the resume says, so a hidden section must not reappear in it
   it('omits a hidden section', () => {
     expect(json.certificates).toHaveLength(0)
   })
@@ -114,10 +111,7 @@ describe('import', () => {
     expect(running.sections[0]?.entries[0]?.data.current).toBe(true)
   })
 
-  /*
-    Named rather than silent. Telling the user what did not come across is the difference between
-    an import they can trust and one that quietly loses half their history.
-  */
+  // naming what did not come across is what makes an import trustworthy
   it('reports what it could not place', () => {
     expect(skipped).toContain('volunteer')
   })
@@ -133,10 +127,7 @@ describe('import', () => {
   })
 })
 
-/*
-  The round trip is the real test of an interchange format: anything that survives export but not
-  import is a field the user loses by leaving and coming back.
-*/
+// the real test of an interchange format: what survives export but not import is lost
 describe('round trip', () => {
   const back = fromJsonResume(toJsonResume(resume))
 

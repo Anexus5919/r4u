@@ -2,14 +2,7 @@ import { compact, contactLine, row, spacer, stack, text } from '../layout/helper
 import type { LayoutNode, ResumeTemplate, TemplateInput } from '../layout/types.js'
 import { renderEntry, sectionHead } from './blocks.js'
 
-/*
-  LEDGER. Senior, ten years or more, comfortable running to two pages.
-
-  Structural signature: section headings sit INLINE with a hairline running from the end of the
-  heading to the right margin. Density is tight throughout, and the header splits with the name
-  left and contact stacked right, so the first line carries two pieces of information rather
-  than one.
-*/
+// LEDGER. senior, two pages. heads INLINE with a rule running to the right margin
 function render({ resume, theme }: TemplateInput): LayoutNode[] {
   const { personal } = resume
   const nameSize = theme.bodySize * 1.9

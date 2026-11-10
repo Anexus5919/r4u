@@ -2,17 +2,7 @@ import { compact, contactLine, dateRange, row, spacer, stack, text } from '../la
 import type { DocTheme, LayoutNode, ResumeTemplate, TemplateInput } from '../layout/types.js'
 import { renderEntry, sectionHead } from './blocks.js'
 
-/*
-  MARGINALIA. Researchers, long chronologies, anyone with many short entries.
-
-  Structural signature: a 26mm left rail. Section headings and entry dates hang in it,
-  right-aligned against the body, and the content runs in a single column beside them. It is the
-  one layout in the set whose heads sit outside the measure rather than on top of it.
-
-  ATS caution, and honestly so: a rail is a second column as far as a line-oriented extractor is
-  concerned, so the dates can interleave with the headings. The linearised variant moves both
-  back inline.
-*/
+// MARGINALIA. a 26mm left rail carrying heads and dates. caution: a rail reads as a column
 /** 26mm. Exported so the test can assert the head really is in the rail and not beside it. */
 export const RAIL = 73.7
 

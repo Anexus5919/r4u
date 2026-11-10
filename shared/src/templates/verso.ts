@@ -4,16 +4,7 @@ import type { DocTheme, LayoutNode, ResumeTemplate, TemplateInput } from '../lay
 import type { TemplateResume } from '../layout/types.js'
 import { renderEntry, sectionHead } from './blocks.js'
 
-/*
-  VERSO. Design, marketing and career changes, where the skills have to lead.
-
-  Structural signature: the sidebar is on the LEFT at 34 percent on a tinted ground, and the name
-  lives INSIDE it. There is no header band at all, which is what makes this structurally distinct
-  from Recto rather than a mirror of it. No rules anywhere: the tint edge does the separating.
-
-  A hybrid rather than a functional resume. Leading with skills is the goal; dropping the dated
-  chronology to do it is the format recruiters distrust most and parsers handle worst.
-*/
+// VERSO. sidebar LEFT at 34% on a tint, name inside it, no header block and no rules
 const ASIDE_SECTIONS = ['skills', 'languages', 'certifications'] as const
 
 function asideSection(theme: DocTheme, section: TemplateResume['sections'][number]): LayoutNode {

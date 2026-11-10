@@ -3,18 +3,7 @@ import type { DocTheme, LayoutNode, ResumeTemplate, TemplateInput } from '../lay
 import type { TemplateResume } from '../layout/types.js'
 import { renderEntry, sectionHead } from './blocks.js'
 
-/*
-  RECTO. Experienced people with long skill inventories, for human-reviewed and referral
-  applications.
-
-  Structural signature: two columns with the sidebar on the RIGHT at 32 percent, a full-width
-  split header band above both, and a hairline running down the gutter. Verso is its mirror in
-  every one of those respects, which is what keeps them two designs rather than one flipped.
-
-  Not ATS safe, and badged that way on the card before anyone picks it. A line-oriented extractor
-  reads across both columns and interleaves them, which is Textkernel code 433. The linearised
-  variant splices the sidebar back into a single column in canonical order.
-*/
+// RECTO. sidebar RIGHT at 32%, split header, gutter hairline. Verso mirrors all three
 const ASIDE_SECTIONS = ['skills', 'certifications', 'languages', 'education'] as const
 
 function asideSection(theme: DocTheme, section: TemplateResume['sections'][number]): LayoutNode {

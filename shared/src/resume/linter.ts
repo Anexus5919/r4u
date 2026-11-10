@@ -10,15 +10,7 @@ import {
   isWeakVerb,
 } from './verbs.js'
 
-/*
-  A rule-based writing linter. No model call, no API key, no cost.
-
-  Every finding names the rule that produced it and points at the exact field, which is what
-  makes it coaching rather than a score. See TEMPLATES.md section 11.
-
-  Deliberately not an auto-fix. Rewriting someone's bullets for them is exactly the generated
-  feel the design direction rejects, and it would break the honesty premise of the whole product.
-*/
+// rule-based, no model call: every finding names its rule, which makes it coaching
 
 export type Severity = 'error' | 'warning' | 'hint'
 
@@ -205,11 +197,7 @@ function lintSummary(section: ResumeSection, out: Finding[]) {
   }
 }
 
-/*
-  Gated on resumeType. An academic CV must not be told to bullet-limit its publications or to
-  quantify a citation, and "references available on request" is correct there and wrong on a
-  resume. A linter that fights the user is worse than no linter.
-*/
+// gated on resumeType: a CV must not be told to quantify a citation
 export function lintResume(resume: Partial<Resume>): Finding[] {
   const findings: Finding[] = []
   const sections = Array.isArray(resume.sections) ? resume.sections : []
