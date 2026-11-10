@@ -185,7 +185,9 @@ export function AdminOverviewPage() {
               <TBody>
                 {logs.map((entry) => (
                   <TR key={entry.id}>
-                    <TD>{entry.actor?.name ?? 'Visitor'}</TD>
+                    <TD>
+                      {entry.actor?.name ?? (entry.actorDeleted ? 'Deleted account' : 'Visitor')}
+                    </TD>
                     <TD className="font-mono text-xs">{entry.action}</TD>
                     <TD numeric className="text-xs text-ink-09">
                       {formatRelative(entry.at)}

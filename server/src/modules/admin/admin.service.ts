@@ -374,15 +374,20 @@ export async function listLogs(page: number, limit: number): Promise<Paged<Activ
     ActivityLogModel.countDocuments(),
   ])
 
-  const items: ActivityEntry[] = docs.map((doc) => ({
-    id: doc.id,
-    actor: person(doc.actor),
-    action: doc.action,
-    targetType: doc.targetType,
-    targetId: doc.targetId ? String(doc.targetId) : null,
-    meta: (doc.meta ?? {}) as ActivityEntry['meta'],
-    at: doc.at.toISOString(),
-  }))
+  const items: ActivityEntry[] = docs.map((doc) => {
+    const actor = person(doc.actor)
+    // populate leaves null for a deleted account, but still remembers the id it looked up
+    return {
+      id: doc.id,
+      actor,
+      actorDeleted: !actor && Boolean(doc.populated('actor')),
+      action: doc.action,
+      targetType: doc.targetType,
+      targetId: doc.targetId ? String(doc.targetId) : null,
+      meta: (doc.meta ?? {}) as ActivityEntry['meta'],
+      at: doc.at.toISOString(),
+    }
+  })
 
   return paged(items, page, limit, total)
 }

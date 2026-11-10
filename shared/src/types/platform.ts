@@ -193,6 +193,8 @@ export interface AdminUserRow {
 export interface ActivityEntry {
   id: string
   actor: PersonRef | null
+  // true when the entry had an actor whose account no longer exists, unlike an anonymous visitor
+  actorDeleted: boolean
   action: string
   targetType: string
   targetId: string | null

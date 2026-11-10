@@ -196,7 +196,7 @@ function Logs() {
             {logs.map((entry) => (
               <TR key={entry.id}>
                 <TD className="pl-5 text-xs text-ink-09">{new Date(entry.at).toLocaleString()}</TD>
-                <TD>{entry.actor?.name ?? 'Visitor'}</TD>
+                <TD>{entry.actor?.name ?? (entry.actorDeleted ? 'Deleted account' : 'Visitor')}</TD>
                 <TD className="font-mono text-xs">{entry.action}</TD>
                 <TD className="text-xs text-ink-09">{entry.targetType}</TD>
                 <TD className="pr-5 font-mono text-xs text-ink-09">

@@ -195,6 +195,22 @@ describe('admin templates, reports and logs', () => {
     const entry = logs.body.data.logs.find((l: { action: string }) => l.action === 'admin.role')
     expect(entry.meta).toEqual({ from: 'user', to: 'reviewer' })
     expect(entry.actor.name).toBe('admin')
+    expect(entry.actorDeleted).toBe(false)
+  })
+
+  it('marks an entry whose actor was deleted, rather than calling them a visitor', async () => {
+    const gone = await account('gone@example.com')
+    const admin = await account('admin@example.com', 'admin')
+    await flushActivity()
+    await UserModel.deleteOne({ _id: gone.id })
+
+    const logs = await request(app).get('/api/admin/logs').set(auth(admin.token))
+    type Entry = { actor: { id: string } | null; actorDeleted: boolean; targetId: string | null }
+    const orphan = logs.body.data.logs.find((l: Entry) => l.targetId === gone.id && !l.actor)
+    expect(orphan).toBeDefined()
+    expect(orphan.actorDeleted).toBe(true)
+    const live = logs.body.data.logs.find((l: Entry) => l.actor?.id === admin.id)
+    expect(live.actorDeleted).toBe(false)
   })
 })
 
