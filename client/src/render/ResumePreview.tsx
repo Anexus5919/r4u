@@ -31,6 +31,7 @@ export function ResumePreview({
   const frame = useRef<HTMLDivElement>(null)
   const page = useRef<HTMLDivElement>(null)
   const content = useRef<HTMLDivElement>(null)
+  const reported = useRef<PreviewMetrics | null>(null)
   const [scale, setScale] = useState(1)
 
   const template = getTemplate(resume.templateKey ?? 'foundry')
@@ -73,10 +74,17 @@ export function ResumePreview({
     const available = page.current.clientHeight - 2 * theme.margin * PT_TO_PX
     const overflowPx = Math.max(0, contentHeight - available)
 
-    onMetrics({
+    const next: PreviewMetrics = {
       overflowMm: Math.round(overflowPx / MM_TO_PX),
-      fill: available > 0 ? contentHeight / available : 0,
-    })
+      fill: available > 0 ? Math.round((contentHeight / available) * 1000) / 1000 : 0,
+    }
+
+    // an unchanged report still re-renders a parent holding it in state, which loops forever
+    const last = reported.current
+    if (last && last.overflowMm === next.overflowMm && last.fill === next.fill) return
+
+    reported.current = next
+    onMetrics(next)
   })
 
   return (
