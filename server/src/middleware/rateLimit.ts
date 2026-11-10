@@ -55,3 +55,16 @@ export const passwordResetLimiter = rateLimit({
     return `${ipKeyGenerator(req.ip ?? '')}:${email}`
   },
 })
+
+// a public resume link is cheap to hammer and costs a database read each time
+export const publicShareLimiter = rateLimit({
+  ...base,
+  windowMs: 60 * 60 * 1000,
+  limit: 60,
+})
+
+export const reportLimiter = rateLimit({
+  ...base,
+  windowMs: 60 * 60 * 1000,
+  limit: 5,
+})

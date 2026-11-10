@@ -5,6 +5,7 @@ import { notFound } from '../../lib/AppError.js'
 import { ResumeModel } from '../../models/index.js'
 import { readResumeContent } from './resumes.access.js'
 import type { Principal } from './resumes.access.js'
+import { resolveForNewResume } from '../templates/templates.service.js'
 
 export interface ListOptions {
   q?: string
@@ -86,11 +87,15 @@ export interface CreateInput {
 }
 
 export async function create(ownerId: string, input: CreateInput) {
+  // a gallery entry may be a preset, so it resolves to a renderer key plus design defaults
+  const { templateKey, design } = await resolveForNewResume(input.templateKey)
+
   return ResumeModel.create({
     owner: ownerId,
     title: input.title,
     resumeType: input.resumeType,
-    templateKey: input.templateKey ?? 'foundry',
+    templateKey,
+    design,
     sections: seedSections(input.resumeType),
     meta: { completeness: 0, wordCount: 0, sectionCount: 0 },
   })
