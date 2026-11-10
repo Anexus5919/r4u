@@ -7,45 +7,6 @@ import { ButtonLink } from '@/components/ui/Button'
   which is more useful than a grey box and keeps the design reviewable.
 */
 
-export function LandingPage() {
-  return (
-    <div className="min-h-dvh bg-ink-01">
-      <div className="mx-auto flex min-h-dvh max-w-6xl flex-col px-6 lg:px-10">
-        <header className="flex h-16 shrink-0 items-center justify-between">
-          <span className="font-display text-lg tracking-tight text-ink-12">R4U</span>
-          <ButtonLink to="/login" variant="ghost" size="sm">
-            Sign in
-          </ButtonLink>
-        </header>
-
-        <main className="flex flex-1 items-start pt-16">
-          <div className="max-w-xl">
-            <h1 className="font-display text-[38px] leading-tight text-ink-12">
-              Build a resume a machine can actually read
-            </h1>
-            <p className="mt-4 text-md text-ink-09">
-              Your content is stored as structured data, so one dataset renders through any
-              template, exports to a real text-layer A4 PDF, and publishes as a link you control. No
-              paywall at download.
-            </p>
-
-            <div className="mt-8">
-              <ButtonLink to="/register" variant="primary">
-                Create an account
-              </ButtonLink>
-            </div>
-
-            <p className="mt-10 border-t border-ink-04 pt-5 text-xs text-ink-09">
-              The hero lockup, where the 4 holds as a pivot and R4U expands into RESUME 4 YOU, is
-              specified in docs/LANDING.md and built in phase 11 against real product screens.
-            </p>
-          </div>
-        </main>
-      </div>
-    </div>
-  )
-}
-
 /*
   The editor and preview surfaces land in phases 5 and 6. They exist as routes now so the
   dashboard card actions navigate somewhere real rather than into a 404, and so the resume
