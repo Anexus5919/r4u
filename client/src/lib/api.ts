@@ -2,12 +2,7 @@ import axios from 'axios'
 import type { AxiosError, AxiosInstance, InternalAxiosRequestConfig } from 'axios'
 import type { ApiErrorShape, ErrorCode } from '@r4u/shared'
 
-/*
-  The access token lives here, in a module variable, and nowhere else.
-
-  localStorage would survive the tab, so any XSS could exfiltrate a credential usable later. An
-  in-memory token dies with the page, which is the whole reason the refresh cookie exists.
-*/
+// access token in memory only: localStorage would hand it to any XSS
 let accessToken: string | null = null
 
 export function setAccessToken(token: string | null) {
@@ -26,10 +21,7 @@ export const api: AxiosInstance = axios.create({
   withCredentials: true,
   timeout: 60_000,
   headers: {
-    /*
-      Required by the server's cookie guard on /auth/refresh and /auth/logout. A custom header
-      forces a CORS preflight, which a cross-site attacker cannot satisfy. Harmless elsewhere.
-    */
+    // the cookie guard needs it: a custom header forces a CORS preflight
     'X-Requested-With': 'r4u',
   },
 })
@@ -39,11 +31,7 @@ api.interceptors.request.use((config) => {
   return config
 })
 
-/*
-  One refresh at a time. Without this, three concurrent 401s fire three refreshes, and because
-  the server rotates on every use, two of them replay a consumed token and revoke the family,
-  logging the user out for doing nothing wrong.
-*/
+// single-flight: concurrent refreshes would replay a rotated token and revoke the family
 let refreshing: Promise<string | null> | null = null
 
 export async function refreshOnce(): Promise<string | null> {

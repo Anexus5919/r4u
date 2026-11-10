@@ -3,11 +3,7 @@ import type { Finding, ResumeType } from '@r4u/shared'
 import { cn } from '@/lib/cn'
 import type { SaveStatus } from '@/editor/reducer'
 
-/*
-  Completeness renders as a hairline rule that fills, with tabular figures. Never a ring chart
-  and never an animated counter: both draw attention to the number rather than to what would
-  move it.
-*/
+// a hairline that fills. never a ring chart, never an animated counter
 export function Completeness({ value }: { value: number }) {
   return (
     <div className="flex flex-col gap-1.5">
@@ -113,10 +109,7 @@ export function CoachPanel({
             <ul className="flex flex-col gap-2">
               {group.items.slice(0, 12).map((finding, index) => (
                 <li key={`${finding.rule}-${finding.entryId ?? ''}-${finding.index ?? index}`}>
-                  {/*
-                    Every note deep links to the section that caused it. A list of complaints the
-                    user cannot act on is worse than no list.
-                  */}
+                  {/* every note deep links to its section: a complaint with no action is noise */}
                   <button
                     type="button"
                     onClick={() => finding.sectionId && onJump(finding.sectionId)}

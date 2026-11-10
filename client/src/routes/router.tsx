@@ -23,8 +23,7 @@ import {
 } from './lazy'
 import { ForbiddenPage, NotFoundPage } from './placeholders'
 
-// guards are layout routes, so a new child inherits its protection by position
-// RequireRole is set membership, matching the server: admin and user branches are siblings
+// guards are layout routes, children inherit protection; roles are set membership
 export const router = createBrowserRouter([
   { path: '/', element: <LandingPage /> },
   { path: '/templates', element: <TemplatesPage /> },

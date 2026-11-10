@@ -2,13 +2,7 @@ import { createContext, useContext } from 'react'
 import type { PublicUser } from '@r4u/shared'
 import type { ApiFailure } from '@/lib/api'
 
-/*
-  'checking' is a real state, not a boolean flag.
-
-  Without it the app renders the guest tree for one frame on every reload, which flashes the
-  login screen at an already-signed-in user and, worse, fires a redirect before the session has
-  had a chance to restore.
-*/
+// 'checking' is a state so a reload neither flashes login nor redirects early
 export type AuthStatus = 'checking' | 'authenticated' | 'guest'
 
 export interface AuthContextValue {

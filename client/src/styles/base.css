@@ -1,7 +1,4 @@
-/*
-  Base layer. Element defaults only. Anything reusable belongs in components/ui.
-  No hex literals here: every colour reads a token.
-*/
+/* base layer: element defaults only, every colour reads a token */
 
 @layer base {
   *,
@@ -79,10 +76,7 @@
     padding: 0;
   }
 
-  /*
-    One focus treatment for the whole product. A ring, never a glow, never a colour change.
-    :focus-visible only, so a mouse click never draws it.
-  */
+  /* one focus treatment: a ring on :focus-visible only, never a glow */
   :focus {
     outline: none;
   }
@@ -133,11 +127,7 @@
     display: none !important;
   }
 
-  /*
-    Native dialog gives focus trapping, Escape and inertness from the platform.
-    allow-discrete plus @starting-style produce the exit transition in CSS, which is why R4U
-    needs no animation library for modals.
-  */
+  /* native dialog plus allow-discrete and @starting-style: no animation library */
   dialog {
     padding: 0;
     border: none;
@@ -219,10 +209,7 @@
     border-left: var(--hairline) solid var(--ink-04);
   }
 
-  /*
-    The entire motion vocabulary. Components use these rather than arbitrary durations, so the
-    three-duration rule is enforced by what is available rather than by discipline.
-  */
+  /* the entire motion vocabulary: only three durations exist to use */
   .t-xs {
     transition-duration: var(--motion-xs);
     transition-timing-function: var(--ease-out);

@@ -8,13 +8,7 @@ import type { EditorAction, EditorState } from './reducer'
 
 export const AUTOSAVE_DELAY = 500
 
-/*
-  Autosave is a debounced HTTP PATCH, never a socket message. HTTP gives retries, real status
-  codes, rate limiting and an endpoint that can be demonstrated in Postman. See ADR-013.
-
-  What is sent is the diff between the last confirmed server state and the current one, so an
-  undo is just another state and needs no inverse of its own.
-*/
+// debounced HTTP PATCH of the diff since the last confirmed save, see ADR-013
 export function useAutosave(state: EditorState, dispatch: (action: EditorAction) => void) {
   // a ref, because the timer closure would otherwise capture the state it was created with
   const latest = useRef(state)
@@ -43,10 +37,7 @@ export function useAutosave(state: EditorState, dispatch: (action: EditorAction)
     } catch (error) {
       const failure = error as AxiosError<ApiErrorShape & { data?: { resume: ResumeDetail } }>
 
-      /*
-        409. The other tab won. Take the server's document as the new truth rather than telling
-        the user to reload, which would throw away whatever they have typed since.
-      */
+      // 409: the other tab won, so rebase on the server copy rather than reload
       if (failure.response?.status === 409) {
         const remote = (failure.response.data as { data?: { resume: ResumeDetail } }).data?.resume
         if (remote) {
@@ -74,10 +65,7 @@ export function useAutosave(state: EditorState, dispatch: (action: EditorAction)
     }
   }, [dirty, state.resume, flush])
 
-  /*
-    The browser will not wait for an async save, so this cannot guarantee a write. It exists to
-    make the user decide, which is the only honest thing available at this point.
-  */
+  // the browser will not await a save, so the honest option is to ask the user
   useEffect(() => {
     if (!dirty) return
 

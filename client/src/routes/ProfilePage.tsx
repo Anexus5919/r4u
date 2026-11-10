@@ -191,10 +191,7 @@ function Appearance({
 }) {
   const { toast } = useToast()
 
-  /*
-    Applied locally first so the change is instant, then persisted. The stored value is what a
-    fresh device picks up on first sign in, which is what FR 2.3 means by retaining it.
-  */
+  // applied locally for instant feedback, then persisted to seed new devices (FR 2.3)
   async function choose(theme: Theme) {
     setTheme(theme)
     try {

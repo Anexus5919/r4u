@@ -3,13 +3,7 @@ import { PT_TO_PX, getTemplate, resolveTheme, splitGrounds, toTemplateResume } f
 import type { Resume } from '@r4u/shared'
 import { renderToDom } from './renderToDom'
 
-/*
-  The preview is a real 210mm by 297mm box, scaled with a transform rather than laid out at some
-  convenient pixel size and hoped to match.
-
-  Authoring in physical units removes an entire class of rounding drift against the PDF: a 20mm
-  margin here is a 20mm margin there, not "about 75 pixels".
-*/
+// a real 210mm by 297mm box scaled by transform, so margins match the PDF
 
 const A4_MM = { width: 210, height: 297 }
 const MM_TO_PX = 96 / 25.4
@@ -62,11 +56,7 @@ export function ResumePreview({
     return () => observer.disconnect()
   }, [])
 
-  /*
-    Measured after layout, every render, because the content changes on every keystroke. Phase 7
-    replaces this with the page count the PDF renderer reports, which is the only number that can
-    be exactly right, but a DOM measurement is what makes the warning live while typing.
-  */
+  // measured after every layout so the overflow warning is live while typing
   useLayoutEffect(() => {
     if (!onMetrics || !content.current || !page.current) return
 
@@ -101,11 +91,7 @@ export function ResumePreview({
       >
         <div
           ref={page}
-          /*
-            The paper is true white in both themes and carries a visible edge. It has to be the
-            figure on the screen and the application the ground, which is the whole reason the
-            chrome is achromatic.
-          */
+          // true white paper with an edge in both themes: the only figure on screen
           className="paper border border-ink-05 shadow-none"
           style={{
             width: `${A4_MM.width}mm`,

@@ -1,16 +1,7 @@
 import { PT_TO_PX } from '@r4u/shared'
 import type { LayoutNode, Style } from '@r4u/shared'
 
-/*
-  The DOM half of "one layout AST, two adapters".
-
-  Every length in the AST is in points, because @react-pdf treats a bare number as pt. This
-  converts pt to px so one number means one physical size in both renderers. Getting that wrong
-  is how a preview and an export start disagreeing about margins.
-
-  Deliberately no Tailwind. @react-pdf has no CSS cascade and no class resolution, so both
-  adapters must consume the same plain token object or drift is guaranteed. See ADR-002.
-*/
+// DOM adapter: AST lengths are pt, converted to px; no Tailwind. see ADR-002
 
 const px = (value: number) => `${value * PT_TO_PX}px`
 

@@ -1,7 +1,4 @@
-/*
-  Neither date-fns nor dayjs. R4U's only date needs are a YYYY-MM month input and a short
-  display date, both of which Intl already does. See ADR-013.
-*/
+// Intl covers the only date needs, so no date-fns or dayjs. see ADR-013
 
 const SHORT_DATE = new Intl.DateTimeFormat('en-GB', {
   day: 'numeric',

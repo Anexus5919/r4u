@@ -36,10 +36,7 @@ export function Button({
   )
 }
 
-/*
-  A link that looks like a button. Navigation is an anchor, not a button: nesting a Link inside a
-  button is invalid markup and breaks middle-click, copy link and keyboard expectations.
-*/
+// navigation is an anchor: a Link inside a button is invalid and breaks middle-click
 export interface ButtonLinkProps extends LinkProps {
   variant?: ButtonVariant
   size?: ButtonSize

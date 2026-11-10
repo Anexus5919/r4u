@@ -46,10 +46,7 @@ describe('diffResume', () => {
     expect(ops.every((op) => op.op === 'setPersonal')).toBe(true)
   })
 
-  /*
-    Clearing a field that was never set is not a change. Without this, opening a form and
-    tabbing through it would send an op per field on first load.
-  */
+  // clearing an unset field is not a change, or tabbing through a form sends ops
   it('treats an empty string and an unset value as the same', () => {
     const base = makeResume()
     const next = structuredClone(base)
@@ -97,13 +94,7 @@ describe('diffResume', () => {
   })
 })
 
-/*
-  The payoff of deriving ops from a diff rather than accumulating them.
-
-  With an accumulated log, undo has to emit the inverse of whatever it reversed, and every action
-  needs a hand-written opposite. Here an undo is just another state, so the diff describes it
-  correctly without anyone writing an inverse at all.
-*/
+// undo is just another state, so the diff describes it with no hand-written inverse
 describe('undo through the diff', () => {
   it('emits nothing once an edit is undone back to the saved state', () => {
     const { ops } = after({ type: 'section_toggle', sectionId: 's-exp' }, { type: 'undo' })

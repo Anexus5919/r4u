@@ -32,11 +32,7 @@ function RequestLink() {
     }
   }
 
-  /*
-    The confirmation is deliberately vague about whether the address exists, matching the
-    server's identical-response behaviour. Saying "we could not find that account" here would
-    undo the enumeration defence on the endpoint.
-  */
+  // deliberately vague, matching the server, so the page cannot enumerate accounts
   if (sent) {
     return (
       <div className="flex flex-col gap-4">

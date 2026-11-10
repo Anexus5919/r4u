@@ -8,10 +8,7 @@ import { ResumePreview } from '@/render/ResumePreview'
 import type { PreviewMetrics } from '@/render/ResumePreview'
 import type { EditorResume } from '@/editor/types'
 
-/*
-  The right column. The paper is figure and the application is ground, which is why the preview
-  renders on true white with a visible page edge and everything around it stays achromatic.
-*/
+// the paper is figure and the app is ground, which is why the chrome stays achromatic
 
 const ATS_LABEL = {
   safe: 'ATS safe',
@@ -38,11 +35,7 @@ function longestBullet(resume: EditorResume) {
   return best
 }
 
-/*
-  Three remedies in a fixed priority order, which is itself the coaching: content before design.
-  Shrinking the type to fit a bullet nobody needed is the wrong trade, so trimming is offered
-  first and the auto-fit is offered second.
-*/
+// content before design: trimming is offered before shrinking the type to fit
 function OverflowNotice({
   overflowMm,
   resume,
@@ -132,10 +125,7 @@ export function DocumentPanel({
         {active ? (
           <p className="text-xs text-ink-09">
             {active.audience}{' '}
-            {/*
-              Badged honestly and up front. Shipping a beautiful two-column template and then
-              scoring it zero on layout makes the checker look broken rather than the template.
-            */}
+            {/* badged up front, or a zero layout score makes the checker look broken */}
             <span
               className={cn(
                 'font-mono text-2xs',

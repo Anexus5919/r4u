@@ -6,11 +6,7 @@ import { Input } from '@/components/ui/Input'
 import { Label } from '@/components/ui/Field'
 import { FieldControl } from './fields'
 
-/*
-  Personal details are the contact block, not a section. Every template needs them and no
-  template can hide them, so they sit outside the sections array rather than being a section that
-  happens to be undeletable.
-*/
+// the contact block, not a section: no template can hide it, so it sits outside sections
 export function PersonalForm({
   personal,
   onChange,

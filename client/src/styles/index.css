@@ -2,14 +2,7 @@
 @import './tokens.css';
 @import './base.css';
 
-/*
-  Theme resolution has three states: an explicit choice stamps data-theme on the root, and the
-  default "system" setting stamps nothing, leaving prefers-color-scheme to decide. The variant
-  handles both so a `dark:` utility agrees with the token switch in tokens.css.
-
-  Most of the product needs no `dark:` utility at all, because the ink tokens already swap.
-  Reach for it only where the structure differs, such as elevation becoming an inset highlight.
-*/
+/* dark variant covers explicit data-theme and system; ink tokens already swap */
 @custom-variant dark {
   &:where([data-theme='dark'], [data-theme='dark'] *) {
     @slot;

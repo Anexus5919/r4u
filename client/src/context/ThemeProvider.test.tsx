@@ -48,10 +48,7 @@ describe('ThemeProvider', () => {
     expect(localStorage.getItem(THEME_STORAGE_KEY)).toBe('dark')
   })
 
-  /*
-    Returning to system must remove the attribute, not stamp the resolved value. Stamping would
-    freeze the theme and a mid-session OS change would stop being picked up.
-  */
+  // stamping the resolved value would freeze the theme against OS changes
   it('removes the attribute when returning to system', async () => {
     const user = userEvent.setup()
     render(

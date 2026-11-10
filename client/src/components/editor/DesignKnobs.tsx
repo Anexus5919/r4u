@@ -3,14 +3,7 @@ import type { ResumeDesign } from '@r4u/shared'
 import { cn } from '@/lib/cn'
 import { Button } from '@/components/ui/Button'
 
-/*
-  Five knobs and no more.
-
-  The list is closed on purpose: these are the ones that change how a resume fits a page without
-  letting anyone dismantle the typographic system. There is no font picker, no colour wheel, no
-  free spacing value, because every one of those is a way to make a document worse that a user
-  cannot easily undo.
-*/
+// five knobs, closed: no font picker, no colour wheel, no free spacing value
 
 const TYPE_SCALES = [9.5, 10, 10.5, 11, 11.5] as const
 const LEADINGS = [

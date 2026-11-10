@@ -1,9 +1,6 @@
 import { cn } from '@/lib/cn'
 
-/*
-  Invalid state is a 1px danger edge plus a text line below, never a tinted field.
-  Focus is a ring, never a glow and never a colour change.
-*/
+// invalid is a 1px danger edge plus a text line; focus is a ring, never a glow
 
 const SHELL =
   'w-full rounded-xs border bg-ink-00 text-ink-12 transition-colors t-xs lift ' +

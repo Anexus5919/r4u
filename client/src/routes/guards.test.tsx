@@ -55,10 +55,7 @@ const PROTECTED = (
 )
 
 describe('RequireAuth', () => {
-  /*
-    The reason 'checking' is a state rather than a boolean. Redirecting during the restore would
-    bounce an already-signed-in user to the login screen on every reload.
-  */
+  // redirecting during restore would bounce a signed-in user to login on reload
   it('renders neither the content nor a redirect while the session is restoring', () => {
     renderAt('/private', { status: 'checking', user: null }, PROTECTED)
 
@@ -118,11 +115,7 @@ describe('RequireRole', () => {
     expect(screen.getByText('editor')).toBeInTheDocument()
   })
 
-  /*
-    Set membership, not a rank ladder. A ladder would make admin a superset of every role by
-    construction, which is exactly how the "admin cannot read resume content" rule gets broken.
-    The client mirrors the server here on purpose.
-  */
+  // set membership mirrors the server: admin is not a superset. see ADR-008
   it('refuses an admin, because admin is not a superset of user', () => {
     renderAt('/editor', { status: 'authenticated', user: makeUser('admin') }, USER_ONLY)
 

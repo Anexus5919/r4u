@@ -1,9 +1,6 @@
 import { cn } from '@/lib/cn'
 
-/*
-  The surface stays neutral. Only a hairline left rule carries the tone, which keeps the
-  monochrome system intact while still marking the state. Never a tinted panel.
-*/
+// neutral surface, only a hairline left rule carries the tone, never a tinted panel
 const RULE = {
   success: 'border-l-success',
   warning: 'border-l-warning',
