@@ -55,6 +55,9 @@ function toCss(style: Style = {}): React.CSSProperties {
     css[key] = value
   }
 
+  // Yoga defaults flexShrink to 0 and the DOM to 1, so a declared width must not yield to a sibling
+  if (style.width !== undefined && style.flexShrink === undefined) css.flexShrink = 0
+
   // Yoga lays out in flex by default, so the DOM has to be told the same thing
   css.display = css.display ?? 'flex'
   css.flexDirection = css.flexDirection ?? 'column'
