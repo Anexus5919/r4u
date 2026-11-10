@@ -36,32 +36,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [state, dispatch] = useReducer(reducer, INITIAL)
   const restored = useRef(false)
 
-  /*
-    Session restore on boot. The refresh cookie is the only thing that survives a reload, so this
-    single call both proves the session and mints a fresh access token.
-  */
+  // the refresh cookie is the only thing that survives a reload, so one call proves the session
   useEffect(() => {
-    // StrictMode invokes effects twice in development, and a second refresh would rotate again
+    // sent once, because a second refresh would rotate the token again under StrictMode
     if (restored.current) return
     restored.current = true
 
-    let cancelled = false
-
+    // never cancelled: StrictMode's fake unmount would drop the only result and blank every guard
     apiPost<Session>('/auth/refresh')
       .then((session) => {
-        if (cancelled) return
         setAccessToken(session.accessToken)
         dispatch({ type: 'signed_in', user: session.user })
       })
       .catch(() => {
-        if (cancelled) return
         setAccessToken(null)
         dispatch({ type: 'signed_out' })
       })
-
-    return () => {
-      cancelled = true
-    }
   }, [])
 
   const start = useCallback(async (path: string, body: unknown): Promise<PublicUser> => {
