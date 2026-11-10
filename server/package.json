@@ -13,7 +13,9 @@
     "seed": "tsx src/scripts/seed-cli.ts",
     "seed:prod": "node dist/scripts/seed-cli.js",
     "migrate": "tsx src/scripts/migrate-cli.ts",
-    "migrate:prod": "node dist/scripts/migrate-cli.js"
+    "migrate:prod": "node dist/scripts/migrate-cli.js",
+    "admin": "tsx src/scripts/admin-cli.ts",
+    "admin:prod": "node dist/scripts/admin-cli.js"
   },
   "dependencies": {
     "bcryptjs": "^3.0.3",
