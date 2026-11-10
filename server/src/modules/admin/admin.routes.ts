@@ -128,11 +128,9 @@ adminRouter.post(
   ]),
   async (req: Request, res: Response) => {
     const input = req.validated as TemplateInput
-    res
-      .status(201)
-      .json({
-        data: { template: await service.createTemplate(input, principalOf(req).id, clientIp(req)) },
-      })
+    res.status(201).json({
+      data: { template: await service.createTemplate(input, principalOf(req).id, clientIp(req)) },
+    })
   }
 )
 
@@ -180,6 +178,11 @@ adminRouter.patch(
     })
   }
 )
+
+adminRouter.get('/reports/:id/preview', validate([idRule]), async (req: Request, res: Response) => {
+  const { id } = req.validated as { id: string }
+  res.json({ data: { resume: await service.previewReport(id) } })
+})
 
 adminRouter.get('/logs', validate(pageRules), async (req: Request, res: Response) => {
   const input = req.validated as { page?: number; limit?: number }

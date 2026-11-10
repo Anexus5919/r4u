@@ -197,3 +197,37 @@ describe('admin templates, reports and logs', () => {
     expect(entry.actor.name).toBe('admin')
   })
 })
+
+describe('admin report preview', () => {
+  it('shows a reported page only while its link is public', async () => {
+    const owner = await account('aman@example.com')
+    await withContent(owner.token)
+    const resumes = await request(app).get('/api/resumes').set(auth(owner.token))
+    const created = await request(app)
+      .post(`/api/resumes/${resumes.body.data.resumes[0].id}/share`)
+      .set(auth(owner.token))
+      .send({ redact: { email: true } })
+    await request(app)
+      .post(`/api/public/r/${created.body.data.token}/report`)
+      .send({ reason: 'spam' })
+
+    const admin = await account('admin@example.com', 'admin')
+    const reports = await request(app).get('/api/admin/reports').set(auth(admin.token))
+    const reportId = reports.body.data.reports[0].id
+
+    const live = await request(app)
+      .get(`/api/admin/reports/${reportId}/preview`)
+      .set(auth(admin.token))
+    expect(live.status).toBe(200)
+    expect(live.body.data.resume.personal.fullName).toBe('Secret Person')
+
+    await request(app)
+      .patch(`/api/share/${created.body.data.link.id}`)
+      .set(auth(owner.token))
+      .send({ enabled: false })
+    const off = await request(app)
+      .get(`/api/admin/reports/${reportId}/preview`)
+      .set(auth(admin.token))
+    expect(off.status).toBe(410)
+  })
+})

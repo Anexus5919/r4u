@@ -25,6 +25,7 @@ import {
 } from '../../models/index.js'
 import { getIo, revokeUserSockets } from '../../sockets/emitters.js'
 import { liveStats } from '../../sockets/presence.js'
+import { publicPayload } from '../share/share.service.js'
 import { isRenderer, serializeTemplate } from '../templates/templates.service.js'
 
 const DAYS = 14
@@ -384,4 +385,17 @@ export async function listLogs(page: number, limit: number): Promise<Paged<Activ
   }))
 
   return paged(items, page, limit, total)
+}
+
+/** The reported page exactly as the public sees it, and only while it is still public (ADR-008). */
+export async function previewReport(id: string) {
+  const report = await ReportModel.findById(id).select('shareLink')
+  if (!report?.shareLink) throw notFound('Report')
+  const link = await ShareLinkModel.findById(report.shareLink)
+  if (!link) throw notFound('Share link')
+  if (!link.enabled) throw new AppError('SHARE_LINK_DISABLED', 'This link is no longer public')
+  if (link.expiresAt && link.expiresAt.getTime() < Date.now()) {
+    throw new AppError('SHARE_LINK_EXPIRED', 'This link is no longer public')
+  }
+  return publicPayload(link)
 }
