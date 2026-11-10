@@ -12,7 +12,7 @@ import { apiRouter } from './routes.js'
 
 const PREVIEW_ORIGIN = /^https:\/\/r4u-[a-z0-9-]+\.vercel\.app$/
 
-function isAllowedOrigin(origin: string): boolean {
+export function isAllowedOrigin(origin: string): boolean {
   if (env.CORS_ORIGINS.includes(origin)) return true
   // preview builds get a new hostname per commit, so the pattern is gated behind a flag
   return env.ALLOW_PREVIEW_ORIGINS && PREVIEW_ORIGIN.test(origin)
