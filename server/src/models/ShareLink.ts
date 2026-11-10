@@ -36,11 +36,17 @@ const shareViewSchema = new Schema(
     resume: { type: Types.ObjectId, ref: 'Resume', required: true },
     fingerprint: { type: String, required: true },
     kind: { type: String, enum: ['view', 'download'], required: true },
+    // hours since the epoch: the dedupe key, so the unique index below can decide a race
+    bucket: { type: Number, required: true },
   },
   { timestamps: { createdAt: true, updatedAt: false } }
 )
 
-shareViewSchema.index({ shareLink: 1, fingerprint: 1, kind: 1, createdAt: -1 })
+// unique, so two overlapping requests cannot both count; partial, so pre-bucket rows never block it
+shareViewSchema.index(
+  { shareLink: 1, fingerprint: 1, kind: 1, bucket: 1 },
+  { unique: true, partialFilterExpression: { bucket: { $exists: true } } }
+)
 shareViewSchema.index({ createdAt: 1 }, { expireAfterSeconds: 48 * 60 * 60 })
 
 export const ShareViewModel = model('ShareView', shareViewSchema)

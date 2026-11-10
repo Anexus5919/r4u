@@ -1,5 +1,4 @@
 import { createHash, randomBytes } from 'node:crypto'
-import { trusted } from 'mongoose'
 import { ipKeyGenerator } from 'express-rate-limit'
 import type { Request } from 'express'
 import type {
@@ -220,7 +219,7 @@ function fingerprint(req: Request) {
   return createHash('sha256').update(parts.join('|')).digest('hex')
 }
 
-/** Counts a view or download once per visitor per hour, and never the owner's own. */
+/** Counts a view or download once per visitor per clock hour, and never the owner's own. */
 export async function recordHit(
   link: ShareLinkDoc,
   kind: 'view' | 'download',
@@ -229,23 +228,20 @@ export async function recordHit(
 ): Promise<boolean> {
   if (viewerId && viewerId === String(link.owner)) return false
 
-  const print = fingerprint(req)
-  const recent = await ShareViewModel.exists({
-    shareLink: link._id,
-    fingerprint: print,
-    kind,
-    // a server-authored operator, so it must be marked trusted past sanitizeFilter
-    createdAt: trusted({ $gte: new Date(Date.now() - DEDUPE_WINDOW_MS) }),
-  })
-  if (recent) return false
-
   const now = new Date()
-  await ShareViewModel.create({
-    shareLink: link._id,
-    resume: link.resume,
-    fingerprint: print,
-    kind,
-  })
+  try {
+    await ShareViewModel.create({
+      shareLink: link._id,
+      resume: link.resume,
+      fingerprint: fingerprint(req),
+      kind,
+      bucket: Math.floor(now.getTime() / DEDUPE_WINDOW_MS),
+    })
+  } catch (error) {
+    // atomic dedupe: a repeat or a racing twin hits the unique index and is simply not counted
+    if ((error as { code?: number }).code === 11000) return false
+    throw error
+  }
 
   const counter = kind === 'view' ? 'views' : 'downloads'
   const stamp = kind === 'view' ? 'lastViewedAt' : 'lastDownloadedAt'

@@ -4,7 +4,7 @@ import { createApp } from '../../app.js'
 import { useTestDb } from '../../test/db.js'
 import { ReportModel } from '../../models/Moderation.js'
 import { ResumeModel } from '../../models/Resume.js'
-import { ShareLinkModel } from '../../models/ShareLink.js'
+import { ShareLinkModel, ShareViewModel } from '../../models/ShareLink.js'
 import { TemplateModel } from '../../models/Template.js'
 import { syncTemplates } from '../templates/templates.service.js'
 
@@ -135,6 +135,24 @@ describe('public resume view', () => {
     expect(analytics.body.data.link.downloads).toBe(1)
     expect(analytics.body.data.daily).toHaveLength(30)
     expect(analytics.body.data.daily.at(-1).views).toBe(2)
+  })
+
+  // the regression: a check-then-write let overlapping requests from one visitor all count
+  it('counts overlapping requests from one visitor exactly once', async () => {
+    await ShareViewModel.createIndexes()
+    const { token } = await signUp()
+    const resumeId = await resumeWithContent(token)
+    const { token: shareToken, link } = (await share(token, resumeId)).body.data
+
+    const hits = await Promise.all(
+      [1, 2, 3, 4].map(() =>
+        request(app).get(`/api/public/r/${shareToken}`).set('User-Agent', 'racing-recruiter')
+      )
+    )
+    expect(hits.every((hit) => hit.status === 200)).toBe(true)
+
+    const analytics = await request(app).get(`/api/share/${link.id}/analytics`).set(auth(token))
+    expect(analytics.body.data.link.views).toBe(1)
   })
 
   it('answers 410 for a disabled link and for an expired one, 404 for a made-up one', async () => {
