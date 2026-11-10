@@ -180,10 +180,33 @@ export function projectEntry(
   Groups on one line each. Never a rating bar, never a set of dots: both are unparseable by every
   ATS and neither is a claim anyone can verify.
 */
-export function skillsEntry(theme: DocTheme, entry: Entry): LayoutNode {
+export function skillsEntry(theme: DocTheme, entry: Entry, options: BlockOptions = {}): LayoutNode {
   const group = str(entry.data, 'group')
   const items = list(entry.data, 'items')
   if (!items.length) return { type: 'spacer', size: 0 }
+
+  // a narrow column cannot fit a 28 percent label beside its list, so the label sits above it
+  if (options.dates === 'inline') {
+    return block({ marginTop: theme.bodySize * 0.45 }, [
+      ...compact([
+        group
+          ? text(
+              {
+                fontSize: theme.bodySize,
+                fontWeight: 600,
+                lineHeight: theme.leading,
+                color: theme.ink,
+              },
+              group
+            )
+          : null,
+        text(
+          { fontSize: theme.bodySize, lineHeight: theme.leading, color: theme.ink },
+          items.join(', ')
+        ),
+      ]),
+    ])
+  }
 
   return block({ marginTop: theme.bodySize * 0.45 }, [
     // flex-start, so a one-line group label stays level with the first line of a list that wraps
@@ -278,7 +301,7 @@ export function renderEntry(
     case 'projects':
       return projectEntry(theme, entry, options)
     case 'skills':
-      return skillsEntry(theme, entry)
+      return skillsEntry(theme, entry, options)
     case 'custom':
       return customEntry(theme, entry, options)
     default:

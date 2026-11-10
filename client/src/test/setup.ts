@@ -5,7 +5,9 @@ import { afterEach, vi } from 'vitest'
 afterEach(cleanup)
 
 // jsdom implements neither, and ThemeProvider and the preview panel both depend on them
-if (!window.matchMedia) {
+const browser = typeof window !== 'undefined'
+
+if (browser && !window.matchMedia) {
   window.matchMedia = vi.fn().mockImplementation((query: string) => ({
     matches: false,
     media: query,
@@ -18,7 +20,7 @@ if (!window.matchMedia) {
   }))
 }
 
-if (!window.ResizeObserver) {
+if (browser && !window.ResizeObserver) {
   window.ResizeObserver = class {
     observe() {}
     unobserve() {}
