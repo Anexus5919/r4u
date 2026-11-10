@@ -90,6 +90,12 @@ test.describe('sharing', () => {
   test('explains an unknown link instead of showing content', async ({ page }) => {
     await page.goto('/r/thisLinkDoesNotExist_0123456789')
     await expect(page.getByRole('heading', { name: 'This link does not exist' })).toBeVisible()
+    // a shared page is never indexed, even by a crawler that renders the app
+    await expect(page.locator('meta[name="robots"]')).toHaveAttribute(
+      'content',
+      'noindex, nofollow'
+    )
+    await expect(page.locator('meta[name="referrer"]')).toHaveAttribute('content', 'no-referrer')
   })
 })
 

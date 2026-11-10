@@ -6,6 +6,7 @@ import { useToast } from '@/context/ToastContext'
 import { apiGet, apiPost, toApiFailure } from '@/lib/api'
 import type { ApiFailure } from '@/lib/api'
 import { downloadPdf } from '@/lib/pdf'
+import { usePrivateDocument } from '@/hooks/usePrivateDocument'
 import { cn } from '@/lib/cn'
 import { Logo } from '@/components/brand/Logo'
 import { Button, ButtonLink } from '@/components/ui/Button'
@@ -127,6 +128,7 @@ export function PublicResumePage() {
   const [load, setLoad] = useState<Load>({ status: 'loading' })
   const [downloading, setDownloading] = useState(false)
   const [reporting, setReporting] = useState(false)
+  usePrivateDocument()
 
   useEffect(() => {
     const controller = new AbortController()
