@@ -3,7 +3,8 @@ import { fileURLToPath } from 'node:url'
 import { renderToBuffer } from '@react-pdf/renderer'
 import { describe, expect, it } from 'vitest'
 import { SAMPLE_RESUME, TEMPLATE_LIST } from '@r4u/shared'
-import { ResumeDocument, pdfFileName, registerFonts } from './renderToPdf'
+import { ResumeDocument } from './PdfDocument'
+import { pdfFileName, registerFonts } from './renderToPdf'
 
 const FONTS = fileURLToPath(new URL('../../public/fonts', import.meta.url))
 

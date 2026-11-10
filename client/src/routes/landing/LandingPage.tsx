@@ -10,10 +10,12 @@ import { Features } from './Features'
 import { Hero } from './Hero'
 import { TemplateGallery } from './TemplateGallery'
 
+// root-relative, so the same navigation works from every public page
 const ANCHORS = [
-  { href: '#features', label: 'Features' },
-  { href: '#templates', label: 'Templates' },
-  { href: '#how-it-works', label: 'How it works' },
+  { href: '/#features', label: 'Features' },
+  { href: '/templates', label: 'Templates' },
+  { href: '/#how-it-works', label: 'How it works' },
+  { href: '/about', label: 'About' },
 ]
 
 // every figure here is read from the product, so the strip cannot overstate it
@@ -39,7 +41,7 @@ const STEPS = [
   },
 ]
 
-function LandingNav() {
+export function LandingNav() {
   const { status } = useAuth()
   const signedIn = status === 'authenticated'
   const [open, setOpen] = useState(false)
@@ -204,7 +206,7 @@ function CallToAction() {
   )
 }
 
-function Footer() {
+export function Footer() {
   return (
     <footer className="border-t border-ink-04 bg-ink-00">
       <div className="mx-auto grid max-w-7xl grid-cols-1 gap-10 px-6 py-14 sm:grid-cols-2 lg:grid-cols-[2fr_1fr_1fr] lg:px-10">
@@ -248,6 +250,16 @@ function Footer() {
             <li>
               <Link to="/reset" className="text-sm text-ink-09 no-underline hover:text-ink-12">
                 Reset your password
+              </Link>
+            </li>
+            <li>
+              <Link to="/privacy" className="text-sm text-ink-09 no-underline hover:text-ink-12">
+                Privacy
+              </Link>
+            </li>
+            <li>
+              <Link to="/terms" className="text-sm text-ink-09 no-underline hover:text-ink-12">
+                Terms
               </Link>
             </li>
           </ul>

@@ -1,6 +1,6 @@
 import { useMemo, useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { PAGE_TARGET, RESUME_TYPES, getTemplate } from '@r4u/shared'
+import { getTemplate } from '@r4u/shared'
 import type { ResumeStatus, ResumeSummary, ResumeType } from '@r4u/shared'
 import { api, toApiFailure } from '@/lib/api'
 import { formatRelative } from '@/lib/format'
@@ -13,7 +13,6 @@ import { TemplateTile } from '@/components/resume/TemplateTile'
 import { Banner } from '@/components/ui/Banner'
 import { Button, ButtonLink } from '@/components/ui/Button'
 import { Card, Skeleton, StatusLabel } from '@/components/ui/Card'
-import { Field } from '@/components/ui/Field'
 import { Icon } from '@/components/ui/Icon'
 import { Input } from '@/components/ui/Input'
 import { Modal } from '@/components/ui/Modal'
@@ -156,91 +155,6 @@ function StatCards({ resumes }: { resumes: ResumeSummary[] }) {
   )
 }
 
-function CreateModal({
-  open,
-  onClose,
-  onCreated,
-}: {
-  open: boolean
-  onClose: () => void
-  onCreated: (id: string) => void
-}) {
-  const [title, setTitle] = useState('')
-  const [resumeType, setResumeType] = useState<ResumeType>('professional')
-  const [busy, setBusy] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-
-  async function submit(event: React.FormEvent) {
-    event.preventDefault()
-    if (!title.trim()) return
-
-    setBusy(true)
-    setError(null)
-
-    try {
-      const res = await api.post('/resumes', { title: title.trim(), resumeType })
-      onCreated(res.data.data.resume.id)
-    } catch (caught) {
-      setError(toApiFailure(caught).message)
-      setBusy(false)
-    }
-  }
-
-  return (
-    <Modal
-      open={open}
-      onClose={onClose}
-      title="New resume"
-      description="Name it for the role you are targeting. You can rename it later."
-      footer={
-        <>
-          <Button variant="ghost" onClick={onClose}>
-            Cancel
-          </Button>
-          <Button variant="primary" loading={busy} onClick={(e) => void submit(e)}>
-            Create and open
-          </Button>
-        </>
-      }
-    >
-      <form onSubmit={(e) => void submit(e)} className="flex flex-col gap-5">
-        {error ? <Banner>{error}</Banner> : null}
-
-        <Field label="Title" value={title} max={80} required>
-          {({ id }) => (
-            <Input
-              id={id}
-              // the dialog exists only because the user just asked for it, so focus belongs here
-              // eslint-disable-next-line jsx-a11y/no-autofocus
-              autoFocus
-              placeholder="Backend Developer CV"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-            />
-          )}
-        </Field>
-
-        <fieldset className="flex flex-col gap-2">
-          <legend className="text-sm font-medium text-ink-11">Career stage</legend>
-          <p className="mb-1 text-xs text-ink-09">
-            This sets the section order and the length to aim for.
-          </p>
-
-          <Segmented
-            label="Career stage"
-            value={resumeType}
-            onChange={setResumeType}
-            stretch
-            options={RESUME_TYPES.map((type) => ({ value: type, label: TYPE_LABEL[type] }))}
-          />
-
-          <p className="mt-1 text-xs text-ink-09">Target length: {PAGE_TARGET[resumeType]}</p>
-        </fieldset>
-      </form>
-    </Modal>
-  )
-}
-
 export function DashboardPage() {
   const navigate = useNavigate()
   const { toast } = useToast()
@@ -250,7 +164,6 @@ export function DashboardPage() {
   const [search, setSearch] = useState('')
   const [status, setStatus] = useState<ResumeStatus | ''>('')
   const [sort, setSort] = useState<ResumeQuery['sort']>('updated')
-  const [creating, setCreating] = useState(false)
   const [pendingDelete, setPendingDelete] = useState<ResumeSummary | null>(null)
   const [deleting, setDeleting] = useState(false)
 
@@ -321,7 +234,7 @@ export function DashboardPage() {
           >
             Import JSON
           </Button>
-          <Button variant="primary" onClick={() => setCreating(true)}>
+          <Button variant="primary" onClick={() => navigate('/resume/new')}>
             <Icon name="plus" />
             New resume
           </Button>
@@ -382,7 +295,7 @@ export function DashboardPage() {
         {empty && !filtering ? (
           <ThreeDoors
             busy={importer.busy}
-            onScratch={() => setCreating(true)}
+            onScratch={() => navigate('/resume/new')}
             onSample={() => void importer.fromSample()}
             onImport={() => fileInput.current?.click()}
           />
@@ -401,15 +314,6 @@ export function DashboardPage() {
           </div>
         ) : null}
       </div>
-
-      <CreateModal
-        open={creating}
-        onClose={() => setCreating(false)}
-        onCreated={(id) => {
-          setCreating(false)
-          navigate(`/resume/${id}/edit`)
-        }}
-      />
 
       <Modal
         open={Boolean(pendingDelete)}

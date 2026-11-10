@@ -1,30 +1,6 @@
 import { useAuth } from '@/context/AuthContext'
 import { Logo } from '@/components/brand/Logo'
 import { ButtonLink } from '@/components/ui/Button'
-import { Card } from '@/components/ui/Card'
-
-// the console is built in phase 9; until then the route exists so the role guard is exercised
-export function AdminPage() {
-  return (
-    <div className="mx-auto max-w-7xl">
-      <h1 className="text-xl text-ink-12">Admin console</h1>
-      <p className="mt-1.5 text-sm text-ink-09">
-        Platform statistics, user management, templates and moderation.
-      </p>
-
-      <Card className="mt-8 max-w-2xl p-6">
-        <h2 className="text-md text-ink-12">The console is being built</h2>
-        <p className="mt-2 text-sm text-ink-09">
-          User search, role changes, blocking, the template library and the reports queue will
-          appear here. Your administrator role is already active and enforced on every request.
-        </p>
-        <p className="mt-5 border-t border-ink-04 pt-4 text-sm text-ink-10">
-          Resume content is not visible to administrators, by design.
-        </p>
-      </Card>
-    </div>
-  )
-}
 
 function ErrorPage({ code, title, body }: { code: string; title: string; body: string }) {
   const { status, user } = useAuth()
