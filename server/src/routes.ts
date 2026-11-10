@@ -6,6 +6,8 @@ import { usersRouter } from './modules/users/users.routes.js'
 import { resumesRouter } from './modules/resumes/resumes.routes.js'
 import { publicShareRouter, resumeShareRouter, shareRouter } from './modules/share/share.routes.js'
 import { templatesRouter } from './modules/templates/templates.routes.js'
+import { reviewsRouter } from './modules/reviews/reviews.routes.js'
+import { notificationsRouter } from './modules/notifications/notifications.routes.js'
 
 export const apiRouter = Router()
 
@@ -26,3 +28,5 @@ apiRouter.use('/public/r', publicShareRouter)
 apiRouter.use('/resumes/:id/share', resumeShareRouter)
 apiRouter.use('/resumes', resumesRouter)
 apiRouter.use('/share', shareRouter)
+apiRouter.use('/reviews', reviewsRouter)
+apiRouter.use('/notifications', notificationsRouter)
