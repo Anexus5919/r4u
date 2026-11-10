@@ -25,6 +25,20 @@ await connectDb()
 // safe here, and it means indexes exist without running the migration script first
 await mongoose.syncIndexes()
 
+// a fresh in-memory database every boot, so the demo accounts are seeded every boot
+const { DEMO_ACCOUNTS, DEMO_PASSWORD, seedDemo } = await import('./scripts/seed.js')
+const seed = await seedDemo()
+if (seed.seeded) {
+  logger.info(
+    {
+      accounts: Object.values(DEMO_ACCOUNTS).map((a) => `${a.role} ${a.email}`),
+      demoPassword: DEMO_PASSWORD,
+      shareUrl: seed.shareUrl,
+    },
+    'demo data seeded'
+  )
+}
+
 const server = createServer(createApp())
 
 server.listen(env.PORT, () => {

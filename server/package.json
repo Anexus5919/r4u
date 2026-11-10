@@ -9,7 +9,9 @@
     "build": "tsc --build",
     "start": "node dist/index.js",
     "clean": "rimraf dist *.tsbuildinfo",
-    "dev:memory": "tsx watch src/dev.ts"
+    "dev:memory": "tsx watch src/dev.ts",
+    "seed": "tsx src/scripts/seed-cli.ts",
+    "seed:prod": "node dist/scripts/seed-cli.js"
   },
   "dependencies": {
     "bcryptjs": "^3.0.3",
