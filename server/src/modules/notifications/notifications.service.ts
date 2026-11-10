@@ -53,7 +53,7 @@ export async function notify(input: NotifyInput): Promise<NotificationItem> {
         $set: { preview, actor: input.actor },
         $setOnInsert: { entity: input.entity, user: input.user, type: 'chat' },
       },
-      { upsert: true, new: true }
+      { upsert: true, returnDocument: 'after' }
     )
   } else {
     doc = await NotificationModel.create({ ...input, preview })

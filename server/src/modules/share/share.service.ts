@@ -253,7 +253,7 @@ export async function recordHit(
   const updated = await ShareLinkModel.findByIdAndUpdate(
     link._id,
     { $inc: { [counter]: 1 }, $set: { [stamp]: now } },
-    { new: true }
+    { returnDocument: 'after' }
   )
 
   await ShareDailyModel.updateOne(

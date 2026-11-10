@@ -110,7 +110,7 @@ export async function rename(resumeId: string, ownerId: string, title: string) {
   const resume = await ResumeModel.findOneAndUpdate(
     { _id: resumeId, owner: ownerId },
     { $set: { title }, $inc: { version: 1 } },
-    { new: true }
+    { returnDocument: 'after' }
   )
 
   if (!resume) throw notFound('Resume')
