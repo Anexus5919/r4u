@@ -171,18 +171,29 @@ seed it once with `npm run seed --workspace=server`.
 
 ## Demo accounts
 
-Created by the seed (automatically on every in-memory boot). Password for all: `R4uDemo-2026!`
+Sample accounts for trying the app, on the live site and locally. Password for all: `R4uDemo-2026!`
 
 | Role           | Email              | What to try                                                               |
 | -------------- | ------------------ | ------------------------------------------------------------------------- |
 | User           | `user@r4u.dev`     | Three resumes, a live share link with history, an active review with chat |
 | Reviewer       | `reviewer@r4u.dev` | The active review room; a completed review                                |
 | Reviewer       | `kavya@r4u.dev`    | A pending request to accept or decline                                    |
-| Admin          | `admin@r4u.dev`    | Overview, users, templates, reports                                       |
 | User           | `divya@r4u.dev`    | A completed review                                                        |
 | User (blocked) | `rahul@r4u.dev`    | Sign-in is refused                                                        |
 
-On a production database the seed refuses the built-in password; set `SEED_PASSWORD` first.
+**There is no public admin account.** A documented admin password on a public site would let anyone
+block users and change roles, so seeding a real database never creates one. Sign-up always creates
+an ordinary user, and an administrator is promoted from the command line by whoever holds the
+database connection string:
+
+```bash
+# with MONGODB_URI in server/.env pointing at the target database
+npm run admin --workspace=server -- promote you@example.com   # also: demote, delete
+```
+
+The in-memory development server is the one exception: it is private to your machine and discarded
+on exit, so it also seeds `admin@r4u.dev` with the same password for local work. On a production
+database the seed refuses the built-in password unless `SEED_PASSWORD` is set.
 
 ## Environment variables
 
@@ -205,23 +216,25 @@ and API are on different hosts. Empty means the same origin.
 
 ## Scripts
 
-| Command                                     | What it does                                                                    |
-| ------------------------------------------- | ------------------------------------------------------------------------------- |
-| `npm run dev:server:memory`                 | API with an in-memory, seeded MongoDB                                           |
-| `npm run dev:server` / `npm run dev:client` | API against `MONGODB_URI` / Vite client                                         |
-| `npm run build`                             | Build shared, server and client                                                 |
-| `npm run verify`                            | Design guard, lint, typecheck and all unit and integration tests                |
-| `npm test`                                  | Vitest across the three workspaces                                              |
-| `npm run test:e2e`                          | Playwright end-to-end suite (starts its own servers)                            |
-| `npm run test:api`                          | Postman collection against a running API (`test:api:limits` for the 429 checks) |
-| `npm run seed --workspace=server`           | Seed demo data into `MONGODB_URI`                                               |
-| `npm run migrate --workspace=server`        | Create any missing index                                                        |
+| Command                                               | What it does                                                                    |
+| ----------------------------------------------------- | ------------------------------------------------------------------------------- |
+| `npm run dev:server:memory`                           | API with an in-memory, seeded MongoDB                                           |
+| `npm run dev:server` / `npm run dev:client`           | API against `MONGODB_URI` / Vite client                                         |
+| `npm run build`                                       | Build shared, server and client                                                 |
+| `npm run verify`                                      | Design guard, lint, typecheck and all unit and integration tests                |
+| `npm test`                                            | Vitest across the three workspaces                                              |
+| `npm run test:e2e`                                    | Playwright end-to-end suite (starts its own servers)                            |
+| `npm run test:api`                                    | Postman collection against a running API (`test:api:limits` for the 429 checks) |
+| `npm run seed --workspace=server`                     | Seed demo data into `MONGODB_URI`, never an admin                               |
+| `npm run admin --workspace=server -- promote <email>` | Make a registered account an admin (`demote` and `delete` too)                  |
+| `npm run migrate --workspace=server`                  | Create any missing index                                                        |
 
 ## Docker
 
 ```bash
 docker compose up --build
 docker compose exec server node server/dist/scripts/seed-cli.js   # optional demo data
+docker compose exec server node server/dist/scripts/admin-cli.js promote you@example.com
 ```
 
 Open http://localhost:8080. Compose runs MongoDB 7, the API (Node 22 alpine, non-root, health
@@ -237,15 +250,18 @@ The pipeline is ready; the accounts are yours to connect. All three services hav
    connection string.
 2. **Render (API)**: New, Blueprint, select this repository. `render.yaml` defines a Docker web
    service `r4u-api` with generated JWT secrets and a health check. Set `MONGODB_URI`,
-   `CORS_ORIGINS` and `APP_URL` (your Vercel URL), and optionally SMTP and Cloudinary. Seed it once
-   from the Render shell with `node server/dist/scripts/seed-cli.js` after setting `SEED_PASSWORD`.
+   `CORS_ORIGINS` and `APP_URL` (your Vercel URL), and optionally SMTP and Cloudinary. Seed and
+   promote from your own machine: put the Atlas `MONGODB_URI` in `server/.env`, run
+   `npm run seed --workspace=server`, register on the live site, then promote that account.
 3. **Vercel (client)**: import the repository with the root directory `client`. `client/vercel.json`
    installs from the workspace root, rewrites `/api/*` to the Render service so the refresh cookie
    stays same-site, and serves the SPA. Set `VITE_SOCKET_URL=https://r4u-api.onrender.com`. If your
    Render URL differs, update the rewrite destination.
-4. **GitHub Actions**: add repository secrets `RENDER_DEPLOY_HOOK_URL`, and `VERCEL_TOKEN`,
-   `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID`. Every push to `main` then runs verify, tests, end-to-end,
-   the Docker smoke test and the security scan, and deploys only if all of them pass.
+4. **Continuous deployment**: every push to `main` runs verify, tests, end-to-end, the Docker smoke
+   test and the security scan in GitHub Actions. Render redeploys the API only once all of those
+   checks pass (`autoDeployTrigger: checksPass`), and Vercel's Git integration builds the client.
+   The workflow's own deploy job is an alternative for hosts without that integration: it runs only
+   when the `RENDER_DEPLOY_HOOK_URL` or `VERCEL_TOKEN` secrets exist, so leave them unset here.
 
 **Live:**
 
