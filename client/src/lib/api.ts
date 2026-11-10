@@ -46,7 +46,7 @@ api.interceptors.request.use((config) => {
 */
 let refreshing: Promise<string | null> | null = null
 
-async function refreshOnce(): Promise<string | null> {
+export async function refreshOnce(): Promise<string | null> {
   refreshing ??= api
     .post(REFRESH_PATH)
     .then((res) => {
@@ -121,4 +121,13 @@ export async function apiGet<T>(url: string, signal?: AbortSignal): Promise<T> {
 export async function apiPost<T>(url: string, body?: unknown, signal?: AbortSignal): Promise<T> {
   const res = await api.post(url, body, { signal })
   return res.data?.data as T
+}
+
+export async function apiPatch<T>(url: string, body?: unknown): Promise<T> {
+  const res = await api.patch(url, body)
+  return res.data?.data as T
+}
+
+export async function apiDelete(url: string): Promise<void> {
+  await api.delete(url)
 }

@@ -2,6 +2,7 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { RouterProvider } from 'react-router-dom'
 import { AuthProvider } from '@/context/AuthProvider'
+import { SocketProvider } from '@/context/SocketProvider'
 import { ThemeProvider } from '@/context/ThemeProvider'
 import { ThemeSync } from '@/context/ThemeSync'
 import { ToastProvider } from '@/context/ToastProvider'
@@ -20,8 +21,10 @@ createRoot(container).render(
     <ThemeProvider>
       <ToastProvider>
         <AuthProvider>
-          <ThemeSync />
-          <RouterProvider router={router} />
+          <SocketProvider>
+            <ThemeSync />
+            <RouterProvider router={router} />
+          </SocketProvider>
         </AuthProvider>
       </ToastProvider>
     </ThemeProvider>

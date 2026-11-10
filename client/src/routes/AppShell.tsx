@@ -6,6 +6,7 @@ import { Avatar } from '@/components/ui/Avatar'
 import { Icon } from '@/components/ui/Icon'
 import { Segmented } from '@/components/ui/Segmented'
 import { useAuth } from '@/context/AuthContext'
+import { useSocket } from '@/context/SocketContext'
 import { useTheme } from '@/context/ThemeContext'
 import { useDismiss } from '@/hooks/useDismiss'
 import { cn } from '@/lib/cn'
@@ -19,20 +20,56 @@ const THEMES: { value: Theme; label: string }[] = [
 interface NavItem {
   to: string
   label: string
+  end?: boolean
+  count?: boolean
 }
 
 // admin and user surfaces are siblings, so each role sees only the links it can open
 function navFor(role: Role | undefined): NavItem[] {
   if (role === 'admin') {
     return [
-      { to: '/admin', label: 'Admin console' },
-      { to: '/profile', label: 'Profile' },
+      { to: '/admin', label: 'Overview', end: true },
+      { to: '/admin/users', label: 'Users' },
+      { to: '/admin/templates', label: 'Templates' },
+      { to: '/admin/reports', label: 'Reports' },
     ]
   }
   return [
     { to: '/dashboard', label: 'My resumes' },
-    { to: '/profile', label: 'Profile' },
+    { to: '/reviews', label: 'Reviews' },
+    { to: '/notifications', label: 'Notifications', count: true },
   ]
+}
+
+function NavLabel({ item, unread }: { item: NavItem; unread: number }) {
+  return (
+    <>
+      {item.label}
+      {item.count && unread > 0 ? (
+        <span
+          className="ml-1.5 font-mono text-xs text-accent-text tabular-nums"
+          aria-label={`${unread} unread`}
+        >
+          {unread}
+        </span>
+      ) : null}
+    </>
+  )
+}
+
+function ConnectionLine() {
+  const { status } = useSocket()
+  if (status !== 'waking' && status !== 'offline') return null
+  return (
+    <p
+      role="status"
+      className="border-b border-ink-04 bg-ink-02 px-6 py-2 text-sm text-ink-09 lg:px-10"
+    >
+      {status === 'waking'
+        ? 'Connecting to the server. This can take up to a minute after a period of inactivity.'
+        : 'Live updates are paused. Your work still saves; refresh to reconnect.'}
+    </p>
+  )
 }
 
 function navClass({ isActive }: { isActive: boolean }) {
@@ -126,6 +163,7 @@ export function AppShell() {
   const { user, logout } = useAuth()
   const navigate = useNavigate()
   const [drawer, setDrawer] = useState(false)
+  const { unread } = useSocket()
 
   const items = navFor(user?.role)
   const home = user?.role === 'admin' ? '/admin' : '/dashboard'
@@ -154,8 +192,8 @@ export function AppShell() {
 
           <nav aria-label="Primary" className="ml-8 hidden items-center gap-1 md:flex">
             {items.map((item) => (
-              <NavLink key={item.to} to={item.to} className={navClass}>
-                {item.label}
+              <NavLink key={item.to} to={item.to} end={item.end} className={navClass}>
+                <NavLabel item={item} unread={unread} />
               </NavLink>
             ))}
           </nav>
@@ -175,10 +213,11 @@ export function AppShell() {
               <NavLink
                 key={item.to}
                 to={item.to}
+                end={item.end}
                 className={navClass}
                 onClick={() => setDrawer(false)}
               >
-                {item.label}
+                <NavLabel item={item} unread={unread} />
               </NavLink>
             ))}
             <div className="mt-2 border-t border-ink-04 px-3 pt-3">
@@ -188,6 +227,8 @@ export function AppShell() {
           </nav>
         ) : null}
       </header>
+
+      <ConnectionLine />
 
       <main className="px-6 py-10 lg:px-10 print:p-0">
         <Outlet />
