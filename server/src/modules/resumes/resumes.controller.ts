@@ -2,6 +2,7 @@ import type { Request, Response } from 'express'
 import { fromJsonResume, toJsonResume } from '@r4u/shared'
 import type { ResumeOp, ResumeType } from '@r4u/shared'
 import { AppError } from '../../lib/AppError.js'
+import { logActivity } from '../../lib/activity.js'
 import { resumeDetail, resumeSummary } from '../../lib/serializers.js'
 import { ResumeModel } from '../../models/index.js'
 import { VersionConflict, applyOps } from './resumes.autosave.js'
@@ -41,6 +42,14 @@ export async function create(req: Request, res: Response) {
     resumeType: input.resumeType ?? 'professional',
   })
 
+  logActivity({
+    actor: principal(req).id,
+    action: 'resume.create',
+    targetType: 'resume',
+    targetId: resume.id,
+    meta: { resumeType: resume.resumeType, templateKey: resume.templateKey },
+    ip: req.ip,
+  })
   res.status(201).json({ data: { resume: resumeDetail(resume) } })
 }
 
@@ -51,11 +60,7 @@ export async function read(req: Request, res: Response) {
   res.json({ data: { resume: resumeDetail(resume) } })
 }
 
-/*
-  Autosave. The version in the body is the client's view of the document, and a mismatch is a
-  409 carrying the current state so the client can rebase rather than being told to reload and
-  lose its work.
-*/
+// a version mismatch is a 409 carrying current state, so the client can rebase
 export async function autosave(req: Request, res: Response) {
   const { id, version, ops } = req.validated as {
     id: string
@@ -137,10 +142,7 @@ export async function exportJson(req: Request, res: Response) {
   res.json(toJsonResume(resume.toObject() as never))
 }
 
-/*
-  Import creates a new resume rather than overwriting one. An import that silently replaces what
-  is already there is a second way to lose work, and the user has no way back from it.
-*/
+// import creates a new resume, never overwrites one, so no work is lost
 export async function importJson(req: Request, res: Response) {
   const { title, document } = req.validated as { title?: string; document: Record<string, unknown> }
   const owner = principal(req)
@@ -157,6 +159,8 @@ export async function importJson(req: Request, res: Response) {
     { $set: { personal, sections }, $inc: { version: 1 } }
   )
 
+  // written straight to the document, so the denormalised summary has to be brought up to date
+  await service.refreshMeta(resume.id, owner)
   await versionService.snapshot(resume.id, owner, 'import')
 
   const saved = await service.read(resume.id, owner)
@@ -167,5 +171,12 @@ export async function remove(req: Request, res: Response) {
   const { id } = req.validated as { id: string }
   await service.remove(id, principal(req).id)
 
+  logActivity({
+    actor: principal(req).id,
+    action: 'resume.delete',
+    targetType: 'resume',
+    targetId: id,
+    ip: req.ip,
+  })
   res.status(204).end()
 }

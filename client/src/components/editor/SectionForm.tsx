@@ -26,11 +26,7 @@ import { newObjectId } from '@/editor/types'
 import type { EditorEntry, EditorSection } from '@/editor/types'
 import { BulletList, FieldControl } from './fields'
 
-/*
-  Forms are generated from SECTION_REGISTRY. Eleven section types share one renderer, and adding
-  a field is a data change rather than a new component, which is what keeps the character limits
-  the counter shows identical to the ones the server enforces.
-*/
+// forms come from SECTION_REGISTRY, so the counter's limits match the server's
 
 function EntryFields({
   spec,
@@ -104,11 +100,7 @@ function SortableEntry({
     <li
       ref={setNodeRef}
       style={{ transform: CSS.Translate.toString(transform), transition }}
-      /*
-        An entry is a common region made of whitespace and a hairline above it. Never a nested
-        card: a card inside a card is on the tell list and it makes the form read as a stack of
-        widgets rather than as one document.
-      */
+      // an entry is whitespace plus a hairline, never a nested card
       className={cn(
         'group border-t border-ink-04 pt-6 first:border-t-0 first:pt-0',
         isDragging && 'opacity-60'

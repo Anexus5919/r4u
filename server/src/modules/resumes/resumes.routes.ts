@@ -22,10 +22,7 @@ resumesRouter.use(requireAuth)
 resumesRouter.get('/', validate(listRules), controller.list)
 resumesRouter.post('/', validate(createRules), controller.create)
 
-/*
-  Import creates a new resume, so it sits beside create rather than under an id. It carries the
-  larger body limit because an incoming JSON Resume can be a full career.
-*/
+// import creates, so it sits beside create with the larger body limit
 resumesRouter.post(
   '/import',
   express.json({ limit: '1mb' }),
@@ -33,16 +30,10 @@ resumesRouter.post(
   controller.importJson
 )
 
-/*
-  Ownership is enforced inside the service by filtering on owner, and a miss returns 404 rather
-  than 403. A 403 would confirm the id exists, which enumerates a collection of PII documents.
-*/
+// ownership is a service-side owner filter; a miss is 404, never 403
 resumesRouter.get('/:id', validate([resumeIdRule]), controller.read)
 
-/*
-  Autosave carries a 1mb limit rather than the global 256kb, because a long academic CV is a
-  genuinely large document and rejecting a save is the one failure a user cannot recover from.
-*/
+// 1mb rather than 256kb: a rejected save is the one unrecoverable failure
 resumesRouter.patch(
   '/:id',
   express.json({ limit: '1mb' }),

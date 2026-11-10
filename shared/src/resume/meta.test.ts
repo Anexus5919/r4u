@@ -16,11 +16,7 @@ describe('isQuantified', () => {
     for (const bullet of quantified) expect(isQuantified(bullet)).toBe(true)
   })
 
-  /*
-    The guard that makes the whole metric mean something. Every one of these is a duty
-    statement, and every one contains digits. Without stripping years and versions first they
-    would all count as quantified and the ratio would be noise.
-  */
+  // without stripping years and versions first, every duty statement counts as quantified
   it('rejects duty statements whose only numbers are dates or versions', () => {
     const notQuantified = [
       'Worked on the payments platform from 2021 to 2023.',
@@ -51,10 +47,7 @@ describe('the sample resume', () => {
     expect(resume.title).toBe('Backend Developer CV')
   })
 
-  /*
-    The fixture is the worked example the product shows off, so every bullet in it must pass the
-    check the product asks users to pass. If someone edits it carelessly, this fails.
-  */
+  // the fixture has to pass the check the product asks users to pass
   it('has every visible bullet quantified', () => {
     const { quantified, total } = quantifiedRatio(resume)
 
@@ -135,11 +128,7 @@ describe('completeness', () => {
   })
 })
 
-/*
-  Regression guard. The real caller is a Mongoose document from toObject(), where an untouched
-  subdocument is absent rather than defaulted. Blind destructuring threw here once, inside
-  autosave, which is the one path that must never fail.
-*/
+// regression guard: the real caller is toObject(), where an untouched subdocument is absent
 describe('tolerating stored shapes', () => {
   it('handles a document with no personal, sections or entries', () => {
     const partials = [

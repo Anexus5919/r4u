@@ -31,10 +31,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
   const resolved: ResolvedTheme = theme === 'system' ? system : theme
 
-  /*
-    'system' removes the attribute entirely rather than stamping the resolved value, so the
-    CSS media query stays in charge and a mid-session OS change is picked up by both layers.
-  */
+  // 'system' removes the attribute so the media query keeps tracking the OS
   useEffect(() => {
     const root = document.documentElement
     if (theme === 'system') root.removeAttribute('data-theme')

@@ -1,31 +1,14 @@
 import { z } from 'zod'
 import { MAX_LINKS, MAX_SECTIONS, RESUME_TYPES, SECTION_TYPES } from './sections.js'
 
-/*
-  Two Zod 4 traps govern the shape of this file.
-
-  1. `.partial()` throws outright on an object schema that already carries a refinement. So the
-     base object is composed first and completely, the draft schema is derived from it, and the
-     strict schema attaches its cross-field rules last. Reordering these breaks the module at
-     import time, not at call time.
-
-  2. `.default({})` injects the literal value without parsing it, so a nested object ships as
-     `{}` with none of its own defaults filled in. `.prefault({})` runs it through the schema.
-     The failure is silent: the resume renders with an undefined accent and nobody notices.
-
-  Both are pinned by tests in schema.test.ts against the installed version.
-*/
+// zod 4: compose the base first, attach refinements last, and prefault rather than default
 
 export const MONTH_PATTERN = /^\d{4}-(0[1-9]|1[0-2])$/
 
 export const EntrySchema = z.object({
   _id: z.string().optional(),
   hidden: z.boolean().default(false),
-  /*
-    Deliberately open. Per-type field validation is driven by SECTION_REGISTRY at the edge,
-    where the section type is known, rather than by a discriminated union here that would have
-    to be kept in step with the registry by hand.
-  */
+  // open on purpose: per-type validation runs at the edge from SECTION_REGISTRY
   data: z.record(z.string(), z.unknown()).prefault({}),
 })
 
@@ -73,10 +56,7 @@ export const ResumeBase = z.object({
   notes: z.string().max(4000).default(''),
 })
 
-/**
- * Autosave. Every field optional, because a half-typed resume must never be rejected: the user
- * is mid-sentence, not submitting a form.
- */
+/** autosave. every field optional, because a half-typed resume must never be rejected */
 export const ResumeDraftSchema = ResumeBase.partial()
 
 interface DateRange {
@@ -85,15 +65,7 @@ interface DateRange {
   current?: unknown
 }
 
-/*
-  FR 4.4, and dimension B of the ATS rubric.
-
-  Format first, then ordering. Month strings sort lexicographically once they are zero padded,
-  so a string compare is correct here and needs no date parsing at all.
-
-  Entry data is an open record, so these rules cannot live on the field schemas. They belong on
-  the strict schema, where every entry is visible at once.
-*/
+// FR 4.4. padded month strings sort lexicographically, so no date parsing is needed
 function dateIssues(sections: z.infer<typeof SectionSchema>[]) {
   const issues: { path: (string | number)[]; message: string }[] = []
 
@@ -135,12 +107,7 @@ export const ResumeSchema = ResumeBase.check((ctx) => {
   }
 })
 
-/*
-  A typed fallback for the one subdocument that is routinely absent.
-
-  `resume.personal ?? {}` widens to `{}` and every field access on it becomes a type error, which
-  has now been written out by hand in three places. One helper instead.
-*/
+// resume.personal ?? {} widens to {} and every field access becomes a type error
 export function personalOf(resume: { personal?: ResumePersonal }): Partial<ResumePersonal> {
   return resume.personal ?? {}
 }

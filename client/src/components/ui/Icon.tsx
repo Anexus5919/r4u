@@ -1,12 +1,6 @@
 import { cn } from '@/lib/cn'
 
-/*
-  Twelve glyphs. No icon library, and no additions without removing one.
-
-  Every path is drawn on the same 16px grid with one stroke weight and one join style, which is
-  what makes a hand-drawn set read as a system. Where a glyph would not be clearly better than a
-  word, R4U uses the word instead, which is why there is no bell, no gear and no document icon.
-*/
+// twelve glyphs on one 16px grid and stroke; no library, and none added without a removal
 
 const PATHS = {
   plus: 'M8 3.5v9M3.5 8h9',
@@ -54,10 +48,7 @@ export function Icon({ name, label, className, ...rest }: IconProps) {
   )
 }
 
-/*
-  Section markers in the editor are two-letter monospace abbreviations rather than pictograms:
-  more legible at 12px, costs nothing, and reads as considered.
-*/
+// two-letter monospace marks rather than pictograms: more legible at 12px
 export function SectionMark({ children, className }: { children: string; className?: string }) {
   return (
     <span

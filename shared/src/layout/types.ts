@@ -1,30 +1,12 @@
 import type { ResumeType, SectionType } from '../resume/sections.js'
 
-/*
-  One layout AST, two adapters.
+// one layout AST, two adapters: renderToDom walks it to divs, renderToPdf to View and Text
 
-  The hardest problem in a resume builder is template drift: the live HTML preview and the
-  exported PDF are rendered by different engines, so they diverge and the user downloads
-  something they did not see. Writing each template twice guarantees it.
-
-  A template is a pure function to this node set. renderToDom walks it into divs, renderToPdf
-  walks it into View and Text. Content drift becomes structurally impossible, and box drift is
-  near zero because @react-pdf/renderer runs yoga-layout, the same Flexbox spec the browser does.
-*/
-
-/*
-  The style vocabulary is the intersection of what a browser and Yoga both implement, and it is
-  enforced by this type rather than by discipline.
-
-  CSS Grid, float, text-shadow and background-image are absent on purpose: @react-pdf supports
-  none of them, and a compile error is far cheaper than a silently different PDF.
-
-  Every length is in points. The PDF renderer treats a bare number as pt, and the DOM adapter
-  scales pt to px, so one number means one physical size in both.
-*/
+// the browser and yoga intersection, typed rather than trusted: a compile error is cheaper
 export interface Style {
   flexDirection?: 'row' | 'column'
-  alignItems?: 'flex-start' | 'center' | 'flex-end' | 'baseline' | 'stretch'
+  // no baseline: @react-pdf gives Text no baseline function, so yoga bottom-aligns instead
+  alignItems?: 'flex-start' | 'center' | 'flex-end' | 'stretch'
   justifyContent?: 'flex-start' | 'center' | 'flex-end' | 'space-between'
   flexGrow?: number
   flexShrink?: number
@@ -49,10 +31,7 @@ export interface Style {
   fontWeight?: 400 | 600
   fontStyle?: 'normal' | 'italic'
   lineHeight?: number
-  /*
-    Capped at 0.08 x fontSize by the theme layer. Measured, extraction breaks around 0.10, where
-    EXPERIENCE comes back as E X P E R I E N C E and the parser stops recognising the heading.
-  */
+  // capped at 0.08 x fontSize by the theme layer: extraction breaks around 0.10
   letterSpacing?: number
   textTransform?: 'uppercase' | 'lowercase' | 'none'
   textAlign?: 'left' | 'center' | 'right'
@@ -70,11 +49,10 @@ export type LayoutNode =
   | { type: 'text'; style?: Style; value: string }
   | { type: 'rule'; style?: Style }
   | { type: 'spacer'; size: number }
-  /*
-    An atomic block that must not split across an A4 boundary: one job, one degree, one project.
-    The PDF adapter maps it to wrap={false}; the DOM adapter uses break-inside: avoid.
-  */
+  // never split across an A4 boundary: wrap={false} in the PDF, break-inside avoid in the DOM
   | { type: 'block'; style?: Style; children: LayoutNode[] }
+  // a full-bleed ground behind the page, left trim to right. stretch would stop at the content
+  | { type: 'ground'; style?: Style }
 
 /** The resolved document theme. Templates read this and never reach for a raw token. */
 export interface DocTheme {
@@ -89,6 +67,8 @@ export interface DocTheme {
   sectionGap: number
   /** page margin in points */
   margin: number
+  /** A4 width in points, so a template can size a full-bleed ground against the trim */
+  pageWidth: number
 
   ink: string
   muted: string

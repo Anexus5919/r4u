@@ -4,13 +4,7 @@ import type { HydratedDocument, InferSchemaType } from 'mongoose'
 export const VERSION_TRIGGERS = ['manual', 'template', 'import', 'restore', 'daily'] as const
 export type VersionTrigger = (typeof VERSION_TRIGGERS)[number]
 
-/*
-  A full snapshot at milestones only, never per autosave.
-
-  Snapshotting every save would explode storage on a 0.5 GB cluster and, worse, make the version
-  list useless: fifty entries called "12:04, 12:04, 12:04" answer no question anyone has. Five
-  named triggers produce a list a person can actually read.
-*/
+// snapshots at five named milestones only, never per autosave
 const resumeVersionSchema = new Schema(
   {
     resume: { type: Types.ObjectId, ref: 'Resume', required: true, index: true },

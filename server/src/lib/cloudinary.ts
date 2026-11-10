@@ -16,11 +16,7 @@ export interface StoredImage {
   version: number
 }
 
-/*
-  An eager 256x256 face-aware crop at upload time, rather than transforming on the fly at render
-  time. The free tier bills transformations per thousand, and building transform URLs inside a
-  list render burns that quota fast. One transform per upload, reused forever.
-*/
+// one eager crop per upload: on-the-fly transforms burn the free quota
 export async function uploadAvatar(buffer: Buffer, userId: string): Promise<StoredImage> {
   if (!cloudinaryConfigured) {
     throw new AppError('INTERNAL', 'Image uploads are not configured on this deployment')

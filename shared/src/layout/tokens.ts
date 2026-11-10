@@ -1,15 +1,4 @@
-/*
-  Document colours. The second of exactly two files in the project permitted to hold a hex
-  literal, and the reason is structural rather than a convenience.
-
-  The application chrome reads CSS custom properties from client/src/styles/tokens.css, which the
-  browser resolves at runtime. A PDF has no CSS, no cascade and no custom properties, so a
-  template must be handed concrete values. Putting them here keeps the rule intact: colour lives
-  in exactly one place per surface, and no template invents its own.
-
-  Every value below is a step from the ink ramp in docs/DESIGN-SYSTEM.md section 3.1. The document
-  does not get a palette of its own.
-*/
+// the second of two files allowed a hex literal: a PDF has no CSS custom properties
 
 export const DOC_COLORS = {
   /** ink-12. body text and headings on paper */
@@ -20,21 +9,10 @@ export const DOC_COLORS = {
   rule: '#c2bfba',
   /** ink-00. paper is true white in both themes, because paper is */
   paper: '#ffffff',
-  /*
-    ink-11, used when the user has chosen no accent.
-
-    Deliberately a near-black from the ramp rather than a colour. A resume that arrives tinted
-    because nobody picked anything is a template imposing itself on someone's document.
-  */
+  // ink-11. near-black rather than a colour, so an unchosen accent tints nothing
   fallbackAccent: '#2e2924',
 
-  /*
-    ink-12 as a ground, for Placard's reversed header band.
-
-    The band must be real text drawn over a background rectangle and never a rasterised image.
-    An image of a name extracts as nothing, which would turn the one template with a strong
-    header into the one template with no name.
-  */
+  // ink-12 ground for Placard's band. real text over a rectangle, never a rasterised image
   band: '#16130f',
   onBand: '#ffffff',
 
@@ -42,16 +20,7 @@ export const DOC_COLORS = {
   tint: '#f6f5f4',
 } as const
 
-/*
-  The accent choices offered on a resume, and the whole list.
-
-  Deliberately five, deliberately muted, and deliberately print colours rather than screen ones.
-  A free colour picker produces the neon resume, and the accent only ever touches rules and
-  section headings, so a saturated value would be loud without being legible.
-
-  "None" is first and is the default, because a document that arrives uncoloured is a document
-  nobody has imposed on.
-*/
+// five muted print colours and no picker: a free colour wheel produces the neon resume
 export const ACCENT_CHOICES = [
   { key: '', name: 'None', value: DOC_COLORS.fallbackAccent },
   { key: '#7a2e1f', name: 'Oxide', value: '#7a2e1f' },

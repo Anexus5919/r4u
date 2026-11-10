@@ -85,10 +85,7 @@ describe('POST /api/auth/login', () => {
     expect(res.body.data.accessToken).toEqual(expect.any(String))
   })
 
-  /*
-    The two failures must be indistinguishable. A different status, code or wording would let
-    anyone enumerate which addresses are registered.
-  */
+  // the two failures must be identical, or the endpoint enumerates accounts
   it('does not reveal whether an email is registered', async () => {
     await registerUser()
 
@@ -145,10 +142,7 @@ describe('GET /api/auth/me', () => {
     expect(res.body.data.user.email).toBe(CREDENTIALS.email)
   })
 
-  /*
-    FR 9.3 requires blocking to take effect immediately. tokenVersion plus the per-request
-    lookup is what delivers that, rather than waiting out the 15 minute token expiry.
-  */
+  // FR 9.3: blocking is immediate via tokenVersion, not at token expiry
   it('rejects an existing token the moment the account is blocked', async () => {
     const registered = await registerUser()
     const token = registered.body.data.accessToken as string
@@ -174,10 +168,7 @@ describe('POST /api/auth/refresh', () => {
     expect(cookieFrom(res)).not.toBe(first)
   })
 
-  /*
-    A consumed token presented again is the signature of theft: the attacker and the legitimate
-    holder are both using the chain. Revoking the whole family logs both out, which is correct.
-  */
+  // a replayed consumed token signals theft, so the whole family is logged out
   it('revokes the entire family when a consumed token is replayed', async () => {
     const registered = await registerUser()
     const stolen = cookieFrom(registered)

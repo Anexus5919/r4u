@@ -1,16 +1,11 @@
 import { useId } from 'react'
 import { cn } from '@/lib/cn'
 
-/*
-  Labels are sentence case at 12px, not uppercase. An uppercase label at this size needs
-  tracking to be legible, and tracked uppercase is reserved for section eyebrows.
-*/
-
+// sentence case, never uppercase: tracked uppercase is reserved for section eyebrows
 export function Label({ className, ...rest }: React.LabelHTMLAttributes<HTMLLabelElement>) {
-  // the rule cannot see through a passthrough wrapper. Field always supplies htmlFor, and
-  // every direct use of Label must do the same.
+  // the rule cannot see through a passthrough wrapper; Field always supplies htmlFor
   // eslint-disable-next-line jsx-a11y/label-has-associated-control
-  return <label className={cn('block text-xs text-ink-09', className)} {...rest} />
+  return <label className={cn('block text-sm font-medium text-ink-11', className)} {...rest} />
 }
 
 export interface FieldProps {
@@ -57,7 +52,7 @@ export function Field({
       <div className="flex items-baseline justify-between gap-3">
         <Label htmlFor={id}>
           {label}
-          {required ? <span className="text-ink-07"> (required)</span> : null}
+          {required ? <span className="font-normal text-ink-08"> (required)</span> : null}
         </Label>
 
         {max !== undefined ? (

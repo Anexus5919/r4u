@@ -148,10 +148,7 @@ describe('undo and redo', () => {
     expect(canRedo(state)).toBe(false)
   })
 
-  /*
-    Typing must be one undo step, not one per keystroke. Without this an undo after writing a job
-    title removes a single character, which reads as broken.
-  */
+  // a typing burst is one undo step, or undo removes a single character
   it('collapses a typing burst into one step', () => {
     const state = run(
       start(),
@@ -208,10 +205,7 @@ describe('undo and redo', () => {
 })
 
 describe('save lifecycle', () => {
-  /*
-    base becomes the snapshot that was sent, never the live state. Anything typed while the
-    request was in flight has to remain in the next diff, or it is silently lost.
-  */
+  // base is the sent snapshot, so edits typed in flight stay in the next diff
   it('rebases onto what was sent, keeping in-flight edits pending', () => {
     const typed = run(start(), { type: 'notes_set', value: 'first' })
     const sent = typed.resume
@@ -241,10 +235,7 @@ describe('save lifecycle', () => {
     expect(editorReducer(saved, { type: 'notes_set', value: 'b' }).saving).toBe('idle')
   })
 
-  /*
-    A 409 means the server holds a document these snapshots no longer describe, so keeping them
-    would let an undo resurrect a state that never existed.
-  */
+  // after a 409 old snapshots would let undo resurrect a state that never existed
   it('clears history on a rebase', () => {
     const edited = run(
       start(),

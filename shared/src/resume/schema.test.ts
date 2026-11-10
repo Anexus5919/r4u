@@ -2,11 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { z } from 'zod'
 import { ResumeBase, ResumeDraftSchema, ResumeSchema } from './schema.js'
 
-/*
-  The first two suites pin behaviour of the installed Zod against the reasoning in schema.ts.
-  If a future upgrade changes either, these fail loudly instead of the resume quietly rendering
-  with no accent colour.
-*/
+// pins the installed Zod against the reasoning in schema.ts, so an upgrade fails loudly
 
 describe('zod 4 composition traps', () => {
   it('refuses .partial() on a schema that already carries a refinement', () => {
@@ -58,10 +54,7 @@ describe('ResumeBase', () => {
 })
 
 describe('ResumeDraftSchema', () => {
-  /*
-    Autosave fires mid-sentence. A draft with no title, no sections and a half-typed field is a
-    normal state, not an error, and rejecting it would lose the user's work.
-  */
+  // autosave fires mid-sentence, so a half-typed draft is a normal state, not an error
   it('accepts an empty object', () => {
     expect(ResumeDraftSchema.safeParse({}).success).toBe(true)
   })

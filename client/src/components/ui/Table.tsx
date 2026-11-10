@@ -1,10 +1,6 @@
 import { cn } from '@/lib/cn'
 
-/*
-  No zebra striping, no vertical rules, no coloured pills. A 1px horizontal rule between rows,
-  numeric columns right-aligned with tabular figures, and a sticky header that is neither bold
-  nor uppercase. Row hover shifts the ground only.
-*/
+// hairline rows, tabular numerics, plain sticky header; no zebra, no pills
 
 export function Table({ className, ...rest }: React.TableHTMLAttributes<HTMLTableElement>) {
   return (

@@ -18,10 +18,7 @@ export class AppError extends Error {
   }
 }
 
-/*
-  404 rather than 403 for a resource the caller does not own. A 403 confirms the id exists, which
-  is an enumeration oracle over a collection of PII documents. See ADR-008.
-*/
+// 404 rather than 403: a 403 confirms the id exists. see ADR-008
 export function notFound(what = 'Resource'): AppError {
   return new AppError('NOT_FOUND', `${what} not found`)
 }

@@ -1,10 +1,6 @@
 import { cn } from '@/lib/cn'
 
-/*
-  radius 6px, 1px edge, no shadow at rest. Hover darkens the edge only: no lift, no scale.
-  Never nest a Card inside a Card. If a region needs separation inside one, use whitespace
-  and a Rule.
-*/
+// 6px radius, 1px edge, no shadow, hover darkens the edge only; never nest a Card
 
 export interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
   interactive?: boolean
@@ -14,7 +10,7 @@ export function Card({ interactive, className, ...rest }: CardProps) {
   return (
     <div
       className={cn(
-        'rounded-sm border border-ink-05 bg-ink-00',
+        'lift rounded-sm border border-ink-04 bg-ink-00',
         interactive && 't-xs transition-colors hover:border-ink-06',
         className
       )}
@@ -27,18 +23,12 @@ export function Rule({ className, ...rest }: React.HTMLAttributes<HTMLHRElement>
   return <hr className={cn('border-ink-04', className)} {...rest} />
 }
 
-/*
-  A static block, never a shimmer sweep. The sweep is a catalogued tell and it also draws the
-  eye to nothing.
-*/
+// a static block, never a shimmer sweep: the sweep is a catalogued tell
 export function Skeleton({ className, ...rest }: React.HTMLAttributes<HTMLDivElement>) {
   return <div aria-hidden className={cn('rounded-xs bg-ink-03', className)} {...rest} />
 }
 
-/*
-  Status reads as a text label preceded by a filled or hollow glyph, never a coloured pill.
-  Coloured pills across a table are the fastest way to destroy a monochrome system.
-*/
+// status is a text label with a glyph, never a coloured pill
 export function StatusLabel({
   on,
   children,
@@ -62,9 +52,7 @@ export function StatusLabel({
   )
 }
 
-/*
-  Empty states are instructions with one action. No illustration, no icon, no "nothing here yet".
-*/
+// an empty state is an instruction with one action, no illustration or icon
 export function EmptyState({
   title,
   description,

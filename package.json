@@ -29,7 +29,9 @@
     "design-guard": "bash scripts/design-guard.sh",
     "verify": "npm run design-guard && npm run lint && npm run typecheck && npm run test",
     "prepare": "husky",
-    "dev:server:memory": "npm run dev:memory --workspace=server"
+    "dev:server:memory": "npm run dev:memory --workspace=server",
+    "test:api": "postman collection run docs/r4u.postman_collection.json -e docs/r4u.postman_environment.json -i \"01 Health\" -i \"02 Auth\" -i \"03 Resumes\" -i \"04 Templates and sharing\" -i \"05 Reviews and notifications\" -i \"06 Admin\"",
+    "test:api:limits": "postman collection run docs/r4u.postman_collection.json -e docs/r4u.postman_environment.json -i \"07 Rate limiting (run last: locks logins from this IP for 15 minutes)\""
   },
   "lint-staged": {
     "*.{ts,tsx,js,jsx}": [
@@ -44,6 +46,7 @@
     "@commitlint/cli": "^21.2.2",
     "@commitlint/config-conventional": "^21.2.2",
     "@eslint/js": "^10.0.1",
+    "@playwright/test": "^1.65.0",
     "@testing-library/dom": "^10.4.1",
     "@testing-library/jest-dom": "^7.0.1",
     "@testing-library/react": "^16.3.2",

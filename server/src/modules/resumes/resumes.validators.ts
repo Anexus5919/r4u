@@ -43,11 +43,7 @@ export const versionLabelRules = [
   body('label').optional().isString().trim().isLength({ max: 120 }),
 ]
 
-/*
-  The incoming document is validated for shape and size only. fromJsonResume is deliberately
-  tolerant about its contents: a file that half-imports and names what it skipped is more useful
-  than one that refuses outright.
-*/
+// shape and size only: fromJsonResume tolerates and names what it skips
 export const importRules = [
   body('title').optional().isString().trim().isLength({ min: 1, max: 80 }),
   body('document').isObject().withMessage('Provide a JSON Resume document'),

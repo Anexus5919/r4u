@@ -3,16 +3,7 @@ import { DOC_COLORS } from '../layout/tokens.js'
 import type { LayoutNode, ResumeTemplate, TemplateInput } from '../layout/types.js'
 import { renderEntry, sectionHead } from './blocks.js'
 
-/*
-  PLACARD. Business, consulting and finance, where the first impression is a title.
-
-  Structural signature: a full-bleed reversed header band carrying the name, target title and
-  contact, and a hairline rule ABOVE each section heading. Foundry puts its rule below, so the
-  two are deliberate opposites rather than variations.
-
-  The band is real text over a background rectangle, never an image. A rasterised header extracts
-  as nothing, which would make the one template with a strong header the one with no name on it.
-*/
+// PLACARD. full-bleed reversed band, rule ABOVE each head. the band is text, never an image
 function render({ resume, theme }: TemplateInput): LayoutNode[] {
   const { personal } = resume
   const nameSize = theme.bodySize * 2.2
@@ -92,7 +83,7 @@ export const placard: ResumeTemplate = {
     hasTables: false,
     hasImages: false,
     headerFooterContent: false,
-    bodyFont: 'Public Sans',
+    bodyFont: 'Source Sans 3',
     bulletGlyph: '•',
     dateLayout: 'right',
     maxDimensionAScore: 30,

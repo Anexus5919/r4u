@@ -25,20 +25,13 @@ const userSchema = new Schema(
       maxlength: 254,
     },
 
-    /*
-      select: false means every query omits it unless explicitly asked for. A password hash must
-      never reach a response by accident, and this makes the safe path the default one.
-    */
+    // select: false makes omitting the hash the default path
     passwordHash: { type: String, required: true, select: false },
 
     role: { type: String, enum: AUTHENTICATED_ROLES, default: 'user', index: true },
     status: { type: String, enum: USER_STATUSES, default: 'active', index: true },
 
-    /*
-      Carried in the access token as `tv`. Bumping it invalidates every token already issued,
-      which is what makes blocking an account and resetting a password take effect immediately
-      rather than at the next 15 minute expiry.
-    */
+    // carried as tv in the token: bumping it revokes every issued token at once
     tokenVersion: { type: Number, default: 0 },
 
     headline: { type: String, maxlength: 80, default: '' },
@@ -54,10 +47,7 @@ const userSchema = new Schema(
 
     lastSeenAt: { type: Date },
 
-    /*
-      express-rate-limit keeps its counters in memory, which a free-tier restart wipes and an
-      attacker's brute-force budget along with it. These two survive.
-    */
+    // persist across restarts, unlike express-rate-limit's in-memory counters
     failedLoginCount: { type: Number, default: 0 },
     lockUntil: { type: Date },
 

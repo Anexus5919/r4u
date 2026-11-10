@@ -5,11 +5,7 @@ import { Icon } from '@/components/ui/Icon'
 import { Input, Textarea } from '@/components/ui/Input'
 import { Label } from '@/components/ui/Field'
 
-/*
-  One control per FieldType in SECTION_REGISTRY. The forms are generated from the registry, so a
-  new field is a data change rather than a new component, and the character limits shown here are
-  the same constants the server rejects on.
-*/
+// one control per FieldType, so a new field is a data change rather than a component
 
 function Counter({ value, spec }: { value: string; spec: FieldSpec }) {
   if (!spec.max) return null
@@ -57,10 +53,7 @@ export function FieldRow({
   )
 }
 
-/*
-  Tags are squared chips, not pills. A skill is a word, and a rating bar or a set of dots would
-  be both unparseable by an ATS and an unverifiable claim, so neither exists here.
-*/
+// squared chips, not pills. no rating bar: unparseable, and an unverifiable claim
 export function TagInput({
   spec,
   values,
@@ -127,10 +120,7 @@ export function TagInput({
   )
 }
 
-/*
-  Bullets are the field the coaching panel cares most about, so each one carries its own findings
-  inline rather than sending the user to a list elsewhere.
-*/
+// findings sit inline on each bullet rather than in a list somewhere else
 export function BulletList({
   spec,
   values,

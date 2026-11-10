@@ -11,10 +11,7 @@ function bearer(req: Request): string | null {
   return header.slice(7).trim() || null
 }
 
-/*
-  Runs on every request. Sets a guest principal when there is no usable token, so downstream
-  policy code never has to handle a null user.
-*/
+// every request gets a principal, guest by default, so nothing handles null
 export async function attachPrincipal(req: Request, _res: Response, next: NextFunction) {
   const token = bearer(req)
   if (!token) {
@@ -24,12 +21,7 @@ export async function attachPrincipal(req: Request, _res: Response, next: NextFu
 
   const claims = verifyAccessToken(token)
 
-  /*
-    One indexed lookup per authenticated request, deliberately. It is what makes blocking an
-    account and resetting a password take effect immediately rather than at the next 15 minute
-    expiry, which FR 9.3 requires. At this scale the cost is acceptable, and it is the reason
-    tokenVersion exists at all.
-  */
+  // a lookup per request makes blocks and resets immediate (FR 9.3), via tokenVersion
   const user = await UserModel.findById(claims.sub).select('role status tokenVersion')
 
   if (!user) throw new AppError('TOKEN_INVALID', 'Invalid token')

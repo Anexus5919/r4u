@@ -11,6 +11,7 @@ export interface ModalProps {
   footer?: React.ReactNode
   children?: React.ReactNode
   className?: string
+  size?: 'md' | 'lg'
 }
 
 export function Modal({
@@ -21,6 +22,7 @@ export function Modal({
   footer,
   children,
   className,
+  size = 'md',
 }: ModalProps) {
   const ref = useRef<HTMLDialogElement>(null)
 
@@ -47,7 +49,10 @@ export function Modal({
     <dialog
       ref={ref}
       aria-labelledby="modal-title"
-      className="m-auto w-[min(32rem,calc(100vw-2rem))]"
+      className={cn(
+        'm-auto',
+        size === 'lg' ? 'w-[min(56rem,calc(100vw-2rem))]' : 'w-[min(32rem,calc(100vw-2rem))]'
+      )}
     >
       {/* floating layer: shadow and no border, never both */}
       <div className={cn('float rounded-sm bg-ink-00 p-6', className)}>

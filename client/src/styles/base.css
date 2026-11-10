@@ -1,7 +1,4 @@
-/*
-  Base layer. Element defaults only. Anything reusable belongs in components/ui.
-  No hex literals here: every colour reads a token.
-*/
+/* base layer: element defaults only, every colour reads a token */
 
 @layer base {
   *,
@@ -29,10 +26,7 @@
     text-rendering: optimizeLegibility;
   }
 
-  /*
-    The optical-size axis is set explicitly rather than left to font-optical-sizing: auto,
-    so the values are documented and reviewable. See DESIGN-SYSTEM.md section 4.2.
-  */
+  /* tracking tightens as size grows, which is what keeps large sans headings from looking loose */
   h1,
   h2,
   h3,
@@ -40,36 +34,19 @@
     margin: 0;
     font-family: var(--font-display);
     color: var(--ink-12);
-    font-weight: 400;
-    letter-spacing: -0.01em;
+    font-weight: 600;
+    letter-spacing: -0.02em;
     line-height: 1.2;
   }
 
   h1 {
-    font-variation-settings: 'opsz' 60;
-  }
-
-  h2 {
-    font-variation-settings: 'opsz' 36;
-  }
-
-  h3,
-  h4 {
-    font-variation-settings: 'opsz' 24;
+    letter-spacing: -0.03em;
+    line-height: 1.1;
   }
 
   p {
     margin: 0;
     max-width: 75ch;
-  }
-
-  /* labels, captions and table cells sit at the small end of the optical range */
-  small,
-  caption,
-  th,
-  label,
-  figcaption {
-    font-variation-settings: 'opsz' 14;
   }
 
   a {
@@ -99,22 +76,19 @@
     padding: 0;
   }
 
-  /*
-    One focus treatment for the whole product. A ring, never a glow, never a colour change.
-    :focus-visible only, so a mouse click never draws it.
-  */
+  /* one focus treatment: a ring on :focus-visible only, never a glow */
   :focus {
     outline: none;
   }
 
   :focus-visible {
-    outline: 2px solid var(--ink-07);
+    outline: 2px solid var(--accent-solid);
     outline-offset: 2px;
     border-radius: var(--radius-xs);
   }
 
   ::selection {
-    background-color: var(--ink-04);
+    background-color: var(--accent-edge);
     color: var(--ink-12);
   }
 
@@ -153,11 +127,7 @@
     display: none !important;
   }
 
-  /*
-    Native dialog gives focus trapping, Escape and inertness from the platform.
-    allow-discrete plus @starting-style produce the exit transition in CSS, which is why R4U
-    needs no animation library for modals.
-  */
+  /* native dialog plus allow-discrete and @starting-style: no animation library */
   dialog {
     padding: 0;
     border: none;
@@ -216,9 +186,19 @@
     border-radius: 0;
   }
 
-  /* the one permitted elevation, for genuinely floating layers only. never with a border */
+  /* menus, popovers and dialogs */
   .float {
     box-shadow: var(--shadow-float);
+  }
+
+  /* resting cards: a hairline plus the faintest lift, so white cards separate from the ground */
+  .lift {
+    box-shadow: var(--shadow-card);
+  }
+
+  /* a rendered resume sitting on the page as a physical sheet */
+  .sheet {
+    box-shadow: var(--shadow-paper);
   }
 
   .rule {
@@ -229,10 +209,7 @@
     border-left: var(--hairline) solid var(--ink-04);
   }
 
-  /*
-    The entire motion vocabulary. Components use these rather than arbitrary durations, so the
-    three-duration rule is enforced by what is available rather than by discipline.
-  */
+  /* the entire motion vocabulary: only three durations exist to use */
   .t-xs {
     transition-duration: var(--motion-xs);
     transition-timing-function: var(--ease-out);
@@ -246,5 +223,34 @@
   .t-md {
     transition-duration: var(--motion-md);
     transition-timing-function: var(--ease-out);
+  }
+}
+
+/* print is the fallback export: the sheet alone, at true scale, on A4, with grounds kept */
+@media print {
+  @page {
+    size: A4;
+    margin: 0;
+  }
+
+  .print-root > div > div {
+    width: 210mm !important;
+    height: auto !important;
+    max-width: none !important;
+    overflow: visible !important;
+  }
+
+  .print-root .paper {
+    transform: none !important;
+    height: auto !important;
+    min-height: 297mm;
+    overflow: visible !important;
+    border: 0 !important;
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+
+  .sheet {
+    box-shadow: none !important;
   }
 }

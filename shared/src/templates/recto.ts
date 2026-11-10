@@ -3,18 +3,7 @@ import type { DocTheme, LayoutNode, ResumeTemplate, TemplateInput } from '../lay
 import type { TemplateResume } from '../layout/types.js'
 import { renderEntry, sectionHead } from './blocks.js'
 
-/*
-  RECTO. Experienced people with long skill inventories, for human-reviewed and referral
-  applications.
-
-  Structural signature: two columns with the sidebar on the RIGHT at 32 percent, a full-width
-  split header band above both, and a hairline running down the gutter. Verso is its mirror in
-  every one of those respects, which is what keeps them two designs rather than one flipped.
-
-  Not ATS safe, and badged that way on the card before anyone picks it. A line-oriented extractor
-  reads across both columns and interleaves them, which is Textkernel code 433. The linearised
-  variant splices the sidebar back into a single column in canonical order.
-*/
+// RECTO. sidebar RIGHT at 32%, split header, gutter hairline. Verso mirrors all three
 const ASIDE_SECTIONS = ['skills', 'certifications', 'languages', 'education'] as const
 
 function asideSection(theme: DocTheme, section: TemplateResume['sections'][number]): LayoutNode {
@@ -83,8 +72,10 @@ function render({ resume, theme }: TemplateInput): LayoutNode[] {
     ]),
   ])
 
-  const columns = row({ gap: 0, alignItems: 'flex-start' }, [
-    stack({ width: '64%', paddingRight: 16 }, [
+  // stretch: the gutter rule has no children, so under flex-start it is zero high and paints nothing
+  const columns = row({ gap: 0, alignItems: 'stretch' }, [
+    // flexGrow rather than a percentage, so main takes exactly what the rule and aside leave
+    stack({ flexGrow: 1, flexShrink: 1, paddingRight: 16 }, [
       ...main.map((section) =>
         stack({ marginBottom: theme.sectionGap }, [
           sectionHead(theme, section.title, 'rule-below'),
@@ -95,12 +86,8 @@ function render({ resume, theme }: TemplateInput): LayoutNode[] {
       ),
     ]),
 
-    /*
-      A 0.5pt filled column rather than a left border. Style deliberately carries no
-      borderLeftWidth, because a vertical rule is the one place templates would reach for a
-      border that behaves differently in the two engines. A filled box is unambiguous in both.
-    */
-    stack({ width: 0.5, backgroundColor: theme.rule, flexGrow: 1 }, []),
+    // a filled column, not a left border: a vertical border is drawn differently by each engine
+    stack({ width: 0.5, backgroundColor: theme.rule }, []),
 
     stack(
       { width: '32%', paddingLeft: 16 },
@@ -122,7 +109,7 @@ export const recto: ResumeTemplate = {
     hasTables: false,
     hasImages: false,
     headerFooterContent: false,
-    bodyFont: 'Public Sans',
+    bodyFont: 'Source Sans 3',
     bulletGlyph: '•',
     dateLayout: 'right',
     // two columns caps dimension A at 3 of 6 on reading order alone

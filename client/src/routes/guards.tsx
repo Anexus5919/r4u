@@ -3,11 +3,7 @@ import { hasRole } from '@r4u/shared'
 import type { Role } from '@r4u/shared'
 import { useAuth } from '@/context/AuthContext'
 
-/*
-  While the session is restoring, render nothing rather than a spinner. The check resolves in a
-  single request, and a spinner that appears for 80ms reads as jank. A protected route is never
-  rendered before the token is verified.
-*/
+// render nothing while restoring: an 80ms spinner reads as jank
 function Pending() {
   return <div className="min-h-dvh bg-ink-01" aria-busy="true" />
 }
@@ -25,10 +21,7 @@ export function RequireAuth() {
   return <Outlet />
 }
 
-/*
-  Landing on /login while already signed in is a dead end. Send them to the surface their role
-  actually owns.
-*/
+// a signed-in visitor to /login goes to the surface their role owns
 export function RequireGuest() {
   const { status, user } = useAuth()
 
@@ -40,10 +33,7 @@ export function RequireGuest() {
   return <Outlet />
 }
 
-/*
-  Set membership, matching the server. RequireRole('user') denies an admin, which is the point:
-  an administrator is not a superset of a user.
-*/
+// set membership, matching the server: RequireRole('user') denies an admin
 export function RequireRole({ allowed }: { allowed: Role[] }) {
   const { status, user } = useAuth()
 

@@ -1,26 +1,36 @@
+import dns from 'node:dns'
 import mongoose from 'mongoose'
 import { env, isProduction } from './env.js'
 import { logger } from './logger.js'
 
-/*
-  sanitizeFilter is the correct Express 5 defence against operator injection. Do NOT install
-  express-mongo-sanitize: it is abandoned and silently breaks, because req.query became a getter.
-*/
+// sanitizeFilter, not express-mongo-sanitize, which breaks on Express 5
 mongoose.set('sanitizeFilter', true)
 mongoose.set('strictQuery', true)
 
-/*
-  Atlas M0 gives 0.5 GB including indexes and 100 operations per second, and this service spins
-  down after 15 minutes idle so it boots often. Mongoose rebuilds every index on every boot with
-  autoIndex on, which would spend that operation budget on nothing. Indexes are created once by
-  scripts/create-indexes.ts instead.
-*/
+// M0 op budget: index.ts runs ensureIndexes() once per boot instead of autoIndex
 if (isProduction) mongoose.set('autoIndex', false)
+
+const PUBLIC_RESOLVERS = ['8.8.8.8', '1.1.1.1']
+
+// some Windows routers refuse Node's SRV queries though the OS resolves them; fall back only then
+async function ensureSrvResolvable(uri: string) {
+  if (!uri.startsWith('mongodb+srv://')) return
+  const host = new URL(uri).hostname
+  try {
+    await dns.promises.resolveSrv(`_mongodb._tcp.${host}`)
+  } catch (error) {
+    const code = (error as { code?: string }).code
+    if (code !== 'ECONNREFUSED' && code !== 'ETIMEOUT' && code !== 'ESERVFAIL') throw error
+    dns.setServers(PUBLIC_RESOLVERS)
+    logger.warn({ code }, 'system dns refused the srv lookup, using public resolvers')
+  }
+}
 
 export async function connectDb(uri: string = env.MONGODB_URI): Promise<typeof mongoose> {
   mongoose.connection.on('error', (error) => logger.error({ error }, 'mongoose connection error'))
   mongoose.connection.on('disconnected', () => logger.warn('mongoose disconnected'))
 
+  await ensureSrvResolvable(uri)
   await mongoose.connect(uri, {
     serverSelectionTimeoutMS: 10_000,
     maxPoolSize: 10,

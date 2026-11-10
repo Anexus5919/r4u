@@ -92,10 +92,7 @@ function Editor({ loaded }: { loaded: EditorResume }) {
 
   const active = state.resume.sections.find((section) => section._id === activeId)
 
-  /*
-    The switch itself is immediate and always safe: reorderForTemplate never drops a section, and
-    a section the template does not mention keeps its place. Only the reorder needs asking about.
-  */
+  // the switch never drops a section, so only the reorder needs asking about
   function chooseTemplate(key: string) {
     dispatch({ type: 'template_set', value: key })
 
@@ -181,11 +178,7 @@ function Editor({ loaded }: { loaded: EditorResume }) {
         </div>
       </header>
 
-      {/*
-        Three panels split by a single hairline with background parity, not three cards on a grey
-        field. Uniform connectedness through a rule costs less ink than common region through
-        cards, and it keeps the paper as the only figure on the screen.
-      */}
+      {/* three panels split by a hairline, not three cards on a grey field */}
       <div className="flex min-h-[calc(100dvh-8.5rem)] flex-col lg:flex-row">
         <aside className="shrink-0 border-b border-ink-04 px-4 py-6 lg:w-64 lg:border-r lg:border-b-0">
           <button
@@ -285,10 +278,7 @@ function Editor({ loaded }: { loaded: EditorResume }) {
         </aside>
       </div>
 
-      {/*
-        A template is a suggestion, not an instruction. The user may have ordered their sections
-        deliberately, so the switch happens immediately and the reorder is offered separately.
-      */}
+      {/* a template suggests an order: the switch is immediate, the reorder is offered */}
       <Modal
         open={Boolean(pendingOrder)}
         onClose={() => setPendingOrder(null)}

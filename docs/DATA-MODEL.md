@@ -328,7 +328,9 @@ to leak the share URL in the `Referer` header.
   createdAt }
 ```
 
-Index: `{ shareLink: 1, fingerprint: 1, createdAt: -1 }`. TTL 48 hours.
+Index: `{ shareLink: 1, fingerprint: 1, kind: 1, bucket: 1 }` **unique**, where `bucket` is the clock hour
+(hours since the epoch). The unique index is what makes the dedupe atomic: two overlapping requests
+from one visitor cannot both insert, so neither can both count. TTL 48 hours on `createdAt`.
 
 Deduplicate within a **one-hour window** and **exclude the owner's own visits**. Without both, the
 counters are noise and the analytics feature actively looks broken, which is worse than not

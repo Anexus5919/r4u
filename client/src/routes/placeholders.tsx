@@ -1,112 +1,36 @@
-import { useParams } from 'react-router-dom'
 import { useAuth } from '@/context/AuthContext'
+import { Logo } from '@/components/brand/Logo'
 import { ButtonLink } from '@/components/ui/Button'
 
-/*
-  Real copy, never lorem. These say plainly what is not built yet and which phase builds it,
-  which is more useful than a grey box and keeps the design reviewable.
-*/
-
-export function LandingPage() {
-  return (
-    <div className="min-h-dvh bg-ink-01">
-      <div className="mx-auto flex min-h-dvh max-w-6xl flex-col px-6 lg:px-10">
-        <header className="flex h-16 shrink-0 items-center justify-between">
-          <span className="font-display text-lg tracking-tight text-ink-12">R4U</span>
-          <ButtonLink to="/login" variant="ghost" size="sm">
-            Sign in
-          </ButtonLink>
-        </header>
-
-        <main className="flex flex-1 items-start pt-16">
-          <div className="max-w-xl">
-            <h1 className="font-display text-[38px] leading-tight text-ink-12">
-              Build a resume a machine can actually read
-            </h1>
-            <p className="mt-4 text-md text-ink-09">
-              Your content is stored as structured data, so one dataset renders through any
-              template, exports to a real text-layer A4 PDF, and publishes as a link you control. No
-              paywall at download.
-            </p>
-
-            <div className="mt-8">
-              <ButtonLink to="/register" variant="primary">
-                Create an account
-              </ButtonLink>
-            </div>
-
-            <p className="mt-10 border-t border-ink-04 pt-5 text-xs text-ink-09">
-              The hero lockup, where the 4 holds as a pivot and R4U expands into RESUME 4 YOU, is
-              specified in docs/LANDING.md and built in phase 11 against real product screens.
-            </p>
-          </div>
-        </main>
-      </div>
-    </div>
-  )
-}
-
-/*
-  The editor and preview surfaces land in phases 5 and 6. They exist as routes now so the
-  dashboard card actions navigate somewhere real rather than into a 404, and so the resume
-  loads and the ownership guard is exercised on the way.
-*/
-function ResumeStub({ heading, body }: { heading: string; body: string }) {
-  const { id } = useParams()
-
-  return (
-    <div className="max-w-3xl">
-      <ButtonLink to="/dashboard" variant="ghost" size="sm">
-        Back to my resumes
-      </ButtonLink>
-
-      <h1 className="mt-6 text-xl text-ink-12">{heading}</h1>
-      <p className="mt-2 text-sm text-ink-09">{body}</p>
-      <p className="mt-4 font-mono text-2xs text-ink-07">resume {id}</p>
-    </div>
-  )
-}
-
-export function PreviewPage() {
-  return (
-    <ResumeStub
-      heading="Preview and export"
-      body="Template switching, the live A4 preview and text-layer PDF export arrive in phases 6 and 7."
-    />
-  )
-}
-
-export function AdminPage() {
-  return (
-    <div className="max-w-3xl">
-      <h1 className="text-xl text-ink-12">Admin</h1>
-      <p className="mt-2 text-sm text-ink-09">
-        Platform statistics, user management and the moderation queue arrive in phase 9.
-      </p>
-      <p className="mt-6 text-xs text-ink-09">Resume content is not visible to administrators.</p>
-    </div>
-  )
-}
-
 function ErrorPage({ code, title, body }: { code: string; title: string; body: string }) {
-  const { status } = useAuth()
+  const { status, user } = useAuth()
   const signedIn = status === 'authenticated'
+  const home = user?.role === 'admin' ? '/admin' : '/dashboard'
 
   return (
-    <div className="min-h-dvh bg-ink-01">
-      <div className="mx-auto flex min-h-dvh max-w-6xl items-start px-6 pt-32 lg:px-10">
-        <div className="max-w-md">
-          <p className="font-mono text-2xs tracking-wide text-ink-07 uppercase">{code}</p>
-          <h1 className="mt-3 text-xl text-ink-12">{title}</h1>
-          <p className="mt-2 text-sm text-ink-09">{body}</p>
+    <div className="flex min-h-dvh flex-col bg-ink-01">
+      <header className="flex h-16 items-center border-b border-ink-04 bg-ink-00 px-6 lg:px-10">
+        <Logo tagline />
+      </header>
 
-          <div className="mt-8">
-            <ButtonLink to={signedIn ? '/dashboard' : '/'} variant="secondary">
+      <main className="flex flex-1 items-center justify-center px-6 py-20">
+        <div className="max-w-md text-center">
+          <p className="text-d5 leading-none font-semibold tracking-tight text-accent">{code}</p>
+          <h1 className="mt-6 text-xl text-ink-12">{title}</h1>
+          <p className="mx-auto mt-3 text-sm leading-relaxed text-ink-09">{body}</p>
+
+          <div className="mt-8 flex justify-center gap-2">
+            <ButtonLink to={signedIn ? home : '/'} variant="primary">
               {signedIn ? 'Back to your dashboard' : 'Back to the home page'}
             </ButtonLink>
+            {signedIn ? null : (
+              <ButtonLink to="/login" variant="secondary">
+                Sign in
+              </ButtonLink>
+            )}
           </div>
         </div>
-      </div>
+      </main>
     </div>
   )
 }
@@ -116,7 +40,7 @@ export function NotFoundPage() {
     <ErrorPage
       code="404"
       title="That page does not exist"
-      body="The address may be mistyped, or the resource may have been deleted."
+      body="The address may be mistyped, or the page may have moved. Nothing you saved is affected."
     />
   )
 }

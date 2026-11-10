@@ -2,13 +2,7 @@ import { compact, contactLine, spacer, stack, text, tracking } from '../layout/h
 import type { LayoutNode, ResumeTemplate, TemplateInput } from '../layout/types.js'
 import { renderEntry, sectionHead } from './blocks.js'
 
-/*
-  QUIRE. Freshers and students, where the content is genuinely thin.
-
-  Structural signature: no rules anywhere. Separation is whitespace alone, and the density is
-  deliberately low so a short resume fills a page honestly rather than being padded to fit.
-  Education leads, because for a fresher it is the strongest asset on the page.
-*/
+// QUIRE. freshers. no rules anywhere, low density, education first
 function render({ resume, theme }: TemplateInput): LayoutNode[] {
   const { personal } = resume
   const nameSize = theme.bodySize * 2.9
@@ -71,7 +65,7 @@ export const quire: ResumeTemplate = {
     hasTables: false,
     hasImages: false,
     headerFooterContent: false,
-    bodyFont: 'Public Sans',
+    bodyFont: 'Source Sans 3',
     bulletGlyph: '•',
     dateLayout: 'right',
     maxDimensionAScore: 30,

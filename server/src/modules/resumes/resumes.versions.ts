@@ -5,13 +5,7 @@ import { readResumeContent } from './resumes.access.js'
 import type { Principal } from './resumes.access.js'
 import type { VersionTrigger } from '../../models/ResumeVersion.js'
 
-/*
-  Version history. Snapshots at milestones, and a restore that goes through the normal write path
-  so the restore itself becomes a version and nothing is ever actually lost.
-
-  This is the direct answer to the problem the project opened with: a folder of files called
-  resume_final_v3 that nobody can tell apart.
-*/
+// milestone snapshots, and restore goes through the write path so nothing is lost
 
 const KEEP = 30
 
@@ -54,10 +48,7 @@ export async function snapshot(
     at: resume.version,
   })
 
-  /*
-    Trimmed rather than kept forever. Atlas M0 gives 0.5 GB including indexes, and a resume with
-    three hundred snapshots is a storage problem long before it is a useful history.
-  */
+  // trimmed, since M0's 0.5 GB cannot hold hundreds of snapshots per resume
   const stale = await ResumeVersionModel.find({ resume: resume._id })
     .sort({ createdAt: -1 })
     .skip(KEEP)
@@ -70,10 +61,7 @@ export async function snapshot(
   return version
 }
 
-/*
-  One snapshot per calendar day, taken on the first edit. Enough to answer "what did this look
-  like yesterday" without a snapshot per keystroke.
-*/
+// one snapshot per calendar day, taken on the first edit
 export async function snapshotDaily(resumeId: string, principal: Principal) {
   const since = new Date()
   since.setHours(0, 0, 0, 0)
@@ -97,11 +85,7 @@ export async function listVersions(resumeId: string, principal: Principal) {
     .limit(KEEP)
 }
 
-/*
-  Restore writes through the normal update path and takes a snapshot of the current state first,
-  so the restore is itself undoable. A restore that discards what it replaced is a second way to
-  lose work, which is the opposite of what history is for.
-*/
+// snapshots the current state first, so a restore is itself undoable
 export async function restoreVersion(resumeId: string, versionId: string, principal: Principal) {
   const current = await readResumeContent(resumeId, principal)
 

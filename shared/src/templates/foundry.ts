@@ -2,13 +2,7 @@ import { compact, contactLine, spacer, stack, text, tracking } from '../layout/h
 import type { LayoutNode, ResumeTemplate, TemplateInput } from '../layout/types.js'
 import { renderEntry, sectionHead } from './blocks.js'
 
-/*
-  FOUNDRY. The ATS-safe default, and where everyone starts.
-
-  Structural signature: one column, left-aligned header, a hairline rule BELOW each section
-  heading spanning the full measure, dates right-aligned. Placard is its deliberate opposite,
-  with the rule above.
-*/
+// FOUNDRY. the ATS-safe default. one column, rule BELOW each head, dates right
 function render({ resume, theme }: TemplateInput): LayoutNode[] {
   const { personal } = resume
   const nameSize = theme.bodySize * 2.1
@@ -40,11 +34,7 @@ function render({ resume, theme }: TemplateInput): LayoutNode[] {
           )
         : null,
 
-      /*
-        One line, plain text, inside the body flow. Contact details in a page header are code 311
-        and invisible to most parsers, and an icon in place of the word "Email" carries no text
-        at all.
-      */
+      // in the body flow: contact in a page header is code 311 and invisible to most parsers
       contactLine(personal)
         ? text(
             {

@@ -104,7 +104,7 @@ by starting at `strict: true` with `noImplicitAny: false` and tightening later.
 
 ## ADR-004: Named deviations from the supplied design reference
 
-**Status:** accepted
+**Status:** superseded by ADR-018 for palette, accent, faces and radius
 
 **Context.** R4U was briefed against a reference design file using the Tailwind `stone-*` palette,
 DM Serif Display, `rounded-full` buttons and `rounded-2xl` cards, with a stated goal of avoiding
@@ -384,3 +384,119 @@ code-300 major issue, so a text-layer DOCX is measurably safer for ATS than any 
 competitor in this class ships it.
 
 Deferred to Phase 6 so it does not compete with the core export path in ADR-001.
+
+---
+
+## ADR-016: Ledger drops the multi-column short-item grid
+
+**Status:** accepted, supersedes the Ledger columns axis in `TEMPLATES.md` 4.3
+
+`TEMPLATES.md` 4.3 specified Ledger as "1 main, but short-item sections render as 2 or 3 column
+grids", with `Core Competencies (3-col grid)` in its order and the note "grid cells emit as
+separate text nodes, never a table". It was never implemented, and on review it should not be.
+
+**The grid contradicts Ledger's own ATS badge.** Ledger is `atsSafe: 'safe'` with
+`maxDimensionAScore: 30`, the perfect dimension A score, and that score is only honest for a
+single reading order. Chunking a section into three columns creates exactly the multi-column
+reading order that caps Recto and Verso at 21. Emitting cells as text nodes rather than as a
+table avoids code 402, but it does not avoid code 433, which is about reading order and is the
+reason two-column templates are badged unsafe at all.
+
+Two further problems with the specified fix:
+
+- Ledger passes `dates: 'right'`. Certifications and achievements in a one-third measure would
+  wrap their date range across two lines, which is Textkernel code 418.
+- The stated motivation was the 98-character measure, but margins are a user knob, so Ledger
+  cannot set 16mm for itself, and `skillsEntry` already splits a group label off at 28 percent.
+
+**Decision.** Ledger stays one column. It remains distinct on the other four axes: inline heads
+with a rule running to the right margin, a split header with contact stacked right, and the
+tightest section gap in the set. A shared columns value with Foundry is not a distinctness
+failure, since five of the eight templates are single-column by design.
+
+The alternative, keeping the grid and lowering Ledger to `maxDimensionAScore: 24`, was rejected:
+the product needs one template that is unambiguously the safe dense choice, and a grid buys
+nothing a reader values enough to pay reading order for.
+
+---
+
+## ADR-017: A ground is a node type, not a stretched flex child
+
+**Status:** accepted
+
+Verso's tinted sidebar was a flex child carrying `backgroundColor` and negative margins on all
+three trim edges. It cannot work, in either adapter.
+
+`align-items: stretch` resolves a child against the flex line, and a single-line container's line
+cross size is the taller column's content height, not the page. Measured in headless Chrome with
+Verso's real node tree: with short content the tint stopped 273mm above the bottom trim, under a
+hard horizontal edge. The style vocabulary has no `height`, `minHeight` or `alignSelf`, so no
+template could express the intent.
+
+`minHeight` was considered and rejected. It would make the tint reach the bottom of page one, but
+it also inflates `content.scrollHeight`, which is what the editor's page-fill readout measures, so
+every Verso resume would report 100 percent full while nearly empty. A full-bleed ground that has
+to repeat on page two is also not a flow item at all.
+
+**Decision.** `{ type: 'ground' }` is a top-level node, lifted out of the flow by `splitGrounds()`
+before either adapter walks the tree. The DOM adapter positions it against the page's padding box;
+the PDF adapter will map it to a `fixed` View, which is the only shape that repeats across pages.
+It is anchored at the left trim and takes `width` and `backgroundColor`, nothing else.
+
+Because the ground measures against the page and a column measures against the content box, Verso
+computes its sidebar width in points from `theme.pageWidth`, not as a shared percentage.
+
+---
+
+## ADR-018: A professional product register replaces the editorial one
+
+**Status:** accepted. Supersedes ADR-004 for palette, accent, faces and radius.
+
+**Context.** ADR-004 steered every visual specific away from a catalogue of AI tells: a warm ink
+ramp, a vermillion accent, Newsreader headings over Public Sans, 2px and 6px corners, and a
+13 to 14px tool scale. Built out across the auth, dashboard and editor screens, the result read to
+the product owner as unfinished: small grey text, a newspaper serif on tool headings, a brown-black
+dark theme, and a red primary button that reads as a warning. A resume builder sells confidence in
+the output, and the chrome was not projecting it.
+
+**Decision.** Optimise for a credible, conventional product register over novelty.
+
+| Aspect  | ADR-004                    | Now                                         | Reason                                                                   |
+| ------- | -------------------------- | ------------------------------------------- | ------------------------------------------------------------------------ |
+| Faces   | Newsreader and Public Sans | Geist for interface and headings            | One sans family, drawn for UI, pairs with the Geist Mono already shipped |
+| Neutral | Warm ink ramp              | Cool ink ramp with a faint blue cast        | Crisp on screen; the dark theme no longer reads brown                    |
+| Accent  | Vermillion `#c8331a`       | Blue `#2356e0`, with a subtle tint and edge | Primary action no longer shares a hue with danger                        |
+| Radius  | 2px and 6px                | 6px controls, 12px cards                    | Current product convention; still two values, still no pills             |
+| Scale   | 14px base, 13px labels     | 15px base, 14px labels at medium weight     | Labels and body text read at arm's length                                |
+
+**Unchanged.** The token architecture, `ink-*` naming, the single hex file, the gradient ban, the
+purple ban, the motion vocabulary, true-white paper in both themes, and every rule in
+`design-guard.sh`. The resume templates are untouched: document faces and colours live in
+`shared/src/layout/tokens.ts`, not here.
+
+**Consequence.** `DESIGN-SYSTEM.md` sections 3, 4 and 6 describe the superseded values where they
+conflict with `tokens.css`; this ADR and the token file win. The favicon is a static SVG that
+cannot read custom properties, so it carries the accent and paper values as literals.
+
+---
+
+## ADR-019: Template presets, indexes at boot, and a share token shown once
+
+**Status:** accepted
+
+**Template presets.** FR 9.4 asks the administrator to add templates, and ADR-005 forbids storing
+markup. A database entry is therefore a code renderer (`baseKey`) plus metadata and a design preset
+(accent, type size, leading, spacing, margins). Adding a template means adding a preset over a
+layout that already exists in code; a new layout is a reviewed code change. Creating a resume from a
+preset stores the renderer key and copies the design, so deactivating the preset never affects
+existing resumes.
+
+**Indexes at boot.** DATA-MODEL.md section 1 asked for an explicit migration script with autoIndex
+off, and no such script existed, so a production database ran without its unique and TTL indexes.
+`ensureIndexes()` now runs once per boot: one `createIndexes` per collection, each a no-op when the
+index is present, which costs about fifteen operations per cold start against a budget of one hundred
+per second. `npm run migrate` runs the same on demand.
+
+**Share token.** The public path segment is the token itself, and only its SHA-256 and a four
+character hint are stored. The owner sees the full URL once, at creation, and can create a new link
+at any time. A link the server can show again is a link a leaked backup can show to anyone.

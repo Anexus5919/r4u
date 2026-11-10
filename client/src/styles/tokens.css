@@ -1,120 +1,121 @@
-/*
-  The only file in the project permitted to contain a hex literal.
-  Every value here is specified in docs/DESIGN-SYSTEM.md. Read it before changing anything.
+/* The only file in the project permitted to contain a hex literal. Specified in DESIGN-SYSTEM.md and ADR-018. */
 
-  Do not "warm up" the light end of the ramp. ink-01 at #fbfbfa holds chroma near zero so the
-  page reads as paper. At #faf8f5 it becomes the catalogued cream tell.
-*/
-
-/* Faces are linked from index.html with preconnect. Newsreader carries a real optical-size
-   axis, bound to rendered size in base.css. */
+/* Faces are linked from index.html with preconnect: Geist for the interface, Geist Mono for figures. */
 
 /* ---------------------------------------------------------------- light, the default */
 
 :root {
+  /* a cool neutral ramp with a faint blue cast, so the chrome reads crisp rather than beige */
   --ink-00: #ffffff;
-  --ink-01: #fbfbfa;
-  --ink-02: #f6f5f4;
-  --ink-03: #f0eeec;
-  --ink-04: #e8e6e3;
-  --ink-05: #dbd9d5;
-  --ink-06: #c2bfba;
-  --ink-07: #a39f9a;
-  --ink-08: #85817b;
-  --ink-09: #635e58;
-  --ink-10: #48433d;
-  --ink-11: #2e2924;
-  --ink-12: #16130f;
+  --ink-01: #f8f9fb;
+  --ink-02: #f2f4f7;
+  --ink-03: #eaedf1;
+  --ink-04: #e2e6eb;
+  --ink-05: #d3d9e0;
+  --ink-06: #b9c1cc;
+  --ink-07: #98a2b1;
+  --ink-08: #788395;
+  --ink-09: #5a6577;
+  --ink-10: #434d5d;
+  --ink-11: #2b3340;
+  --ink-12: #111722;
 
-  --accent-solid: #c8331a;
-  --accent-text: #af2d18;
+  /* one confident blue for brand and primary action; red is reserved for destruction */
+  --accent-solid: #2356e0;
+  --accent-hover: #1c47bd;
+  --accent-text: #1f4fd0;
   --accent-on: #ffffff;
+  --accent-subtle: #ebf1fe;
+  --accent-edge: #c7d7fb;
 
-  --state-success: #346c42;
-  --state-warning: #976712;
-  --state-danger: #ac3031;
-  --state-info: #3b6987;
+  --state-success: #1f7a4d;
+  --state-warning: #a16207;
+  --state-danger: #c4302b;
+  --state-info: #2b6cb0;
 
   /* paper is always true white, in both themes. the resume is figure, the app is ground */
   --paper: #ffffff;
   --paper-ink: #16130f;
 
-  --shadow-float: 0 1px 2px rgb(22 19 15 / 0.06), 0 4px 12px rgb(22 19 15 / 0.08);
-  --backdrop: rgb(22 19 15 / 0.3);
+  --shadow-card: 0 1px 2px rgb(16 24 40 / 0.04), 0 1px 3px rgb(16 24 40 / 0.04);
+  --shadow-float: 0 2px 4px rgb(16 24 40 / 0.04), 0 12px 32px rgb(16 24 40 / 0.1);
+  --shadow-paper: 0 1px 3px rgb(16 24 40 / 0.06), 0 24px 48px -12px rgb(16 24 40 / 0.18);
+  --backdrop: rgb(10 13 19 / 0.45);
 }
 
-/* ---------------------------------------------------------------- dark
-
-  A separately tuned ramp, never a mechanical inversion. Elevation is lightness, not shadow:
-  a shadow cast on a dark ground carries no contrast and reads as nothing.
-*/
+/* ---------------------------------------------------------------- dark, tuned separately, never inverted */
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme='light']) {
-    --ink-00: #0e0c09;
-    --ink-01: #15120e;
-    --ink-02: #1c1914;
-    --ink-03: #25211c;
-    --ink-04: #2e2924;
-    --ink-05: #39352f;
-    --ink-06: #4c4741;
-    --ink-07: #625d56;
-    --ink-08: #78746d;
-    --ink-09: #96918c;
-    --ink-10: #b4b0ac;
-    --ink-11: #d3d0cd;
-    --ink-12: #f3f1f0;
+    --ink-00: #0a0d13;
+    --ink-01: #0e1219;
+    --ink-02: #141922;
+    --ink-03: #1a202b;
+    --ink-04: #222935;
+    --ink-05: #2c3441;
+    --ink-06: #3b4452;
+    --ink-07: #535d6d;
+    --ink-08: #6e7889;
+    --ink-09: #96a0b0;
+    --ink-10: #b5bdc9;
+    --ink-11: #d5dae2;
+    --ink-12: #f2f4f7;
 
-    --accent-solid: #d7371d;
-    --accent-text: #f47d67;
+    --accent-solid: #3d6df2;
+    --accent-hover: #5580f5;
+    --accent-text: #8fb0ff;
     --accent-on: #ffffff;
+    --accent-subtle: #141f38;
+    --accent-edge: #24386b;
 
-    --state-success: #7bb587;
-    --state-warning: #d9b06b;
-    --state-danger: #e97871;
-    --state-info: #82b1d3;
+    --state-success: #5fc58f;
+    --state-warning: #e3b155;
+    --state-danger: #f07a72;
+    --state-info: #7fb0e8;
 
-    --shadow-float: inset 0 1px 0 rgb(255 255 255 / 0.06);
+    --shadow-card: inset 0 1px 0 rgb(255 255 255 / 0.03);
+    --shadow-float: inset 0 1px 0 rgb(255 255 255 / 0.05), 0 16px 40px rgb(0 0 0 / 0.45);
+    --shadow-paper: 0 24px 60px -12px rgb(0 0 0 / 0.6);
     --backdrop: rgb(0 0 0 / 0.6);
   }
 }
 
 :root[data-theme='dark'] {
-  --ink-00: #0e0c09;
-  --ink-01: #15120e;
-  --ink-02: #1c1914;
-  --ink-03: #25211c;
-  --ink-04: #2e2924;
-  --ink-05: #39352f;
-  --ink-06: #4c4741;
-  --ink-07: #625d56;
-  --ink-08: #78746d;
-  --ink-09: #96918c;
-  --ink-10: #b4b0ac;
-  --ink-11: #d3d0cd;
-  --ink-12: #f3f1f0;
+  --ink-00: #0a0d13;
+  --ink-01: #0e1219;
+  --ink-02: #141922;
+  --ink-03: #1a202b;
+  --ink-04: #222935;
+  --ink-05: #2c3441;
+  --ink-06: #3b4452;
+  --ink-07: #535d6d;
+  --ink-08: #6e7889;
+  --ink-09: #96a0b0;
+  --ink-10: #b5bdc9;
+  --ink-11: #d5dae2;
+  --ink-12: #f2f4f7;
 
-  --accent-solid: #d7371d;
-  --accent-text: #f47d67;
+  --accent-solid: #3d6df2;
+  --accent-hover: #5580f5;
+  --accent-text: #8fb0ff;
   --accent-on: #ffffff;
+  --accent-subtle: #141f38;
+  --accent-edge: #24386b;
 
-  --state-success: #7bb587;
-  --state-warning: #d9b06b;
-  --state-danger: #e97871;
-  --state-info: #82b1d3;
+  --state-success: #5fc58f;
+  --state-warning: #e3b155;
+  --state-danger: #f07a72;
+  --state-info: #7fb0e8;
 
-  --shadow-float: inset 0 1px 0 rgb(255 255 255 / 0.06);
+  --shadow-card: inset 0 1px 0 rgb(255 255 255 / 0.03);
+  --shadow-float: inset 0 1px 0 rgb(255 255 255 / 0.05), 0 16px 40px rgb(0 0 0 / 0.45);
+  --shadow-paper: 0 24px 60px -12px rgb(0 0 0 / 0.6);
   --backdrop: rgb(0 0 0 / 0.6);
 }
 
-/* ----------------------------------------------------------------
-  Bridge into Tailwind.
+/* ---------------------------------------------------------------- bridge into Tailwind */
 
-  `inline` is load bearing: it makes the generated utilities reference the custom properties
-  above rather than freezing their computed values, which is what lets the theme switch at
-  runtime from a single attribute on the root element.
-*/
-
+/* `inline` is load bearing: utilities reference the properties above, so the theme switches at runtime */
 @theme inline {
   --color-ink-00: var(--ink-00);
   --color-ink-01: var(--ink-01);
@@ -131,8 +132,11 @@
   --color-ink-12: var(--ink-12);
 
   --color-accent: var(--accent-solid);
+  --color-accent-hover: var(--accent-hover);
   --color-accent-text: var(--accent-text);
   --color-accent-on: var(--accent-on);
+  --color-accent-subtle: var(--accent-subtle);
+  --color-accent-edge: var(--accent-edge);
 
   --color-success: var(--state-success);
   --color-warning: var(--state-warning);
@@ -142,22 +146,22 @@
   --color-paper: var(--paper);
   --color-paper-ink: var(--paper-ink);
 
-  --font-display: 'Newsreader', 'Source Serif 4', Georgia, serif;
-  --font-sans: 'Public Sans', system-ui, -apple-system, sans-serif;
+  --font-display: 'Geist', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-sans: 'Geist', system-ui, -apple-system, 'Segoe UI', sans-serif;
   --font-mono: 'Geist Mono', ui-monospace, 'SF Mono', Menlo, monospace;
 
-  /* three radii, no others. 0 is the resume surface and every hairline-ruled section */
-  --radius-xs: 2px;
-  --radius-sm: 6px;
+  /* two radii for the chrome; the resume surface itself is always square */
+  --radius-xs: 6px;
+  --radius-sm: 12px;
 
-  /* tool scale, ratio 1.2 */
+  /* tool scale */
   --text-2xs: 11px;
   --text-xs: 12px;
-  --text-sm: 13px;
-  --text-base: 14px;
+  --text-sm: 14px;
+  --text-base: 15px;
   --text-md: 16px;
   --text-lg: 20px;
-  --text-xl: 24px;
+  --text-xl: 28px;
 
   /* marketing scale, ratio 1.333 */
   --text-d1: 16px;
@@ -165,15 +169,14 @@
   --text-d3: 28px;
   --text-d4: 38px;
   --text-d5: 50px;
-  --text-d6: 67px;
+  --text-d6: 64px;
 
+  --shadow-card: var(--shadow-card);
   --shadow-float: var(--shadow-float);
+  --shadow-paper: var(--shadow-paper);
 }
 
-/* ----------------------------------------------------------------
-  Motion. Three durations, two curves, and that is the entire vocabulary.
-  Only transform and opacity may be animated.
-*/
+/* ---------------------------------------------------------------- motion: three durations, one curve, transform and opacity only */
 
 :root {
   --motion-xs: 100ms;
@@ -184,11 +187,7 @@
   --hairline: 1px;
 }
 
-/* ----------------------------------------------------------------
-  Reduced motion substitutes, it does not delete.
-  Opacity and focus transitions survive; transforms become crossfades.
-*/
-
+/* reduced motion substitutes rather than deletes: opacity and focus transitions survive */
 @media (prefers-reduced-motion: reduce) {
   :root {
     --motion-md: var(--motion-xs);

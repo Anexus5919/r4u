@@ -3,16 +3,7 @@ import type { SectionType } from './sections.js'
 import { personalOf } from './schema.js'
 import type { Resume } from './schema.js'
 
-/*
-  JSON Resume interchange (jsonresume.org).
-
-  Worth supporting because it costs almost nothing and it makes R4U a place people can leave as
-  well as arrive, which is the opposite of the export-is-paywalled complaint that dominates
-  reviews of this category.
-
-  Import is lossy in one direction only: JSON Resume has no concept of a hidden section, section
-  order or a template, so those take R4U defaults. Nothing in the incoming file is dropped.
-*/
+// jsonresume.org, so R4U is a place people can leave as well as arrive
 
 export interface JsonResume {
   basics?: {
@@ -180,13 +171,7 @@ function section(type: SectionType, entries: Record<string, unknown>[]): Importe
   }
 }
 
-/**
- * Builds the resume body from a JSON Resume document.
- *
- * Deliberately tolerant: an unrecognised field is ignored rather than rejected, because a file
- * that half-imports and tells you what it skipped is more useful than one that refuses. Section
- * order follows the incoming document, and the user is shown the result before it is saved.
- */
+/** tolerant: a file that half-imports and says what it skipped beats one that refuses */
 export function fromJsonResume(input: JsonResume): {
   personal: Resume['personal']
   sections: ImportedSection[]
@@ -309,11 +294,7 @@ export function fromJsonResume(input: JsonResume): {
     ),
   ].filter(Boolean) as ImportedSection[]
 
-  /*
-    Named rather than silent. JSON Resume carries sections R4U has no home for, and telling the
-    user what did not come across is the difference between an import they can trust and one
-    that quietly loses half their history.
-  */
+  // named rather than silent: JSON Resume carries sections R4U has no home for
   for (const key of ['volunteer', 'interests', 'meta'] as const) {
     if (Array.isArray((input as Record<string, unknown>)[key])) skipped.push(key)
   }

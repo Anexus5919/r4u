@@ -2,14 +2,7 @@ import { DESIGN_KEYS, ENTRY_KEYS, PERSONAL_KEYS } from '@r4u/shared'
 import type { ResumeOp } from '@r4u/shared'
 import type { EditorResume, EditorSection } from './types'
 
-/*
-  Ops are derived from a diff, not accumulated as the user types.
-
-  Accumulating looks simpler until undo arrives: an undo has to emit the inverse of whatever it
-  reversed, which means every action needs a hand-written opposite and any gap between them is a
-  save that quietly disagrees with the screen. Diffing the current state against the last saved
-  state makes undo, redo and a rebase all fall out for free, because they are just states.
-*/
+// ops are diffed against the last save, so undo, redo and rebase are just states
 
 function sameValue(a: unknown, b: unknown): boolean {
   if (a === b) return true

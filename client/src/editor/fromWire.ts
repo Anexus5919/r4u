@@ -1,16 +1,9 @@
 import type { ResumeDetail } from '@r4u/shared'
 import type { EditorResume, EditorSection } from './types'
 
-/*
-  The wire type carries optional ids because the same schema describes a resume being created.
-  By the time one reaches the editor the server has assigned them all, so this narrows once at
-  the boundary rather than forcing a null check on every line of the editor.
-*/
+// the server has assigned every id by now, so narrow once at the boundary
 export function fromWire(resume: ResumeDetail): EditorResume {
-  /*
-    Field by field rather than a spread over defaults. A spread would let an explicit
-    `fullName: undefined` from the wire wipe the default it was meant to fall back to.
-  */
+  // field by field: a spread would let an explicit undefined wipe the default
   const personal = resume.personal ?? {}
 
   return {

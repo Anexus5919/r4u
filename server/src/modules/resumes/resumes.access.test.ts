@@ -5,12 +5,7 @@ import { useTestDb } from '../../test/db.js'
 import { listResumesForOwner, readResumeContent } from './resumes.access.js'
 import { AppError } from '../../lib/AppError.js'
 
-/*
-  The privacy boundary from FR 9.6 and ADR-008. This suite is written in phase 2, before any
-  route that can read resume content exists, and it is never deleted.
-
-  A regression here is a privacy breach, not a bug.
-*/
+// privacy boundary (FR 9.6, ADR-008): never deleted, a regression is a breach
 
 useTestDb()
 
@@ -49,10 +44,7 @@ describe('resume content boundary', () => {
     expect(found?.personal).toBeUndefined()
   })
 
-  /*
-    The scenario the fail-closed default exists for: a future admin analytics endpoint written by
-    someone who never read this file. It must return nothing sensitive by construction.
-  */
+  // a future unscoped admin query must return nothing sensitive by construction
   it('strips content from an unscoped find across every document', async () => {
     await seedResume()
 

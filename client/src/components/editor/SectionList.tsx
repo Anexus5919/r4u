@@ -19,13 +19,7 @@ import { cn } from '@/lib/cn'
 import { Icon, SectionMark } from '@/components/ui/Icon'
 import type { EditorSection } from '@/editor/types'
 
-/*
-  dnd-kit rather than react-beautiful-dnd, which is deprecated, or native HTML5 drag and drop,
-  which has no touch support, no keyboard path and an unstyleable drag image.
-
-  The keyboard sensor is the reason it is worth the dependency: reordering works from the
-  keyboard with screen-reader announcements and no extra code.
-*/
+// dnd-kit for its keyboard sensor: reordering works from the keyboard, announced
 
 function SortableSection({
   section,
@@ -50,10 +44,7 @@ function SortableSection({
       style={{ transform: CSS.Translate.toString(transform), transition }}
       className={cn('group relative', isDragging && 'z-10')}
     >
-      {/*
-        A 2px accent bar flush to the left edge marks the active section, never a filled row.
-        A filled row reads as a selected cell in a table; a bar reads as a position in a document.
-      */}
+      {/* an accent bar marks the active section; a filled row would read as a table cell */}
       <span
         aria-hidden
         className={cn(

@@ -12,14 +12,7 @@ import { verso } from './verso.js'
 export * from './blocks.js'
 export { broadsheet, foundry, ledger, marginalia, placard, quire, recto, verso }
 
-/*
-  Templates are functions in this repository, keyed by string. The Template collection stores only
-  metadata and this key.
-
-  Storing markup in the database would be remote code execution on whoever renders it, and
-  @react-pdf cannot render markup anyway: its primitives are Document, Page, View and Text, not
-  div and p. See ADR-005.
-*/
+// functions in the repo, keyed by string. markup in the database would be RCE. ADR-005
 export const TEMPLATES: Record<string, ResumeTemplate> = {
   foundry,
   quire,
@@ -44,16 +37,7 @@ interface OrderableSection {
   type: SectionType
 }
 
-/*
-  Reordering a resume to a template's recommended order.
-
-  The rule that matters is the one at the end: anything the template does not mention keeps its
-  place rather than vanishing. A template switch that can silently drop a section is the worst
-  bug this product could ship, and it is the exact failure the two-column slot model invites.
-
-  Never applied automatically. The editor asks first, because the user may have ordered their
-  sections deliberately and a template is a suggestion, not an instruction.
-*/
+// anything the template does not mention keeps its place rather than vanishing
 export function reorderForTemplate<T extends OrderableSection>(
   sections: T[],
   template: ResumeTemplate
@@ -69,13 +53,7 @@ export function reorderForTemplate<T extends OrderableSection>(
   return [...known, ...unknown]
 }
 
-/*
-  Which column a section belongs in for a two-column template.
-
-  Anything absent from both slot lists falls into main. That default is what makes a one-column
-  to two-column switch safe: without it a section has no destination and either duplicates into
-  both columns or disappears from the page entirely.
-*/
+// unlisted sections fall into main, or a one to two column switch loses them
 export function slotFor(type: SectionType, template: ResumeTemplate): 'main' | 'aside' {
   return template.slots.aside.includes(type) ? 'aside' : 'main'
 }

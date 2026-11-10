@@ -2,13 +2,7 @@ import { useMemo } from 'react'
 import { PASSWORD_REQUIREMENTS, checkPassword } from '@r4u/shared'
 import { cn } from '@/lib/cn'
 
-/*
-  Requirements are listed, not scored. A "strength: medium" bar is guesswork and tells a user
-  nothing they can act on. These are the four rules the server actually enforces, read from the
-  same shared module the validator uses, so the list can never promise what registration refuses.
-
-  Met and unmet are distinguished by a filled versus hollow glyph, not by colour.
-*/
+// listed, not scored: a strength bar is guesswork. filled versus hollow glyph, never colour
 export function PasswordRequirements({ value }: { value: string }) {
   const checks = useMemo(() => checkPassword(value), [value])
 

@@ -1,7 +1,4 @@
-/*
-  Runs before any module is imported, which matters because config/env.ts validates at import
-  time and would throw on a missing secret.
-*/
+// runs before imports, since config/env.ts validates at import time
 process.env.NODE_ENV = 'test'
 process.env.LOG_LEVEL = 'fatal'
 process.env.MONGODB_URI ??= 'mongodb://127.0.0.1:27017/r4u-test'

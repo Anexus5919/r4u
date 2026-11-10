@@ -1,14 +1,4 @@
-/*
-  The one definition of what a resume section contains.
-
-  Imported by the express validators, the React form renderer, the character counters, the ATS
-  checker and the template adapters. A limit that lives in two places will eventually disagree
-  with itself, and a counter promising 240 characters while the server rejects at 220 is the
-  fastest way to look unfinished.
-
-  Every limit here matches docs/TEMPLATES.md section 11.1 and the D-dimension checks in
-  docs/ATS-RUBRIC.md.
-*/
+// one definition, read by the validators, forms, counters, ATS checker and templates
 
 export const SECTION_TYPES = [
   'summary',
@@ -44,10 +34,7 @@ export interface SectionSpec {
   type: SectionType
   /** the default heading, chosen because parsers match on header text */
   label: string
-  /**
-   * Headings a production parser reliably recognises. Anything outside this set risks the
-   * section being mis-filed or absorbed into the one above it. See ATS-RUBRIC.md dimension B.
-   */
+  /** headings a production parser recognises. see ATS-RUBRIC.md dimension B */
   canonicalHeadings: string[]
   repeatable: boolean
   maxEntries: number
@@ -296,6 +283,20 @@ export const PAGE_TARGET: Record<ResumeType, string> = {
 
 export function specFor(type: SectionType): SectionSpec {
   return SECTION_REGISTRY[type]
+}
+
+/** Whether an entry puts anything on the page. Dates alone are not content: that is code 324. */
+export function hasContent(type: SectionType, data: Record<string, unknown>): boolean {
+  const spec = SECTION_REGISTRY[type]
+  if (!spec) return true
+
+  return spec.fields.some((field) => {
+    if (field.type === 'month' || field.type === 'boolean') return false
+
+    const value = data[field.key]
+    if (Array.isArray(value)) return value.some((v) => typeof v === 'string' && v.trim() !== '')
+    return typeof value === 'string' && value.trim() !== ''
+  })
 }
 
 export function fieldSpec(type: SectionType, key: string): FieldSpec | undefined {

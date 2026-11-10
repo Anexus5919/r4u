@@ -64,10 +64,7 @@ function classify(error: unknown): AppError {
   return new AppError('INTERNAL', 'Something went wrong')
 }
 
-/*
-  Express 5 forwards async rejections here automatically, so there is no catchAsync wrapper
-  anywhere in this codebase.
-*/
+// Express 5 forwards async rejections here, so no catchAsync wrapper exists
 export function errorHandler(
   error: unknown,
   req: Request,

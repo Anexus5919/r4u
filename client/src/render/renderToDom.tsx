@@ -1,16 +1,7 @@
 import { PT_TO_PX } from '@r4u/shared'
 import type { LayoutNode, Style } from '@r4u/shared'
 
-/*
-  The DOM half of "one layout AST, two adapters".
-
-  Every length in the AST is in points, because @react-pdf treats a bare number as pt. This
-  converts pt to px so one number means one physical size in both renderers. Getting that wrong
-  is how a preview and an export start disagreeing about margins.
-
-  Deliberately no Tailwind. @react-pdf has no CSS cascade and no class resolution, so both
-  adapters must consume the same plain token object or drift is guaranteed. See ADR-002.
-*/
+// DOM adapter: AST lengths are pt, converted to px; no Tailwind. see ADR-002
 
 const px = (value: number) => `${value * PT_TO_PX}px`
 
@@ -55,6 +46,9 @@ function toCss(style: Style = {}): React.CSSProperties {
     css[key] = value
   }
 
+  // Yoga defaults flexShrink to 0 and the DOM to 1, so a declared width must not yield to a sibling
+  if (style.width !== undefined && style.flexShrink === undefined) css.flexShrink = 0
+
   // Yoga lays out in flex by default, so the DOM has to be told the same thing
   css.display = css.display ?? 'flex'
   css.flexDirection = css.flexDirection ?? 'column'
@@ -96,6 +90,17 @@ export function renderToDom(nodes: LayoutNode[], keyPrefix = 'n'): React.ReactNo
 
       case 'spacer':
         return <div key={key} style={{ height: px(node.size), flexShrink: 0 }} />
+
+      // painted against the page padding box, so it bleeds past the margin on all four edges
+      case 'ground': {
+        const { width, backgroundColor } = toCss(node.style)
+        return (
+          <div
+            key={key}
+            style={{ position: 'absolute', top: 0, bottom: 0, left: 0, width, backgroundColor }}
+          />
+        )
+      }
 
       case 'block':
         return (

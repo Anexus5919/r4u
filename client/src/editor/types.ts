@@ -6,11 +6,7 @@ import type {
   SectionType,
 } from '@r4u/shared'
 
-/*
-  The editor's view of a resume. Narrower than ResumeDetail on purpose: every `_id` is present
-  and a string, because the document has already been through the server. Working with the
-  optional ids from the wire type would mean a null check on every line.
-*/
+// every _id is a present string here, sparing a null check on every line
 
 export interface EditorEntry {
   _id: string

@@ -69,10 +69,7 @@ describe('POST /api/resumes/import', () => {
     expect(experience.entries[0].data.organisation).toBe('Corvid Messaging')
   })
 
-  /*
-    Named rather than silent. An import that quietly drops half a career is worse than one that
-    refuses, because the user has no way to know.
-  */
+  // skipped sections are named: a silent partial import hides lost content
   it('reports the sections it could not place', async () => {
     const token = await signUp()
 
@@ -93,6 +90,18 @@ describe('POST /api/resumes/import', () => {
 
     const list = await request(app).get('/api/resumes').set(auth(token))
     expect(list.body.data.resumes).toHaveLength(2)
+  })
+
+  // the dashboard reads meta from the summary, so an import must not list as an empty resume
+  it('lists the imported resume with its real completeness and word count', async () => {
+    const token = await signUp()
+    await request(app).post('/api/resumes/import').set(auth(token)).send({ document: SOURCE })
+
+    const list = await request(app).get('/api/resumes').set(auth(token))
+    const [summary] = list.body.data.resumes
+
+    expect(summary.meta.wordCount).toBeGreaterThan(0)
+    expect(summary.meta.completeness).toBeGreaterThan(0)
   })
 
   it('rejects a body that is not a document', async () => {
@@ -209,10 +218,7 @@ describe('version history', () => {
     expect(restored.body.data.resume.personal.fullName).toBe('Alex Mercer')
   })
 
-  /*
-    A restore that discards what it replaced is a second way to lose work, which is the opposite
-    of what history is for.
-  */
+  // a restore must not discard what it replaced
   it('snapshots the current state before restoring, so the restore is undoable', async () => {
     const token = await signUp()
     const resume = await newResume(token)

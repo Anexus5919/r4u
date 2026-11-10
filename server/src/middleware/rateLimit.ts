@@ -3,12 +3,7 @@ import type { Request, Response } from 'express'
 import { isTest } from '../config/env.js'
 import type { ApiErrorShape } from '@r4u/shared'
 
-/*
-  The in-memory store is wiped on every restart, and this service restarts often on a free tier,
-  so these limits are effectively per-uptime-window. That is stated honestly in the README rather
-  than described as robust brute-force protection. What actually survives a restart is the
-  persistent failedLoginCount and lockUntil on the user document.
-*/
+// in-memory limits reset on restart; failedLoginCount and lockUntil persist
 
 function handler(_req: Request, res: Response) {
   const body: ApiErrorShape = {
@@ -37,21 +32,27 @@ export const authLimiter = rateLimit({
   skipSuccessfulRequests: true,
 })
 
-/*
-  Keyed on the email as well as the IP, so one attacker cannot exhaust a victim's reset budget
-  from many addresses, and one address cannot spray many accounts.
-*/
+// keyed on email and IP, so neither many IPs nor many emails beat it
 export const passwordResetLimiter = rateLimit({
   ...base,
   windowMs: 60 * 60 * 1000,
   limit: 3,
-  /*
-    ipKeyGenerator normalises an IPv6 address to its /56 subnet. Keying on the raw address would
-    let one IPv6 client cycle through effectively unlimited addresses within its own allocation
-    and walk straight past the limit.
-  */
+  // ipKeyGenerator groups IPv6 by /56, or one client cycles addresses past it
   keyGenerator: (req) => {
     const email = typeof req.body?.email === 'string' ? req.body.email.toLowerCase() : ''
     return `${ipKeyGenerator(req.ip ?? '')}:${email}`
   },
+})
+
+// a public resume link is cheap to hammer and costs a database read each time
+export const publicShareLimiter = rateLimit({
+  ...base,
+  windowMs: 60 * 60 * 1000,
+  limit: 60,
+})
+
+export const reportLimiter = rateLimit({
+  ...base,
+  windowMs: 60 * 60 * 1000,
+  limit: 5,
 })

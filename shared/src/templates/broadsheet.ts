@@ -13,26 +13,9 @@ import {
 import type { DocTheme, LayoutNode, ResumeTemplate, TemplateInput } from '../layout/types.js'
 import { renderEntry, sectionHead } from './blocks.js'
 
-/*
-  BROADSHEET. Academic CV, three to six pages.
+// BROADSHEET. academic CV. centred masthead, double rule, hanging-indent publications
 
-  Structural signature: a centred masthead closed by a classic double rule, 1pt over 0.25pt with
-  2mm between, and centred small-caps section headings with no rules of their own. Publications
-  get a bibliographic hanging indent no other template has.
-
-  Not ATS safe, and correctly so. Academic hiring runs through Interfolio and AJO, which take the
-  PDF whole rather than parsing it into fields, so optimising this for a resume parser would be
-  optimising for a system nobody in that pipeline uses.
-*/
-
-/*
-  A true hanging indent, built from the same two-column row the bullets use: the marker sits in a
-  fixed column and the text flows in a flexible one, so wrapped lines align under the text rather
-  than under the number.
-
-  CSS text-indent would be the obvious tool and is deliberately absent from the style vocabulary,
-  because @react-pdf does not implement it. This gets the same result inside the intersection.
-*/
+// a hanging indent built from a two-column row, because @react-pdf has no text-indent
 function citation(theme: DocTheme, index: number, value: string, detail: string): LayoutNode {
   return row({ gap: 0, marginTop: theme.bodySize * 0.45 }, [
     text(
@@ -122,7 +105,10 @@ function render({ resume, theme }: TemplateInput): LayoutNode[] {
               theme,
               index,
               str(entry.data, 'title'),
-              [str(entry.data, 'venue'), dateRange(entry.data)].filter(Boolean).join(', ')
+              // the link belongs in a citation: the DOI is half of what makes it one
+              [str(entry.data, 'venue'), dateRange(entry.data), str(entry.data, 'url')]
+                .filter(Boolean)
+                .join(', ')
             )
           )
         : section.entries.map((entry) =>
@@ -145,14 +131,10 @@ export const broadsheet: ResumeTemplate = {
     hasTables: false,
     hasImages: false,
     headerFooterContent: false,
-    bodyFont: 'EB Garamond',
+    bodyFont: 'Source Sans 3',
     bulletGlyph: '•',
     dateLayout: 'right',
-    /*
-      Centred headings are harder for a header-matching parser than left-aligned ones, and the
-      length alone puts it outside what a resume parser expects. Badged honestly rather than
-      scored generously.
-    */
+    // centred heads are harder for a header-matching parser. badged honestly, not generously
     maxDimensionAScore: 18,
   },
   slots: {

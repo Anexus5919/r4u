@@ -1,9 +1,6 @@
 export const PASSWORD_MIN = 12
 
-/*
-  bcrypt silently truncates at 72 bytes. Without an explicit maximum, two different long
-  passwords become the same password and nobody finds out.
-*/
+// bcrypt truncates at 72 bytes, so two different long passwords would become one
 export const PASSWORD_MAX = 72
 
 export interface PasswordChecks {

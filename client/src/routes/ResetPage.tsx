@@ -32,11 +32,7 @@ function RequestLink() {
     }
   }
 
-  /*
-    The confirmation is deliberately vague about whether the address exists, matching the
-    server's identical-response behaviour. Saying "we could not find that account" here would
-    undo the enumeration defence on the endpoint.
-  */
+  // deliberately vague, matching the server, so the page cannot enumerate accounts
   if (sent) {
     return (
       <div className="flex flex-col gap-4">
@@ -67,7 +63,7 @@ function RequestLink() {
       </Field>
 
       <div>
-        <Button type="submit" variant="primary" loading={submitting}>
+        <Button type="submit" variant="primary" loading={submitting} className="w-full">
           Send reset link
         </Button>
       </div>
@@ -140,7 +136,13 @@ function SetNewPassword({ token }: { token: string }) {
       </p>
 
       <div>
-        <Button type="submit" variant="primary" loading={submitting} disabled={!ready || mismatch}>
+        <Button
+          type="submit"
+          variant="primary"
+          loading={submitting}
+          disabled={!ready || mismatch}
+          className="w-full"
+        >
           Update password
         </Button>
       </div>
@@ -161,7 +163,7 @@ export function ResetPage() {
           : 'Enter the address on your account and we will send a link.'
       }
       footer={
-        <Link to="/login" className="text-ink-12">
+        <Link to="/login" className="font-medium text-accent-text">
           Back to sign in
         </Link>
       }

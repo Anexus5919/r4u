@@ -1,5 +1,7 @@
+import { A4 } from './types.js'
 import { DOC_COLORS } from './tokens.js'
 import type { DocTheme, LayoutNode, Style, TemplateResume } from './types.js'
+import { hasContent } from '../resume/sections.js'
 import { personalOf } from '../resume/schema.js'
 import type { Resume, ResumeDesign } from '../resume/schema.js'
 
@@ -30,6 +32,17 @@ export const block = (style: Style, children: LayoutNode[]): LayoutNode => ({
   children,
 })
 
+/** A full-bleed ground behind the page. Takes width and backgroundColor, nothing else. */
+export const ground = (style: Style): LayoutNode => ({ type: 'ground', style })
+
+/** Grounds paint against the page box, so both adapters lift them out before walking the flow. */
+export function splitGrounds(nodes: LayoutNode[]): { grounds: LayoutNode[]; flow: LayoutNode[] } {
+  return {
+    grounds: nodes.filter((node) => node.type === 'ground'),
+    flow: nodes.filter((node) => node.type !== 'ground'),
+  }
+}
+
 /** Drops the nulls a template produces when a field is empty, so callers can map freely. */
 export function compact(nodes: (LayoutNode | null | undefined | false)[]): LayoutNode[] {
   return nodes.filter(Boolean) as LayoutNode[]
@@ -39,14 +52,7 @@ export function compact(nodes: (LayoutNode | null | undefined | false)[]): Layou
 
 export const TRACKING_CAP = 0.08
 
-/*
-  The single enforcement point for the letter-spacing cap.
-
-  Severe editorial minimalism invites wide tracking on uppercase section headings, and measured,
-  text extraction breaks at a ratio around 0.10: EXPERIENCE comes back as E X P E R I E N C E and
-  the parser stops recognising the heading, which cascades into losing the whole employment
-  history. Templates ask for tracking through this, so no template can exceed the cap.
-*/
+// the one enforcement point: past about 0.10 the parser stops recognising the heading
 export function tracking(fontSize: number, em: number): number {
   return fontSize * Math.min(em, TRACKING_CAP)
 }
@@ -60,17 +66,16 @@ export function month(value: unknown): string {
   return `${MONTHS[Number(index) - 1] ?? ''} ${year}`.trim()
 }
 
-/*
-  Always one line, always the same shape, with an en dash. A range stacked across two lines is
-  Textkernel code 418 and a common casualty of right-aligned date columns.
-*/
+// one line always: a range stacked across two lines is Textkernel code 418
 export function dateRange(data: Record<string, unknown>): string {
   const from = month(data.startDate)
-  if (!from) return ''
+  const to = month(data.endDate)
+
+  // a certification carries an expiry with no issue date more often than not, and it is still a date
+  if (!from) return to ? `Until ${to}` : ''
 
   if (data.current === true) return `${from} – Present`
 
-  const to = month(data.endDate)
   return to ? `${from} – ${to}` : from
 }
 
@@ -90,11 +95,7 @@ export function list(data: Record<string, unknown>, key: string): string[] {
 
 const GAP_SCALE = { compact: 0.75, normal: 1, airy: 1.4 } as const
 
-/*
-  Resolves the five customisation knobs into the values a template reads. Templates never touch
-  a raw design field, which is what keeps the knobs to five and stops one template inventing a
-  sixth.
-*/
+// templates read this and never a raw design field, which is what keeps the knobs to five
 export function resolveTheme(design: ResumeDesign, fonts: Partial<DocTheme> = {}): DocTheme {
   const bodySize = design.typeScale
   const spacing = GAP_SCALE[design.sectionSpacing as keyof typeof GAP_SCALE] ?? 1
@@ -109,14 +110,12 @@ export function resolveTheme(design: ResumeDesign, fonts: Partial<DocTheme> = {}
     sectionGap: Math.round(bodySize * 1.4 * spacing),
     // millimetres in the knob, points in the layout
     margin: Math.round(design.margins * 2.8346),
+    pageWidth: A4.width,
 
     ink: DOC_COLORS.ink,
     muted: DOC_COLORS.muted,
     rule: DOC_COLORS.rule,
-    /*
-      An accent the user has not chosen resolves to near-black, never to a default colour. A
-      resume that arrives coloured because nobody picked anything is a template imposing itself.
-    */
+    // unchosen resolves to near-black: a resume arriving coloured is a template imposing itself
     accent: design.accent || DOC_COLORS.fallbackAccent,
     paper: DOC_COLORS.paper,
   }
@@ -124,10 +123,7 @@ export function resolveTheme(design: ResumeDesign, fonts: Partial<DocTheme> = {}
 
 /* ---------------------------------------------------------------- resume shaping */
 
-/*
-  What a template is allowed to see. Hidden sections and hidden entries are removed here, once,
-  so no template can forget to check and none of them can render the private notes field.
-*/
+// hidden sections and entries are dropped once here, so no template can forget to check
 export function toTemplateResume(resume: Partial<Resume>): TemplateResume {
   const personal = personalOf(resume)
 
@@ -151,7 +147,9 @@ export function toTemplateResume(resume: Partial<Resume>): TemplateResume {
           .map((entry) => ({
             _id: String(entry._id ?? ''),
             data: (entry.data ?? {}) as Record<string, unknown>,
-          })),
+          }))
+          // an entry one click old holds no data and renders to nothing, heading included
+          .filter((entry) => hasContent(section.type, entry.data)),
       }))
       // a heading with nothing under it raises Textkernel code 324, so it never reaches the page
       .filter((section) => section.entries.length > 0),

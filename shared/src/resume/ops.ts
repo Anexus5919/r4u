@@ -1,16 +1,6 @@
 import { z } from 'zod'
 
-/*
-  The autosave vocabulary.
-
-  Deliberately a closed set of named operations rather than JSON Patch. A free-form `path` lets a
-  client write `/owner`, `/version` or `/meta.completeness`, and no amount of downstream checking
-  makes that safe again. Every op below names exactly what it may touch.
-
-  Structural ops (reorder, add, remove) rewrite an array. Field ops address a single subdocument
-  by `_id`, never by array index, because an index shifts the moment a section is reordered and
-  an in-flight patch would then write into a neighbouring entry.
-*/
+// a closed set of named ops, not JSON Patch: a free-form path could write /owner
 
 export const FIELD_OPS = [
   'setPersonal',
@@ -51,11 +41,7 @@ export function isStructural(op: ResumeOp): boolean {
   return (STRUCTURAL_OPS as readonly string[]).includes(op.op)
 }
 
-/*
-  A field name becomes part of a Mongo update path, so it must never carry a dot or a dollar.
-  The allowlist below is the union of every key in SECTION_REGISTRY plus the personal and design
-  keys, which is narrower than a character check and cannot be widened by accident.
-*/
+// a field name becomes part of a Mongo update path, so it is allowlisted, not pattern-checked
 export const PERSONAL_KEYS = [
   'fullName',
   'headline',
@@ -102,10 +88,7 @@ export function isSafeKey(key: string, allowed: readonly string[]): boolean {
 /** The maximum ops one autosave request may carry. A larger batch is a client bug, not a user. */
 export const MAX_OPS_PER_PATCH = 200
 
-/*
-  What an op writes to. Two ops sharing a target are the same edit made twice, which is exactly
-  what typing produces: a keystroke per character, all aimed at one field.
-*/
+// two ops sharing a target are one edit made twice, which is what typing produces
 function targetOf(op: ResumeOp, index: number): string {
   switch (op.op) {
     case 'setPersonal':
@@ -130,13 +113,7 @@ function targetOf(op: ResumeOp, index: number): string {
   }
 }
 
-/**
- * Collapses repeated edits to the same target, keeping the last, and preserves order otherwise.
- *
- * Two purposes. It stops a typing burst sending forty writes for one field, and it guarantees a
- * batch cannot produce two Mongo update paths that resolve to the same document position, which
- * Mongo rejects outright.
- */
+/** keeps the last write per target: Mongo rejects two paths resolving to one position */
 export function coalesceOps(ops: ResumeOp[]): ResumeOp[] {
   const byTarget = new Map<string, ResumeOp>()
 
@@ -150,11 +127,7 @@ export function coalesceOps(ops: ResumeOp[]): ResumeOp[] {
   return [...byTarget.values()]
 }
 
-/* ---------------------------------------------------------------- validation
-
-  Zod rather than express-validator. Its wildcard syntax cannot express a discriminated union,
-  and this payload is nothing but one. See ADR-009.
-*/
+// validation. zod, not express-validator: wildcards cannot express a union. ADR-009
 
 const objectId = z.string().regex(/^[0-9a-f]{24}$/, 'Not a valid id')
 

@@ -1,12 +1,6 @@
 import type { EditorEntry, EditorResume, EditorSection } from './types'
 
-/*
-  Actions are domain verbs, not setState calls. That is what makes undo, redo and a socket-driven
-  remote edit all the same shape: another dispatched action over the same state.
-
-  History holds whole snapshots. A resume is a few kilobytes and the cap is fifty, so the memory
-  cost is trivial next to the correctness of never having to write an inverse for each action.
-*/
+// domain-verb actions and whole-snapshot history (cap fifty), so no inverses
 
 export const HISTORY_LIMIT = 50
 
@@ -136,10 +130,7 @@ function apply(resume: EditorResume, action: EditorAction): EditorResume {
         title: action.value,
       }))
 
-    /*
-      Hiding keeps the entries. FR 4.3 asks for a section to leave the output without its data
-      being deleted, so this is a flag and never a removal.
-    */
+    // hiding is a flag, never a removal: FR 4.3 keeps the data
     case 'section_toggle':
       return mapSection(resume, action.sectionId, (section) => ({
         ...section,
@@ -226,10 +217,7 @@ export function editorReducer(state: EditorState, action: EditorAction): EditorS
     case 'save_started':
       return { ...state, saving: 'saving' }
 
-    /*
-      base becomes the snapshot that was actually sent, not the current state. Anything typed
-      while the request was in flight stays in the diff and goes out with the next save.
-    */
+    // base becomes the sent snapshot, so edits typed in flight go out next save
     case 'save_succeeded':
       return {
         ...state,
@@ -242,10 +230,7 @@ export function editorReducer(state: EditorState, action: EditorAction): EditorS
     case 'save_failed':
       return { ...state, saving: 'error' }
 
-    /*
-      A 409 recovery. The server's copy becomes both the new base and the working state, and the
-      history is cleared because those snapshots describe a document that no longer exists.
-    */
+    // 409 recovery: server copy is base and state, history cleared as it is stale
     case 'rebased':
       return {
         ...initialState(action.resume),

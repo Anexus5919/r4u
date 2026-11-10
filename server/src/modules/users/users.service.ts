@@ -2,10 +2,19 @@ import { AppError, notFound } from '../../lib/AppError.js'
 import { deleteAvatar, uploadAvatar } from '../../lib/cloudinary.js'
 import { hashPassword, verifyPassword } from '../../lib/password.js'
 import { sniffImage } from '../../lib/upload.js'
+import { trusted } from 'mongoose'
 import {
+  CommentModel,
+  MessageModel,
+  NotificationModel,
   PasswordResetTokenModel,
   RefreshTokenModel,
   ResumeModel,
+  ResumeVersionModel,
+  ReviewModel,
+  ShareDailyModel,
+  ShareLinkModel,
+  ShareViewModel,
   UserModel,
 } from '../../models/index.js'
 import type { UserDoc } from '../../models/User.js'
@@ -62,10 +71,7 @@ export async function changePassword(
   }
 
   user.passwordHash = await hashPassword(nextPassword)
-  /*
-    Same reasoning as a reset: changing a password must end every other session. Bumping the
-    version kills issued access tokens, deleting the refresh tokens stops new ones being minted.
-  */
+  // as with a reset, end every session: bump the version, delete refresh tokens
   user.tokenVersion += 1
   await user.save()
 
@@ -87,20 +93,37 @@ export async function setAvatar(userId: string, buffer: Buffer): Promise<UserDoc
   return user
 }
 
-/*
-  FR 2.4. Resumes, sessions and pending reset links all go with the account.
-
-  Reviews, comments and messages join this list in phase 8. They are deliberately not stubbed
-  here, because a delete that silently misses a collection is worse than one that does not
-  mention it yet.
-*/
+// FR 2.4: everything the account owns or wrote goes with it, collection by collection
 export async function deleteAccount(userId: string): Promise<void> {
   const user = await load(userId)
 
   if (user.avatar?.publicId) await deleteAvatar(user.avatar.publicId)
 
+  const resumeIds = (await ResumeModel.find({ owner: user._id }).select('_id').lean()).map(
+    (r) => r._id
+  )
+  const [owned, assigned] = await Promise.all([
+    ReviewModel.find({ owner: user._id }).select('_id').lean(),
+    ReviewModel.find({ reviewer: user._id }).select('_id').lean(),
+  ])
+  const reviewIds = [...owned, ...assigned].map((r) => r._id)
+  const linkIds = (await ShareLinkModel.find({ owner: user._id }).select('_id').lean()).map(
+    (l) => l._id
+  )
+
   await Promise.all([
     ResumeModel.deleteMany({ owner: user._id }),
+    ResumeVersionModel.deleteMany({ owner: user._id }),
+    ShareLinkModel.deleteMany({ owner: user._id }),
+    ShareViewModel.deleteMany({ shareLink: trusted({ $in: linkIds }) }),
+    ShareDailyModel.deleteMany({ shareLink: trusted({ $in: linkIds }) }),
+    ReviewModel.deleteMany({ _id: trusted({ $in: reviewIds }) }),
+    MessageModel.deleteMany({ review: trusted({ $in: reviewIds }) }),
+    MessageModel.deleteMany({ sender: user._id }),
+    CommentModel.deleteMany({ review: trusted({ $in: reviewIds }) }),
+    CommentModel.deleteMany({ resume: trusted({ $in: resumeIds }) }),
+    CommentModel.deleteMany({ author: user._id }),
+    NotificationModel.deleteMany({ user: user._id }),
     RefreshTokenModel.deleteMany({ user: user._id }),
     PasswordResetTokenModel.deleteMany({ user: user._id }),
   ])

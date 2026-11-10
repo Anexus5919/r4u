@@ -40,10 +40,7 @@ describe('POST /api/resumes', () => {
     expect(res.status).toBe(422)
   })
 
-  /*
-    Section order is a function of career stage, not of taste. A fresher leading with Experience
-    buries the Education that is actually their strongest asset, so the seed differs by type.
-  */
+  // section order follows career stage, so the seed differs by type
   it('seeds the section order its career stage calls for', async () => {
     const { token } = await signUp('a@example.com')
 
@@ -82,10 +79,7 @@ describe('GET /api/resumes', () => {
     expect(res.body.data.resumes[0].title).toBe('Alice CV')
   })
 
-  /*
-    A list response physically cannot carry a resume body, because the summary serialiser has no
-    field for one and the schema hook strips content before it ever reaches the serialiser.
-  */
+  // a summary has no body field and the hook strips content before it
   it('never includes resume content in a summary', async () => {
     const { token } = await signUp('a@example.com')
     await createResume(token)
@@ -151,10 +145,7 @@ describe('GET /api/resumes', () => {
   })
 })
 
-/*
-  FR 3.7. Every cross-user access returns 404 rather than 403, because a 403 confirms the id
-  exists and turns the endpoint into an enumeration oracle over a PII collection.
-*/
+// FR 3.7: cross-user access is 404, since a 403 confirms the id exists
 describe('ownership isolation', () => {
   it('gives 404 on another user resume, for every verb', async () => {
     const alice = await signUp('alice@example.com')

@@ -1,6 +1,7 @@
 import type { CookieOptions, Request, Response } from 'express'
 import { isProduction } from '../../config/env.js'
 import { AppError } from '../../lib/AppError.js'
+import { logActivity } from '../../lib/activity.js'
 import { publicUser } from '../../lib/serializers.js'
 import { UserModel } from '../../models/index.js'
 import * as service from './auth.service.js'
@@ -8,12 +9,7 @@ import type { UserDoc } from '../../models/User.js'
 
 export const REFRESH_COOKIE = 'r4u_rt'
 
-/*
-  Scoped to the two endpoints that read it, so it is not attached to every API call.
-
-  In production the client and API are different sites, which forces SameSite=None. Safari's ITP
-  blocks that, which is why phase 12 puts the API behind a same-origin rewrite. See ADR-014.
-*/
+// scoped to the two endpoints that read it; SameSite=None across sites. see ADR-014
 function cookieOptions(): CookieOptions {
   return {
     httpOnly: true,
@@ -44,10 +40,7 @@ function sendSession(
   })
 }
 
-/*
-  Called on client boot to resolve the session. AuthContext holds an explicit `checking` state
-  until this settles, so the app never flashes the login screen on a refresh.
-*/
+// resolves the session on boot while AuthContext holds 'checking'
 export async function me(req: Request, res: Response) {
   const user = (await UserModel.findById(req.principal.id)) as UserDoc | null
   if (!user) throw new AppError('TOKEN_INVALID', 'Session expired')
@@ -57,12 +50,26 @@ export async function me(req: Request, res: Response) {
 export async function register(req: Request, res: Response) {
   const body = input<{ name: string; email: string; password: string }>(req)
   const session = await service.register(body, context(req))
+  logActivity({
+    actor: session.user.id,
+    action: 'auth.register',
+    targetType: 'user',
+    targetId: session.user.id,
+    ip: req.ip,
+  })
   sendSession(res, session, 201)
 }
 
 export async function login(req: Request, res: Response) {
   const body = input<{ email: string; password: string }>(req)
   const session = await service.login(body, context(req))
+  logActivity({
+    actor: session.user.id,
+    action: 'auth.login',
+    targetType: 'user',
+    targetId: session.user.id,
+    ip: req.ip,
+  })
   sendSession(res, session)
 }
 

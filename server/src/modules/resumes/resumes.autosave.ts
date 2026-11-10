@@ -8,11 +8,7 @@ import { snapshot } from './resumes.versions.js'
 import type { Principal } from './resumes.access.js'
 import type { ResumeDoc } from '../../models/Resume.js'
 
-/*
-  Autosave is a debounced HTTP PATCH, never a socket message. HTTP gives retries, idempotency,
-  rate limiting, real status codes and an endpoint that can be demonstrated in Postman. The
-  socket only broadcasts "this resume changed" into a review room.
-*/
+// debounced HTTP PATCH, never a socket message; the socket only broadcasts changes
 
 const oid = (id: string) => new Types.ObjectId(id)
 
@@ -25,15 +21,7 @@ export class VersionConflict extends AppError {
   }
 }
 
-/*
-  Field ops address one subdocument by `_id` through arrayFilters, never by array index. An index
-  shifts the instant a section is reordered or deleted, and an in-flight index-based patch then
-  writes into a neighbouring entry, which is silent corruption rather than an error.
-
-  Each op gets its own filter identifier. Mongo requires every declared identifier to be used,
-  and rejects two update paths that resolve to the same position, which is why the batch is
-  coalesced before it reaches here.
-*/
+// ops target subdocuments by _id via arrayFilters, never index, one filter per op
 function buildFieldUpdate(ops: ResumeOp[]) {
   const set: Record<string, unknown> = {}
   const arrayFilters: Record<string, unknown>[] = []
@@ -164,14 +152,7 @@ export async function applyOps(
 
   if (doc.version !== version) throw new VersionConflict(doc)
 
-  /*
-    A template change is a milestone, so the state before it becomes a version. It is the one
-    edit that can visibly rearrange the whole document, and the one people most often want to
-    undo an hour later rather than an action later.
-
-    Taken before the write, and only when the key actually changes, so re-selecting the current
-    template does not fill the history with duplicates.
-  */
+  // a real template change is a milestone, so snapshot the state before it
   const switching = ops.find(
     (op): op is Extract<ResumeOp, { op: 'setTemplate' }> =>
       op.op === 'setTemplate' && op.value !== doc.templateKey
@@ -204,10 +185,7 @@ export async function applyOps(
       throw new VersionConflict(await currentOrThrow(resumeId, principal))
   }
 
-  /*
-    Denormalised on every write, which is what lets admin dashboards read completeness and word
-    count without ever projecting resume content. See ADR-008.
-  */
+  // meta refreshed on every write so admin views never project content. see ADR-008
   const fresh = await currentOrThrow(resumeId, principal)
   const meta = computeMeta(fresh.toObject() as unknown as ResumeShape)
 

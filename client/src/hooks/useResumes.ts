@@ -29,15 +29,7 @@ function toSearch(query: ResumeQuery): string {
   return search ? `?${search}` : ''
 }
 
-/*
-  A small hand-written fetch layer rather than a data library.
-
-  R4U's centre of gravity is one long-lived mutable document with debounced autosave and socket
-  push, where a query cache degenerates into manual invalidation. See ADR-010.
-
-  The AbortController is the part that matters: without it a fast search types four queries and
-  whichever resolves last wins, which is not necessarily the newest.
-*/
+// hand-written fetch (ADR-010); AbortController makes the newest search win
 export function useResumes(query: ResumeQuery): ResumeListState {
   const [resumes, setResumes] = useState<ResumeSummary[]>([])
   const [status, setStatus] = useState<'loading' | 'ready' | 'error'>('loading')

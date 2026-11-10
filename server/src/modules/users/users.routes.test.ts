@@ -69,10 +69,7 @@ describe('PATCH /api/users/me', () => {
     })
   })
 
-  /*
-    Mass assignment. matchedData only returns fields that have a validation chain, and role has
-    none on this route, so it cannot arrive here however it is spelled in the body.
-  */
+  // mass assignment: role has no chain, so matchedData never returns it
   it('ignores a role escalation attempt in the body', async () => {
     const { token, id } = await signUp()
 
@@ -125,11 +122,7 @@ describe('PATCH /api/users/me/password', () => {
     expect(res.status).toBe(422)
   })
 
-  /*
-    Changing a password must end every other session, which is the whole point of changing it
-    after a suspected compromise. The token version bump kills issued access tokens and the
-    refresh rows are deleted so no new ones can be minted.
-  */
+  // a password change ends every session, including the one that made it
   it('ends every session, including the one that made the change', async () => {
     const { token, id } = await signUp()
 

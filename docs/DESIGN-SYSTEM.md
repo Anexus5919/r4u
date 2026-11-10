@@ -4,6 +4,11 @@ The single source of truth for every visual decision in R4U. Read this before bu
 component, page or template. Nothing in the product may introduce a colour, radius, duration,
 font or shape that is not defined here.
 
+> **Superseded in part by ADR-018.** Faces (now Geist), the neutral ramp (now cool), the accent
+> (now blue) and the two radii (now 6px and 12px) follow `client/src/styles/tokens.css`. Where a
+> section below gives a different value for those four, the token file wins. Everything else here
+> still holds.
+
 ---
 
 ## 0. The central trap
