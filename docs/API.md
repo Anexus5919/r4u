@@ -121,14 +121,16 @@ token carries `tv`.
 
 ## 4. Users
 
-| Method | Path                     | Guard | Notes                                                                                           |
-| ------ | ------------------------ | ----- | ----------------------------------------------------------------------------------------------- |
-| GET    | `/api/users/me`          | user  |                                                                                                 |
-| PATCH  | `/api/users/me`          | user  | name, headline, phone, location, theme                                                          |
-| PATCH  | `/api/users/me/password` | user  | Requires the current password                                                                   |
-| POST   | `/api/users/me/avatar`   | user  | Multipart, streamed to Cloudinary with an eager 256x256 crop                                    |
-| DELETE | `/api/users/me`          | user  | Cascades to resumes, reviews, messages, comments, notifications                                 |
-| GET    | `/api/users/reviewers`   | user  | Directory for the review-request modal. Returns only `reviewerProfile` fields and online state. |
+| Method | Path                             | Guard    | Notes                                                                                           |
+| ------ | -------------------------------- | -------- | ----------------------------------------------------------------------------------------------- |
+| GET    | `/api/users/me`                  | user     |                                                                                                 |
+| PATCH  | `/api/users/me`                  | user     | name, headline, phone, location, theme                                                          |
+| PATCH  | `/api/users/me/password`         | user     | Requires the current password                                                                   |
+| POST   | `/api/users/me/avatar`           | user     | Multipart, streamed to Cloudinary with an eager 256x256 crop                                    |
+| DELETE | `/api/users/me`                  | user     | Cascades to resumes, reviews, messages, comments, notifications                                 |
+| GET    | `/api/users/reviewers`           | user     | Directory for the review-request modal. Returns only `reviewerProfile` fields and online state. |
+| GET    | `/api/users/me/reviewer-profile` | reviewer | The reviewer's own directory profile                                                            |
+| PATCH  | `/api/users/me/reviewer-profile` | reviewer | `bio`, `expertise`, `acceptingRequests`, `openSlots`                                            |
 
 `GET /api/users/reviewers` returns reviewers where `acceptingRequests` is true. It never exposes
 email or phone.
@@ -185,6 +187,9 @@ broken.
 | GET    | `/api/templates`      | public |
 | GET    | `/api/templates/:key` | public |
 
+Entries are a code renderer (`baseKey`) plus metadata and design `defaults`. Creating a resume with a
+preset key stores the renderer key and applies the preset's design; a deactivated entry answers 422.
+
 Returns metadata and `atsProfile`. Never markup. The gallery renders from the repo fixture.
 
 ---
@@ -224,12 +229,14 @@ that breaks during the demo.
 
 | Method | Path                           | Guard  | Notes                                                     |
 | ------ | ------------------------------ | ------ | --------------------------------------------------------- |
+| GET    | `/api/resumes/:id/share`       | owner  | Lists the resume's links with counts, never their tokens  |
 | POST   | `/api/resumes/:id/share`       | owner  | Creates the link. **Returns the raw token exactly once.** |
 | PATCH  | `/api/share/:id`               | owner  | `enabled`, `expiresAt`, `redact`                          |
 | DELETE | `/api/share/:id`               | owner  |                                                           |
 | GET    | `/api/share/:id/analytics`     | owner  | Lifetime counters plus the daily rollup                   |
 | GET    | `/api/public/r/:slug`          | public | Read-only render payload                                  |
 | POST   | `/api/public/r/:slug/download` | public | Records a download, returns the render payload            |
+| POST   | `/api/public/r/:slug/report`   | public | `{ reason, snippet? }`. 5 per hour per IP                 |
 
 The raw token is shown once at creation. Only its SHA-256 is stored, exactly like a password, so a
 leaked backup does not expose every private resume.
@@ -255,6 +262,8 @@ accept-language fallback, and **excludes the owner's own views and downloads**.
 | PATCH  | `/api/reviews/:id/respond`  | reviewer        | `{ accept: boolean }`                                                                        |
 | PATCH  | `/api/reviews/:id/complete` | reviewer        | `{ summary }`. Sets the owner-visible resume status.                                         |
 | GET    | `/api/reviews/:id/comments` | owner, reviewer | Comments are created over the socket; this is the initial load and the Postman-testable path |
+| GET    | `/api/reviews/:id/messages` | owner, reviewer | `?before=<messageId>`. Cursor page of 30, the REST twin of `review:history`                  |
+| GET    | `/api/reviews/:id/resume`   | owner, reviewer | The document for the room: no private notes, no hidden sections                              |
 
 Assignment is an explicit request the reviewer accepts or declines, per ADR-012. There is no
 round-robin and no silent auto-assignment.
@@ -266,11 +275,12 @@ write to the document. That is what keeps FR 7.2 from colliding with autosave.
 
 ## 10. Notifications
 
-| Method | Path                          | Guard |
-| ------ | ----------------------------- | ----- |
-| GET    | `/api/notifications`          | user  | `?filter=all\|unread\|review` |
-| PATCH  | `/api/notifications/read`     | user  | `{ ids: [] }`, max 100        |
-| PATCH  | `/api/notifications/read-all` | user  |                               |
+| Method | Path                              | Guard |
+| ------ | --------------------------------- | ----- |
+| GET    | `/api/notifications`              | user  | `?filter=all\|unread\|review` |
+| PATCH  | `/api/notifications/read`         | user  | `{ ids: [] }`, max 100        |
+| PATCH  | `/api/notifications/read-all`     | user  |
+| GET    | `/api/notifications/unread-count` | user  | The badge's starting value    |     |
 
 Real-time delivery is `notify:new` to `user:<id>`. These endpoints are the initial load and the
 non-socket fallback.
@@ -281,18 +291,19 @@ non-socket fallback.
 
 Every admin route is `authorize('admin')` **as explicit set membership, not a rank ladder**.
 
-| Method | Path                          | Notes                                                                   |
-| ------ | ----------------------------- | ----------------------------------------------------------------------- |
-| GET    | `/api/admin/stats`            | Totals plus live sessions from the prefix-filtered adapter count        |
-| GET    | `/api/admin/users`            | `?q=&role=&status=&page=&limit=`                                        |
-| PATCH  | `/api/admin/users/:id/role`   |                                                                         |
-| PATCH  | `/api/admin/users/:id/status` | Block or unblock. Bumps `tokenVersion`, so it takes effect immediately. |
-| GET    | `/api/admin/templates`        |                                                                         |
-| POST   | `/api/admin/templates`        | Metadata only. No markup field exists.                                  |
-| PATCH  | `/api/admin/templates/:id`    |                                                                         |
-| GET    | `/api/admin/reports`          | `targetType` never includes a private resume                            |
-| PATCH  | `/api/admin/reports/:id`      | Action or dismiss                                                       |
-| GET    | `/api/admin/logs`             | Retention 180 days by TTL                                               |
+| Method | Path                             | Notes                                                                                |
+| ------ | -------------------------------- | ------------------------------------------------------------------------------------ |
+| GET    | `/api/admin/stats`               | Totals plus live sessions from the prefix-filtered adapter count                     |
+| GET    | `/api/admin/users`               | `?q=&role=&status=&page=&limit=`                                                     |
+| PATCH  | `/api/admin/users/:id/role`      |                                                                                      |
+| PATCH  | `/api/admin/users/:id/status`    | Block or unblock. Bumps `tokenVersion`, so it takes effect immediately.              |
+| GET    | `/api/admin/templates`           |                                                                                      |
+| POST   | `/api/admin/templates`           | Metadata only. No markup field exists.                                               |
+| PATCH  | `/api/admin/templates/:id`       |                                                                                      |
+| GET    | `/api/admin/reports`             | `targetType` never includes a private resume                                         |
+| PATCH  | `/api/admin/reports/:id`         | `{ action: disable_link                                                              | dismiss }` |
+| GET    | `/api/admin/reports/:id/preview` | The reported page as the public sees it, only while its link is live (410 otherwise) |
+| GET    | `/api/admin/logs`                | Retention 180 days by TTL                                                            |
 
 **No admin route can select resume content.** The fail-closed `pre(/^find/)` hook strips
 `sections`, `personal` and `notes` unless `contentScope: 'full'`, and that option is confined to

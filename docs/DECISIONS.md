@@ -477,3 +477,26 @@ purple ban, the motion vocabulary, true-white paper in both themes, and every ru
 **Consequence.** `DESIGN-SYSTEM.md` sections 3, 4 and 6 describe the superseded values where they
 conflict with `tokens.css`; this ADR and the token file win. The favicon is a static SVG that
 cannot read custom properties, so it carries the accent and paper values as literals.
+
+---
+
+## ADR-019: Template presets, indexes at boot, and a share token shown once
+
+**Status:** accepted
+
+**Template presets.** FR 9.4 asks the administrator to add templates, and ADR-005 forbids storing
+markup. A database entry is therefore a code renderer (`baseKey`) plus metadata and a design preset
+(accent, type size, leading, spacing, margins). Adding a template means adding a preset over a
+layout that already exists in code; a new layout is a reviewed code change. Creating a resume from a
+preset stores the renderer key and copies the design, so deactivating the preset never affects
+existing resumes.
+
+**Indexes at boot.** DATA-MODEL.md section 1 asked for an explicit migration script with autoIndex
+off, and no such script existed, so a production database ran without its unique and TTL indexes.
+`ensureIndexes()` now runs once per boot: one `createIndexes` per collection, each a no-op when the
+index is present, which costs about fifteen operations per cold start against a budget of one hundred
+per second. `npm run migrate` runs the same on demand.
+
+**Share token.** The public path segment is the token itself, and only its SHA-256 and a four
+character hint are stored. The owner sees the full URL once, at creation, and can create a new link
+at any time. A link the server can show again is a link a leaked backup can show to anyone.

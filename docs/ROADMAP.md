@@ -138,11 +138,10 @@ user gets 404 on all of them.
 
 ## Phase 6: Templates and live preview
 
-**Status: mostly done.** Built: the layout AST, `renderToDom()`, all eight templates, the five
-knobs, template switching with the reorder prompt, `ResumeVersion` with restore, JSON Resume
-import and export, and the overflow warning. Still open: the `Template` model with a seeded
-registry, and guest drafts carried over from phase 4. The interface itself moved to the product
-register in ADR-018, and `/resume/:id` gained a print fallback ahead of phase 7.
+**Status: done.** The layout AST, `renderToDom()`, all eight templates, the five knobs, template
+switching with the reorder prompt, `ResumeVersion` with restore, JSON Resume import and export, the
+overflow warning, and the `Template` registry with presets (ADR-019). Guest drafts are dropped: the
+Experiment 0 document says a guest cannot create, save or edit any data.
 
 - The `LayoutNode` union and the restricted `Style` type
 - `renderToDom()`
@@ -162,6 +161,11 @@ The overflow warning names the overflow in millimetres and updates live.
 ---
 
 ## Phase 7: Export and sharing
+
+**Status: done**, except html2canvas thumbnails (the dashboard draws a schematic template tile
+instead) and the ATS variant toggle, which belongs with phase 10. react-pdf export with static fonts,
+wrap={false} entries and a timeout guard; print fallback; share links hashed, redacted, expiring,
+counted with owner exclusion and a daily rollup; /r/:slug with noindex and no-referrer.
 
 - `renderToPdf()` behind a dynamic import, with the 5-second `Promise.race` guard
 - Static font registration per weight
@@ -183,6 +187,11 @@ link renders a message, not content. The owner's own views do not increment the 
 
 ## Phase 8: Reviews, real time and notifications
 
+**Status: done.** Review, Comment, Message and Notification models; the Socket.IO server with
+handshake auth as a function, a single guard, rooms, derived presence with a ten second grace, idempotent
+chat on clientId, coalesced notifications and an explicit admin deny. Verified by socket integration
+tests and a two-context Playwright test.
+
 - `Review`, `Comment`, `Message`, `Notification`
 - Socket server, JWT handshake with `auth` as a function, the `socket.use()` guard
 - Rooms, the full event catalogue, derived presence with the 10-second grace
@@ -202,6 +211,10 @@ admin token is refused at `review:join`.
 
 ## Phase 9: Administration
 
+**Status: done.** Overview with live sessions and a monochrome chart, users with role and block,
+templates as metadata plus presets (ADR-019), reports judged through the public view, and the
+buffered activity log.
+
 - `/admin` overview with the prefix-filtered live-session count and monochrome charts
 - `/admin/users` with the table design from the design system
 - `/admin/templates`, metadata only, previews from the fixture
@@ -217,6 +230,9 @@ has no private-resume value. Blocking a user ends their session immediately.
 ---
 
 ## Phase 10: ATS Readiness
+
+**Status: not started.** The Experiment 0 planning document scopes automated ATS scoring as a
+future enhancement; the linter and the parseability badges ship already.
 
 **The flagship. Ship it well or not at all.**
 
@@ -239,6 +255,10 @@ links to the right field.
 
 ## Phase 11: Content, accessibility and polish
 
+**Status: partly done.** Built: the landing page from live renders, /about, /privacy, /terms, the
+Playwright suite (twelve tests, including viewports and live chat). Not built: MDX guides,
+/ats-methodology, DOCX export, the hero lockup animation and an axe audit.
+
 - MDX pipeline, `/about`, `/privacy`, `/terms`, `/guides`, `/ats-methodology`
 - Per-check explainers with `<BeforeAfter />`
 - ESCO and O*NET attribution
@@ -257,6 +277,11 @@ principal screens.
 ---
 
 ## Phase 12: Containerisation and deployment
+
+**Status: done in the repository; live deployment waits on account connection.** Multi-stage
+Dockerfiles, compose with MongoDB, nginx proxying the socket, graceful SIGTERM, indexes ensured at
+boot, CI with tests, end-to-end, an image smoke test and a deploy job, render.yaml, vercel.json and
+the Postman collection.
 
 - Multi-stage Dockerfiles for client and server, `USER node`, `--init`, `.dockerignore`
 - Fonts baked into the image
