@@ -9,7 +9,9 @@ import {
   signAccessToken,
 } from '../../lib/tokens.js'
 import { PasswordResetTokenModel, RefreshTokenModel, UserModel } from '../../models/index.js'
+import { env } from '../../config/env.js'
 import { logger } from '../../config/logger.js'
+import { resetPasswordMail, sendMail } from '../../lib/mailer.js'
 import type { UserDoc } from '../../models/User.js'
 
 const MAX_FAILED_LOGINS = 10
@@ -172,8 +174,8 @@ export async function forgotPassword(email: string): Promise<void> {
     expiresAt: new Date(Date.now() + RESET_TTL_MINUTES * 60 * 1000),
   })
 
-  // phase 3 replaces this with real delivery. the token is never logged in production.
-  logger.debug({ email, token }, 'password reset token issued')
+  const url = `${env.APP_URL}/reset?token=${encodeURIComponent(token)}`
+  await sendMail(resetPasswordMail(user.email, user.name, url, RESET_TTL_MINUTES))
 }
 
 export async function resetPassword(token: string, password: string): Promise<void> {
