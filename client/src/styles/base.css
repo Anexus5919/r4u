@@ -238,3 +238,32 @@
     transition-timing-function: var(--ease-out);
   }
 }
+
+/* print is the fallback export: the sheet alone, at true scale, on A4, with grounds kept */
+@media print {
+  @page {
+    size: A4;
+    margin: 0;
+  }
+
+  .print-root > div > div {
+    width: 210mm !important;
+    height: auto !important;
+    max-width: none !important;
+    overflow: visible !important;
+  }
+
+  .print-root .paper {
+    transform: none !important;
+    height: auto !important;
+    min-height: 297mm;
+    overflow: visible !important;
+    border: 0 !important;
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+
+  .sheet {
+    box-shadow: none !important;
+  }
+}

@@ -8,7 +8,8 @@ import { ResetPage } from './ResetPage'
 import { RequireAuth, RequireGuest, RequireRole } from './guards'
 import { LazyDesignSpecimen, LazyEditorPage } from './lazy'
 import { LandingPage } from './landing/LandingPage'
-import { AdminPage, ForbiddenPage, NotFoundPage, PreviewPage } from './placeholders'
+import { PreviewPage } from './PreviewPage'
+import { AdminPage, ForbiddenPage, NotFoundPage } from './placeholders'
 
 /*
   Guards are layout routes rather than per-page wrappers, so a new child route inherits its

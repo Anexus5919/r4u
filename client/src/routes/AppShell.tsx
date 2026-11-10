@@ -136,8 +136,8 @@ export function AppShell() {
   }
 
   return (
-    <div className="min-h-dvh bg-ink-01">
-      <header className="sticky top-0 z-20 border-b border-ink-04 bg-ink-00">
+    <div className="min-h-dvh bg-ink-01 print:bg-transparent">
+      <header className="sticky top-0 z-20 border-b border-ink-04 bg-ink-00 print:hidden">
         <div className="flex h-16 items-center gap-2 px-4 sm:px-6 lg:px-10">
           <button
             type="button"
@@ -189,7 +189,7 @@ export function AppShell() {
         ) : null}
       </header>
 
-      <main className="px-6 py-10 lg:px-10">
+      <main className="px-6 py-10 lg:px-10 print:p-0">
         <Outlet />
       </main>
     </div>
