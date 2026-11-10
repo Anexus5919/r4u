@@ -88,12 +88,15 @@ export function ResumePreview({
   })
 
   return (
-    <div ref={frame} className="w-full">
+    <div ref={frame} className="w-full min-w-0">
       <div
         style={{
           height: A4_MM.height * MM_TO_PX * scale,
           // the scaled box still has to reserve its real height in the flow
           width: A4_MM.width * MM_TO_PX * scale,
+          maxWidth: '100%',
+          // a transform shrinks the paint, not the layout box, which would otherwise scroll a phone sideways
+          overflow: 'hidden',
         }}
       >
         <div
