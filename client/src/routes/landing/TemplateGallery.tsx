@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import { SAMPLE_RESUME, TEMPLATE_LIST } from '@r4u/shared'
 import type { ResumeTemplate } from '@r4u/shared'
 import { Icon } from '@/components/ui/Icon'
+import { Segmented } from '@/components/ui/Segmented'
 import { cn } from '@/lib/cn'
 import { Sheet } from './Sheet'
 
@@ -69,28 +70,13 @@ export function TemplateGallery() {
             </p>
           </div>
 
-          <div
-            role="group"
-            aria-label="Filter templates"
-            className="flex shrink-0 gap-1 rounded-xs bg-ink-02 p-1"
-          >
-            {FILTERS.map((option) => (
-              <button
-                key={option.key}
-                type="button"
-                aria-pressed={filter === option.key}
-                onClick={() => setFilter(option.key)}
-                className={cn(
-                  't-xs h-9 rounded-xs px-4 text-sm font-medium transition-colors',
-                  filter === option.key
-                    ? 'lift bg-ink-00 text-ink-12'
-                    : 'text-ink-09 hover:text-ink-12'
-                )}
-              >
-                {option.label}
-              </button>
-            ))}
-          </div>
+          <Segmented
+            label="Filter templates"
+            value={filter}
+            onChange={setFilter}
+            options={FILTERS.map((option) => ({ value: option.key, label: option.label }))}
+            className="shrink-0"
+          />
         </div>
 
         <ul className="mt-12 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">

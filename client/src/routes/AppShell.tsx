@@ -4,6 +4,7 @@ import type { Role, Theme } from '@r4u/shared'
 import { Logo } from '@/components/brand/Logo'
 import { Avatar } from '@/components/ui/Avatar'
 import { Icon } from '@/components/ui/Icon'
+import { Segmented } from '@/components/ui/Segmented'
 import { useAuth } from '@/context/AuthContext'
 import { useTheme } from '@/context/ThemeContext'
 import { useDismiss } from '@/hooks/useDismiss'
@@ -43,28 +44,8 @@ function navClass({ isActive }: { isActive: boolean }) {
 
 function ThemeSwitch() {
   const { theme, setTheme } = useTheme()
-
   return (
-    <div
-      role="group"
-      aria-label="Theme"
-      className="grid grid-cols-3 gap-1 rounded-xs bg-ink-02 p-1"
-    >
-      {THEMES.map((option) => (
-        <button
-          key={option.value}
-          type="button"
-          aria-pressed={theme === option.value}
-          onClick={() => setTheme(option.value)}
-          className={cn(
-            't-xs h-7 rounded-xs text-xs font-medium transition-colors',
-            theme === option.value ? 'lift bg-ink-00 text-ink-12' : 'text-ink-09 hover:text-ink-12'
-          )}
-        >
-          {option.label}
-        </button>
-      ))}
-    </div>
+    <Segmented label="Theme" value={theme} onChange={setTheme} options={THEMES} size="sm" stretch />
   )
 }
 
