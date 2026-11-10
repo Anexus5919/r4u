@@ -2,6 +2,7 @@ import type { Request, Response } from 'express'
 import { fromJsonResume, toJsonResume } from '@r4u/shared'
 import type { ResumeOp, ResumeType } from '@r4u/shared'
 import { AppError } from '../../lib/AppError.js'
+import { logActivity } from '../../lib/activity.js'
 import { resumeDetail, resumeSummary } from '../../lib/serializers.js'
 import { ResumeModel } from '../../models/index.js'
 import { VersionConflict, applyOps } from './resumes.autosave.js'
@@ -41,6 +42,14 @@ export async function create(req: Request, res: Response) {
     resumeType: input.resumeType ?? 'professional',
   })
 
+  logActivity({
+    actor: principal(req).id,
+    action: 'resume.create',
+    targetType: 'resume',
+    targetId: resume.id,
+    meta: { resumeType: resume.resumeType, templateKey: resume.templateKey },
+    ip: req.ip,
+  })
   res.status(201).json({ data: { resume: resumeDetail(resume) } })
 }
 
@@ -169,5 +178,12 @@ export async function remove(req: Request, res: Response) {
   const { id } = req.validated as { id: string }
   await service.remove(id, principal(req).id)
 
+  logActivity({
+    actor: principal(req).id,
+    action: 'resume.delete',
+    targetType: 'resume',
+    targetId: id,
+    ip: req.ip,
+  })
   res.status(204).end()
 }

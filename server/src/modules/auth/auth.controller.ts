@@ -1,6 +1,7 @@
 import type { CookieOptions, Request, Response } from 'express'
 import { isProduction } from '../../config/env.js'
 import { AppError } from '../../lib/AppError.js'
+import { logActivity } from '../../lib/activity.js'
 import { publicUser } from '../../lib/serializers.js'
 import { UserModel } from '../../models/index.js'
 import * as service from './auth.service.js'
@@ -57,12 +58,26 @@ export async function me(req: Request, res: Response) {
 export async function register(req: Request, res: Response) {
   const body = input<{ name: string; email: string; password: string }>(req)
   const session = await service.register(body, context(req))
+  logActivity({
+    actor: session.user.id,
+    action: 'auth.register',
+    targetType: 'user',
+    targetId: session.user.id,
+    ip: req.ip,
+  })
   sendSession(res, session, 201)
 }
 
 export async function login(req: Request, res: Response) {
   const body = input<{ email: string; password: string }>(req)
   const session = await service.login(body, context(req))
+  logActivity({
+    actor: session.user.id,
+    action: 'auth.login',
+    targetType: 'user',
+    targetId: session.user.id,
+    ip: req.ip,
+  })
   sendSession(res, session)
 }
 
