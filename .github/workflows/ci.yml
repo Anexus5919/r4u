@@ -10,6 +10,11 @@ concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
 
+# least privilege, stated explicitly: gitleaks reads the pull request's commits, nothing writes
+permissions:
+  contents: read
+  pull-requests: read
+
 jobs:
   verify:
     name: Verify
