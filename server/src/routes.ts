@@ -8,6 +8,7 @@ import { publicShareRouter, resumeShareRouter, shareRouter } from './modules/sha
 import { templatesRouter } from './modules/templates/templates.routes.js'
 import { reviewsRouter } from './modules/reviews/reviews.routes.js'
 import { notificationsRouter } from './modules/notifications/notifications.routes.js'
+import { adminRouter } from './modules/admin/admin.routes.js'
 
 export const apiRouter = Router()
 
@@ -30,3 +31,4 @@ apiRouter.use('/resumes', resumesRouter)
 apiRouter.use('/share', shareRouter)
 apiRouter.use('/reviews', reviewsRouter)
 apiRouter.use('/notifications', notificationsRouter)
+apiRouter.use('/admin', adminRouter)
