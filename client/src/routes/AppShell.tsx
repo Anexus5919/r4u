@@ -37,6 +37,7 @@ function navFor(role: Role | undefined): NavItem[] {
   return [
     { to: '/dashboard', label: 'My resumes' },
     { to: '/reviews', label: 'Reviews' },
+    { to: '/reviewers', label: 'Reviewers' },
     { to: '/notifications', label: 'Notifications', count: true },
   ]
 }

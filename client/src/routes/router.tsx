@@ -9,6 +9,7 @@ import { ProfilePage } from './ProfilePage'
 import { AboutPage, PrivacyPage, TemplatesPage, TermsPage } from './PublicPages'
 import { RegisterPage } from './RegisterPage'
 import { ResetPage } from './ResetPage'
+import { ReviewersPage } from './ReviewersPage'
 import { ReviewsPage } from './ReviewsPage'
 import { RequireAuth, RequireGuest, RequireRole } from './guards'
 import { LandingPage } from './landing/LandingPage'
@@ -55,6 +56,7 @@ export const router = createBrowserRouter([
               { path: '/resume/:id/edit', element: <LazyEditorPage /> },
               { path: '/resume/:id', element: <PreviewPage /> },
               { path: '/reviews', element: <ReviewsPage /> },
+              { path: '/reviewers', element: <ReviewersPage /> },
               { path: '/reviews/:id', element: <LazyReviewRoomPage /> },
               { path: '/notifications', element: <NotificationsPage /> },
             ],
