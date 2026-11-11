@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { computeMeta, getTemplate } from '@r4u/shared'
+import { computeMeta, getTemplate, hiddenText } from '@r4u/shared'
 import type { Resume, ResumeDetail } from '@r4u/shared'
 import { ResumePreview } from '@/render/ResumePreview'
 import { useToast } from '@/context/ToastContext'
@@ -14,6 +14,7 @@ import { Icon } from '@/components/ui/Icon'
 import { Segmented } from '@/components/ui/Segmented'
 import { SharePanel } from '@/components/share/SharePanel'
 import { RequestReviewModal } from '@/components/review/RequestReviewModal'
+import { downloadDocx } from '@/lib/docx'
 import { downloadPdf } from '@/lib/pdf'
 
 type Load =
@@ -55,7 +56,17 @@ export function PreviewPage() {
   const [requesting, setRequesting] = useState(false)
   const [width, setWidth] = useState<Width>('page')
 
+  const [exportingWord, setExportingWord] = useState(false)
+
+  // A-GATE: hidden text gets applications blacklisted, so it never leaves as a file
+  function blockedByHiddenText(doc: Partial<Resume>) {
+    if (!hiddenText(doc, getTemplate(doc.templateKey ?? '')).length) return false
+    toast('danger', 'This resume contains text hidden from readers. Remove it before exporting.')
+    return true
+  }
+
   async function exportPdf(doc: Partial<Resume>) {
+    if (blockedByHiddenText(doc)) return
     setExporting(true)
     try {
       await downloadPdf(doc)
@@ -64,6 +75,19 @@ export function PreviewPage() {
       toast('warning', 'The PDF could not be built here. Print, then choose Save as PDF.')
     } finally {
       setExporting(false)
+    }
+  }
+
+  async function exportWord(doc: Partial<Resume>) {
+    if (blockedByHiddenText(doc)) return
+    setExportingWord(true)
+    try {
+      await downloadDocx(doc)
+      toast('success', 'Word file downloaded. It is single-column, so it parses cleanly.')
+    } catch {
+      toast('warning', 'The Word file could not be built here. Download the PDF instead.')
+    } finally {
+      setExportingWord(false)
     }
   }
 
@@ -157,6 +181,12 @@ export function PreviewPage() {
           </Button>
           <Button variant="secondary" onClick={() => setRequesting(true)}>
             Request review
+          </Button>
+          <ButtonLink to={`/resume/${resume.id}/ats`} variant="secondary">
+            ATS check
+          </ButtonLink>
+          <Button variant="secondary" loading={exportingWord} onClick={() => void exportWord(doc)}>
+            Download Word
           </Button>
           <Button variant="primary" loading={exporting} onClick={() => void exportPdf(doc)}>
             <Icon name="download" />
