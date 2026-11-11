@@ -14,6 +14,8 @@ const META_ALLOWLIST = new Set([
   'title',
   'reason',
   'count',
+  'round',
+  'rating',
 ])
 
 export interface ActivityInput {

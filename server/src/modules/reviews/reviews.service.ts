@@ -1,3 +1,4 @@
+import { randomUUID } from 'node:crypto'
 import { Types, trusted } from 'mongoose'
 import type {
   ChatMessage,
@@ -53,6 +54,10 @@ export function serializeReview(doc: PopulatedReview, viewerId: string): ReviewI
     requestedAt: doc.requestedAt.toISOString(),
     respondedAt: iso(doc.respondedAt),
     completedAt: iso(doc.completedAt),
+    round: doc.round ?? 1,
+    resubmittedAt: iso(doc.resubmittedAt),
+    rating: doc.rating ?? null,
+    ratingNote: doc.ratingNote ?? '',
     as: String(doc.owner._id) === viewerId ? 'owner' : 'reviewer',
   }
 }
@@ -299,6 +304,94 @@ export async function complete(reviewId: string, principal: Principal, summary =
     action: 'review.complete',
     targetType: 'review',
     targetId: review.id,
+    ip,
+  })
+
+  return getOne(review.id, principal)
+}
+
+/** The owner has acted on the feedback and asks the same reviewer to look again. */
+export async function resubmit(reviewId: string, principal: Principal, note = '', ip = '') {
+  const review = await loadForParty(reviewId, principal)
+  if (roleIn(review, principal.id) !== 'owner') {
+    throw new AppError('FORBIDDEN_ROLE', 'Only the owner can send the resume back for review')
+  }
+  if (review.status !== 'active') {
+    throw new AppError('VALIDATION_FAILED', 'Only a review in progress can be sent back')
+  }
+
+  review.round = (review.round ?? 1) + 1
+  review.resubmittedAt = new Date()
+  await review.save()
+
+  // the note lands in the chat, so the conversation reads in order with the rest of the review
+  const body = note.trim() || 'I have made the changes. Could you take another look?'
+  const message = await createMessage(review, principal.id, randomUUID(), body)
+  emitToRoom(`review:${review.id}`, 'chat:message', { message })
+  emitToRoom(`review:${review.id}`, 'review:resubmitted', {
+    reviewId: review.id,
+    round: review.round,
+    at: review.resubmittedAt.toISOString(),
+  })
+
+  const resume = await ResumeModel.findById(review.resume).select('title')
+  await notify({
+    user: String(review.reviewer),
+    type: 'review_resubmitted',
+    actor: principal.id,
+    entity: { kind: 'review', id: review.id },
+    preview: resume?.title ?? '',
+  })
+  logActivity({
+    actor: principal.id,
+    action: 'review.resubmit',
+    targetType: 'review',
+    targetId: review.id,
+    meta: { round: review.round },
+    ip,
+  })
+
+  return getOne(review.id, principal)
+}
+
+/** The owner's verdict on a finished review; it is what the reviewer directory averages. */
+export async function rate(
+  reviewId: string,
+  principal: Principal,
+  rating: number,
+  note = '',
+  ip = ''
+) {
+  const review = await loadForParty(reviewId, principal)
+  if (roleIn(review, principal.id) !== 'owner') {
+    throw new AppError('FORBIDDEN_ROLE', 'Only the owner can rate a review')
+  }
+  if (review.status !== 'completed') {
+    throw new AppError('VALIDATION_FAILED', 'A review can be rated once it is completed')
+  }
+
+  const first = review.rating == null
+  review.rating = rating
+  review.ratingNote = note.trim().slice(0, 500)
+  review.ratedAt = new Date()
+  await review.save()
+
+  // a changed mind is recorded quietly; only the first rating is news to the reviewer
+  if (first) {
+    await notify({
+      user: String(review.reviewer),
+      type: 'review_rated',
+      actor: principal.id,
+      entity: { kind: 'review', id: review.id },
+      preview: `${rating} out of 5`,
+    })
+  }
+  logActivity({
+    actor: principal.id,
+    action: 'review.rate',
+    targetType: 'review',
+    targetId: review.id,
+    meta: { rating },
     ip,
   })
 

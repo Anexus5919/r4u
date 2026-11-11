@@ -5,6 +5,8 @@ const NOTIFY_COPY: Record<NotificationItem['type'], string> = {
   review_accepted: 'accepted your review request for',
   review_declined: 'declined your review request for',
   review_completed: 'completed the review of',
+  review_resubmitted: 'sent an updated version for another look:',
+  review_rated: 'rated your review',
   comment: 'commented:',
   chat: 'sent a message:',
 }

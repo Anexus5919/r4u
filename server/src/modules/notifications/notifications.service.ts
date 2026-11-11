@@ -70,7 +70,14 @@ export async function notify(input: NotifyInput): Promise<NotificationItem> {
   return item
 }
 
-const REVIEW_TYPES = ['review_requested', 'review_accepted', 'review_declined', 'review_completed']
+const REVIEW_TYPES = [
+  'review_requested',
+  'review_accepted',
+  'review_declined',
+  'review_completed',
+  'review_resubmitted',
+  'review_rated',
+]
 
 export async function list(userId: string, filter: 'all' | 'unread' | 'review', limit = 50) {
   const query: Record<string, unknown> = { user: userId }

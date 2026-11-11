@@ -56,6 +56,30 @@ reviewsRouter.patch(
   }
 )
 
+reviewsRouter.patch(
+  '/:id/resubmit',
+  validate([idRule, body('note').optional().isString().trim().isLength({ max: 2000 })]),
+  async (req: Request, res: Response) => {
+    const { id, note } = req.validated as { id: string; note?: string }
+    const review = await service.resubmit(id, principalOf(req), note ?? '', clientIp(req))
+    res.json({ data: { review } })
+  }
+)
+
+reviewsRouter.patch(
+  '/:id/rating',
+  validate([
+    idRule,
+    body('rating').isInt({ min: 1, max: 5 }).withMessage('Choose 1 to 5').toInt(),
+    body('note').optional().isString().trim().isLength({ max: 500 }),
+  ]),
+  async (req: Request, res: Response) => {
+    const { id, rating, note } = req.validated as { id: string; rating: number; note?: string }
+    const review = await service.rate(id, principalOf(req), rating, note ?? '', clientIp(req))
+    res.json({ data: { review } })
+  }
+)
+
 reviewsRouter.get('/:id/resume', validate([idRule]), async (req: Request, res: Response) => {
   const { id } = req.validated as { id: string }
   res.json({ data: { resume: await service.resumeForReview(id, principalOf(req)) } })

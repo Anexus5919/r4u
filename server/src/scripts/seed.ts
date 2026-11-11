@@ -177,6 +177,9 @@ export async function seedDemo({ includeAdmin = true }: SeedOptions = {}): Promi
     participants: [{ user: divya._id }, { user: neha._id }],
     respondedAt: new Date(),
     completedAt: new Date(),
+    rating: 5,
+    ratingNote: 'Specific, fast and kind. The SQL tip got me an interview.',
+    ratedAt: new Date(),
   })
   await ResumeModel.updateOne({ _id: divyaResume._id }, { $set: { status: 'reviewed' } })
 

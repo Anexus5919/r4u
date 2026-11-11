@@ -1,30 +1,84 @@
 import type { Request, Response } from 'express'
 import { body } from 'express-validator'
+import type { Types } from 'mongoose'
 import type { ReviewerCard } from '@r4u/shared'
+import { ReviewModel } from '../../models/Review.js'
 import { principalOf } from '../../lib/principal.js'
 import { notFound } from '../../lib/AppError.js'
 import { UserModel } from '../../models/User.js'
 import { isOnline } from '../../sockets/emitters.js'
 
+interface RecordRow {
+  _id: Types.ObjectId
+  completed: number
+  active: number
+  ratings: number
+  ratingSum: number
+  replyMs: number | null
+}
+
+/** One pass over the reviews of every listed reviewer: what they have actually done here. */
+async function trackRecords(ids: Types.ObjectId[]) {
+  const rows = await ReviewModel.aggregate<RecordRow>([
+    { $match: { reviewer: { $in: ids } } },
+    {
+      $group: {
+        _id: '$reviewer',
+        completed: { $sum: { $cond: [{ $eq: ['$status', 'completed'] }, 1, 0] } },
+        active: { $sum: { $cond: [{ $eq: ['$status', 'active'] }, 1, 0] } },
+        ratings: { $sum: { $cond: [{ $isNumber: '$rating' }, 1, 0] } },
+        ratingSum: { $sum: { $cond: [{ $isNumber: '$rating' }, '$rating', 0] } },
+        // $avg skips nulls, so an unanswered request does not drag the figure towards zero
+        replyMs: {
+          $avg: {
+            $cond: [
+              { $eq: [{ $type: '$respondedAt' }, 'date'] },
+              { $subtract: ['$respondedAt', '$requestedAt'] },
+              null,
+            ],
+          },
+        },
+      },
+    },
+  ])
+  return new Map(rows.map((row) => [String(row._id), row]))
+}
+
 // the directory never carries an email or phone: a request goes through R4U, not around it
 export async function listReviewers(req: Request, res: Response) {
   const me = principalOf(req).id
-  const docs = await UserModel.find({ role: 'reviewer', status: 'active' })
-    .select('name headline reviewerProfile')
-    .sort({ name: 1 })
-    .limit(100)
+  const docs = (
+    await UserModel.find({ role: 'reviewer', status: 'active' })
+      .select('name headline reviewerProfile createdAt')
+      .sort({ name: 1 })
+      .limit(100)
+  ).filter((doc) => doc.id !== me && doc.reviewerProfile?.acceptingRequests !== false)
 
-  const reviewers: ReviewerCard[] = docs
-    .filter((doc) => doc.id !== me && doc.reviewerProfile?.acceptingRequests !== false)
-    .map((doc) => ({
+  const records = await trackRecords(docs.map((doc) => doc._id))
+
+  const reviewers: ReviewerCard[] = docs.map((doc) => {
+    const row = records.get(doc.id)
+    const openSlots = doc.reviewerProfile?.openSlots ?? 0
+    const active = row?.active ?? 0
+    return {
       id: doc.id,
       name: doc.name,
       headline: doc.headline ?? '',
       bio: doc.reviewerProfile?.bio ?? '',
       expertise: doc.reviewerProfile?.expertise ?? [],
-      openSlots: doc.reviewerProfile?.openSlots ?? 0,
+      openSlots,
+      slotsFree: Math.max(0, openSlots - active),
       online: isOnline(doc.id),
-    }))
+      record: {
+        completed: row?.completed ?? 0,
+        active,
+        rating: row?.ratings ? Math.round((row.ratingSum / row.ratings) * 10) / 10 : null,
+        ratings: row?.ratings ?? 0,
+        replyHours: row?.replyMs == null ? null : Math.round((row.replyMs / 3_600_000) * 10) / 10,
+        memberSince: (doc as unknown as { createdAt: Date }).createdAt.toISOString(),
+      },
+    }
+  })
 
   res.json({ data: { reviewers } })
 }

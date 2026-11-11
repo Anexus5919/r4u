@@ -23,6 +23,12 @@ const reviewSchema = new Schema(
     requestedAt: { type: Date, default: () => new Date() },
     respondedAt: { type: Date, default: null },
     completedAt: { type: Date, default: null },
+    // each time the owner sends an updated resume back the round moves on; nothing is reopened
+    round: { type: Number, default: 1, min: 1 },
+    resubmittedAt: { type: Date, default: null },
+    rating: { type: Number, min: 1, max: 5, default: null },
+    ratingNote: { type: String, maxlength: 500, default: '' },
+    ratedAt: { type: Date, default: null },
   },
   { timestamps: true }
 )

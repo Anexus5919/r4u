@@ -68,6 +68,18 @@ export interface PublicResume {
 
 // ---------------------------------------------------------------- people
 
+/** A reviewer's record, computed from their reviews on R4U rather than self-reported. */
+export interface ReviewerTrackRecord {
+  completed: number
+  active: number
+  /** average of owner ratings, 1 to 5, or null before the first rating */
+  rating: number | null
+  ratings: number
+  /** mean hours from a request to an answer, or null before the first answer */
+  replyHours: number | null
+  memberSince: string
+}
+
 export interface ReviewerCard {
   id: string
   name: string
@@ -75,7 +87,10 @@ export interface ReviewerCard {
   bio: string
   expertise: string[]
   openSlots: number
+  /** open slots less the reviews already in progress */
+  slotsFree: number
   online: boolean
+  record: ReviewerTrackRecord
 }
 
 export interface PersonRef {
@@ -99,6 +114,12 @@ export interface ReviewItem {
   requestedAt: string
   respondedAt: string | null
   completedAt: string | null
+  /** starts at 1 and goes up each time the owner sends an updated resume back */
+  round: number
+  resubmittedAt: string | null
+  /** the owner's rating of a completed review, 1 to 5 */
+  rating: number | null
+  ratingNote: string
   /** the caller's side of the review */
   as: 'owner' | 'reviewer'
 }
@@ -142,6 +163,8 @@ export const NOTIFICATION_TYPES = [
   'review_accepted',
   'review_declined',
   'review_completed',
+  'review_resubmitted',
+  'review_rated',
   'comment',
   'chat',
 ] as const
