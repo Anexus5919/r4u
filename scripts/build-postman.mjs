@@ -337,14 +337,19 @@ const folders = [
         token: 'userToken',
         tests: [...status(200)],
       }),
-      request('The owner sends it back for re-review', 'PATCH', '/api/reviews/{{reviewId}}/resubmit', {
-        token: 'userToken',
-        body: { note: 'Moved the strongest result to the top.' },
-        tests: [
-          ...status(200),
-          "pm.test('round two', () => pm.expect(pm.response.json().data.review.round).to.eql(2));",
-        ],
-      }),
+      request(
+        'The owner sends it back for re-review',
+        'PATCH',
+        '/api/reviews/{{reviewId}}/resubmit',
+        {
+          token: 'userToken',
+          body: { note: 'Moved the strongest result to the top.' },
+          tests: [
+            ...status(200),
+            "pm.test('round two', () => pm.expect(pm.response.json().data.review.round).to.eql(2));",
+          ],
+        }
+      ),
       request('A reviewer cannot resubmit', 'PATCH', '/api/reviews/{{reviewId}}/resubmit', {
         token: 'reviewerToken',
         body: {},
