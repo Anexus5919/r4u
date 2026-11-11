@@ -216,6 +216,10 @@ POST { "jobDescription": "..." }   // optional; omit for format-only mode
 } }
 ```
 
+`GET` returns the ten most recent totals, `{ history: [{ total, mode, rubricVersion, at }] }`, for
+the trend line. The full result also carries `gate`, `templateCeiling`, `keywords` (matched,
+missing, job title, stuffing reasons) and `hints`.
+
 `parserPreview` is returned in the response and **never persisted**. Neither is the job
 description. Only check ids, statuses and points are stored, per ADR-011.
 

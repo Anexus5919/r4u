@@ -61,10 +61,19 @@ publishes as a link the owner controls.
 - Version history with named snapshots and one-step restore.
 - **PDF export** through `@react-pdf/renderer`: vector text, static embedded fonts, no ligatures,
   entries never split across pages. Print to PDF remains as a fallback.
+- **Word export**: a single-column DOCX written from the same layout tree, in Calibri and Cambria,
+  with dates on a right tab and two-column templates flattened main column first, so it parses
+  cleanly.
+- **ATS Readiness score**: a published, deterministic 100-point rubric across five dimensions, with
+  bars, every lost point explained and linked to the field that fixes it, the raw text a parser
+  extracts, keyword match against a pasted job posting with an anti-stuffing cap, and a tailored
+  copy in one click. The method is public at `/ats-methodology`.
 - **Share links**: shown once, stored only as a hash, optional expiry, hide email, phone or
   location, turn on and off, view and download counts that update live, a 30-day chart.
-- **Mentor review**: request a review from the reviewer directory; chat and section-pinned comments
-  in real time; read receipts, typing indicator and presence.
+- **Mentor review**: choose a reviewer from the directory by expertise, rating, completed reviews,
+  reply time and free slots; chat and section-pinned comments in real time; read receipts, typing
+  indicator and presence; send an updated version back for another round, and rate the review once
+  it is complete.
 - **Notifications**: live, coalesced for chat bursts, with an unread count in the navigation and a
   notification centre with filters.
 - Light, dark and system themes, synced across devices.
@@ -287,13 +296,13 @@ never 403, so ids cannot be enumerated.
 
 ## Testing
 
-| Suite          | Count       | Covers                                                                                                                                                        |
-| -------------- | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Vitest, shared | 211         | Schema, section registry, linter, quantification guard, JSON Resume, templates                                                                                |
-| Vitest, server | 129         | Auth, roles, the admin content ban, resumes, autosave conflicts, versions, sharing, reviews, notifications, admin, seed, and Socket.IO against a real server  |
-| Vitest, client | 66          | Reducer, autosave diff, guards, session restore, preview, DOM adapter, PDF for all eight templates                                                            |
-| Playwright     | 12          | Registration, wrong password, guards, live share counter, PDF download, unknown link, live chat, admin privacy line, three viewport widths, mobile navigation |
-| Postman        | 58 requests | Happy paths plus 401, 403, 404, 409, 410, 422 and 429                                                                                                         |
+| Suite          | Count       | Covers                                                                                                                                                                                                                                       |
+| -------------- | ----------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Vitest, shared | 236         | Schema, section registry, linter, quantification guard, JSON Resume, templates, every ATS check, skill matching, the parser view and the hidden-text gate                                                                                    |
+| Vitest, server | 146         | Auth, roles, the admin content ban, resumes, autosave conflicts, versions, sharing, reviews with rounds and ratings, the reviewer track record, ATS scoring and its storage, notifications, admin, seed, and Socket.IO against a real server |
+| Vitest, client | 70          | Reducer, autosave diff, guards, session restore, preview, DOM adapter, PDF for all eight templates, the Word adapter                                                                                                                         |
+| Playwright     | 12          | Registration, wrong password, guards, live share counter, PDF download, unknown link, live chat, admin privacy line, three viewport widths, mobile navigation                                                                                |
+| Postman        | 65 requests | Happy paths plus 401, 403, 404, 409, 410, 422 and 429, including ATS scoring, re-review and rating                                                                                                                                           |
 
 ## Security
 
@@ -334,8 +343,8 @@ never 403, so ids cannot be enumerated.
   permanently warm service would consume 720 of the 750 monthly instance hours.
 - Rate limits use an in-memory store that resets on restart; persistent login lockout on the user
   document is what survives a restart.
-- Not yet built from the longer roadmap: the published ATS readiness score (phase 10), DOCX
-  export, guest drafts, and the hero lockup animation in `docs/LANDING.md`.
+- Not yet built from the longer roadmap: guest drafts, MDX guides and the hero lockup animation in
+  `docs/LANDING.md`.
 
 ## Documentation
 

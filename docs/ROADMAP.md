@@ -231,8 +231,10 @@ has no private-resume value. Blocking a user ends their session immediately.
 
 ## Phase 10: ATS Readiness
 
-**Status: not started.** The Experiment 0 planning document scopes automated ATS scoring as a
-future enhancement; the linter and the parseability badges ship already.
+**Status: done** (2026-11-12). All five dimensions, the A-GATE, the E-CAP, the guarded
+quantification regex, the keyword pipeline, `AtsScore` with ids and points only, `/resume/:id/ats`
+with bars, linked fixes and the Parser Preview, template ceilings, and Tailor for a job. See ADR-020
+for the two implementation choices.
 
 **The flagship. Ship it well or not at all.**
 
@@ -256,8 +258,9 @@ links to the right field.
 ## Phase 11: Content, accessibility and polish
 
 **Status: partly done.** Built: the landing page from live renders, /about, /privacy, /terms, the
-Playwright suite (twelve tests, including viewports and live chat). Not built: MDX guides,
-/ats-methodology, DOCX export, the hero lockup animation and an axe audit.
+Playwright suite (twelve tests, including viewports and live chat). Since built: /ats-methodology and
+DOCX export as a third adapter (ADR-020). Not built: MDX guides, the hero lockup animation and an
+axe audit.
 
 - MDX pipeline, `/about`, `/privacy`, `/terms`, `/guides`, `/ats-methodology`
 - Per-check explainers with `<BeforeAfter />`

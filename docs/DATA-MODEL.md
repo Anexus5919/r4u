@@ -408,7 +408,7 @@ must kill every existing session, which is the entire point of resetting after a
 ## 15. AtsScore
 
 ```ts
-{ _id, resume: ref Resume, rubricVersion,
+{ _id, resume: ref Resume, owner: ref User, rubricVersion,
   total, mode: 'full' | 'format_only',
   dimensions: [{ id, earned, possible }],
   checks: [{ checkId, status, earned, possible }],

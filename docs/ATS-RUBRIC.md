@@ -423,3 +423,28 @@ rejects, and it breaks the honesty premise of the whole feature.
 ESCO requires acknowledgement of the European Commission. O*NET data is CC BY 4.0 and requires an
 attribution notice. Both lines ship in the ATS methodology panel. A licence violation in a graded
 project is an avoidable own goal.
+
+## 11. Implementation notes
+
+Recorded during phase 10, so the code and this document never disagree. See ADR-020.
+
+- **Where it runs.** `shared/src/ats/` holds the rubric table, the dictionary, the parser view and
+  the scorer, with no dependency, so the browser and the server share one implementation.
+  `POST /api/resumes/:id/ats` scores and stores ids and points only.
+- **Dimension A from template metadata.** A1 always passes because export is a real text layer.
+  A2 to A8 read the template's `atsProfile`, and the dimension is then capped at
+  `maxDimensionAScore`, which is what the gallery badges and the ceiling notice report.
+- **A6 safe list.** The rubric's list plus the faces R4U ships as static per-weight TTFs (Source
+  Sans 3, Source Serif 4 and the rest), because those embed with a complete character map, which
+  is what A6 protects. DOCX export uses Calibri and Cambria from the rubric's own list.
+- **A-GATE.** Text under 6pt, or within delta-E 10 of every surface it could sit on, zeroes the
+  score and blocks PDF and Word export. Grounds and filled boxes count as surfaces, so light text
+  on a dark band is not flagged.
+- **Dictionary.** Hand-curated, about 300 skills with acronym aliases. Short and everyday-word
+  aliases (Go, R, C, Express, Swift) match case-sensitively; a single letter also refuses a
+  following hyphen or ampersand, so R&D and C-suite are not languages. Never stemmed, never fuzzy.
+- **Fallback bucket.** A regular-expression tokeniser and a small suffix stripper, applied to the
+  fallback terms only, stand in for `natural`.
+- **Gating on resume type.** An academic CV may run to six pages and 4,000 words under A7 and D7.
+- **D7 copy.** The 400-word floor is advice, not a verdict: a short one-page resume is told there is
+  room for more evidence, never that it is thin, since the editor may already report it full.
