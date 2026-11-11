@@ -981,6 +981,137 @@
           }
         },
         {
+          "name": "ATS score, format only",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status is 200', () => pm.response.to.have.status(200));",
+                  "pm.test('format only', () => pm.expect(pm.response.json().data.mode).to.eql('format_only'));",
+                  "pm.test('five dimensions', () => pm.expect(pm.response.json().data.dimensions.length).to.eql(5));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Requested-With",
+                "value": "r4u"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{userToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/resumes/{{resumeId}}/ats",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "resumes", "{{resumeId}}", "ats"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "ATS score against a pasted posting",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status is 200', () => pm.response.to.have.status(200));",
+                  "pm.test('matched to the job', () => pm.expect(pm.response.json().data.mode).to.eql('full'));",
+                  "pm.test('keyword report', () => pm.expect(pm.response.json().data.keywords).to.have.property('missing'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Requested-With",
+                "value": "r4u"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{userToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/resumes/{{resumeId}}/ats",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "resumes", "{{resumeId}}", "ats"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"jobDescription\": \"Backend Engineer\\nRequirements:\\n- TypeScript, PostgreSQL, Kafka and Kubernetes\\n- 3+ years of experience\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "ATS history, ids and points only",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status is 200', () => pm.response.to.have.status(200));",
+                  "pm.test('two scores kept', () => pm.expect(pm.response.json().data.history.length).to.be.at.least(2));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Requested-With",
+                "value": "r4u"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{userToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/resumes/{{resumeId}}/ats",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "resumes", "{{resumeId}}", "ats"]
+            }
+          }
+        },
+        {
           "name": "Import JSON Resume",
           "event": [
             {
@@ -1682,6 +1813,95 @@
           }
         },
         {
+          "name": "The owner sends it back for re-review",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status is 200', () => pm.response.to.have.status(200));",
+                  "pm.test('round two', () => pm.expect(pm.response.json().data.review.round).to.eql(2));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Requested-With",
+                "value": "r4u"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{userToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/reviews/{{reviewId}}/resubmit",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "reviews", "{{reviewId}}", "resubmit"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"note\": \"Moved the strongest result to the top.\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "A reviewer cannot resubmit",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": ["pm.test('status is 403', () => pm.response.to.have.status(403));"]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Requested-With",
+                "value": "r4u"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{reviewerToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/reviews/{{reviewId}}/resubmit",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "reviews", "{{reviewId}}", "resubmit"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
           "name": "The reviewer completes it",
           "event": [
             {
@@ -1719,6 +1939,98 @@
             "body": {
               "mode": "raw",
               "raw": "{\n  \"summary\": \"Strong and clear.\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "The owner rates the review",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status is 200', () => pm.response.to.have.status(200));",
+                  "pm.test('rated', () => pm.expect(pm.response.json().data.review.rating).to.eql(5));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Requested-With",
+                "value": "r4u"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{userToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/reviews/{{reviewId}}/rating",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "reviews", "{{reviewId}}", "rating"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"rating\": 5,\n  \"note\": \"Specific and quick.\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "A rating outside 1 to 5 is refused",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status is 422', () => pm.response.to.have.status(422));",
+                  "pm.test('error code is VALIDATION_FAILED', () => pm.expect(pm.response.json().error.code).to.eql('VALIDATION_FAILED'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Requested-With",
+                "value": "r4u"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{userToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/reviews/{{reviewId}}/rating",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "reviews", "{{reviewId}}", "rating"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"rating\": 9\n}",
               "options": {
                 "raw": {
                   "language": "json"

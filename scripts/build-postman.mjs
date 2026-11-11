@@ -197,6 +197,34 @@ const folders = [
           "pm.test('has basics', () => pm.expect(pm.response.json()).to.have.property('basics'));",
         ],
       }),
+      request('ATS score, format only', 'POST', '/api/resumes/{{resumeId}}/ats', {
+        token: 'userToken',
+        body: {},
+        tests: [
+          ...status(200),
+          "pm.test('format only', () => pm.expect(pm.response.json().data.mode).to.eql('format_only'));",
+          "pm.test('five dimensions', () => pm.expect(pm.response.json().data.dimensions.length).to.eql(5));",
+        ],
+      }),
+      request('ATS score against a pasted posting', 'POST', '/api/resumes/{{resumeId}}/ats', {
+        token: 'userToken',
+        body: {
+          jobDescription:
+            'Backend Engineer\nRequirements:\n- TypeScript, PostgreSQL, Kafka and Kubernetes\n- 3+ years of experience',
+        },
+        tests: [
+          ...status(200),
+          "pm.test('matched to the job', () => pm.expect(pm.response.json().data.mode).to.eql('full'));",
+          "pm.test('keyword report', () => pm.expect(pm.response.json().data.keywords).to.have.property('missing'));",
+        ],
+      }),
+      request('ATS history, ids and points only', 'GET', '/api/resumes/{{resumeId}}/ats', {
+        token: 'userToken',
+        tests: [
+          ...status(200),
+          "pm.test('two scores kept', () => pm.expect(pm.response.json().data.history.length).to.be.at.least(2));",
+        ],
+      }),
       request('Import JSON Resume', 'POST', '/api/resumes/import', {
         token: 'userToken',
         body: {
@@ -309,6 +337,19 @@ const folders = [
         token: 'userToken',
         tests: [...status(200)],
       }),
+      request('The owner sends it back for re-review', 'PATCH', '/api/reviews/{{reviewId}}/resubmit', {
+        token: 'userToken',
+        body: { note: 'Moved the strongest result to the top.' },
+        tests: [
+          ...status(200),
+          "pm.test('round two', () => pm.expect(pm.response.json().data.review.round).to.eql(2));",
+        ],
+      }),
+      request('A reviewer cannot resubmit', 'PATCH', '/api/reviews/{{reviewId}}/resubmit', {
+        token: 'reviewerToken',
+        body: {},
+        tests: [...status(403)],
+      }),
       request('The reviewer completes it', 'PATCH', '/api/reviews/{{reviewId}}/complete', {
         token: 'reviewerToken',
         body: { summary: 'Strong and clear.' },
@@ -316,6 +357,19 @@ const folders = [
           ...status(200),
           "pm.test('completed', () => pm.expect(pm.response.json().data.review.status).to.eql('completed'));",
         ],
+      }),
+      request('The owner rates the review', 'PATCH', '/api/reviews/{{reviewId}}/rating', {
+        token: 'userToken',
+        body: { rating: 5, note: 'Specific and quick.' },
+        tests: [
+          ...status(200),
+          "pm.test('rated', () => pm.expect(pm.response.json().data.review.rating).to.eql(5));",
+        ],
+      }),
+      request('A rating outside 1 to 5 is refused', 'PATCH', '/api/reviews/{{reviewId}}/rating', {
+        token: 'userToken',
+        body: { rating: 9 },
+        tests: [...status(422), ...code('VALIDATION_FAILED')],
       }),
       request('Notifications for the owner', 'GET', '/api/notifications?filter=review', {
         token: 'userToken',
