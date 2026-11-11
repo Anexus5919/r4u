@@ -115,15 +115,16 @@ already consumed.
 
 **To `review:<id>`:**
 
-| Event                                     | Payload                                               | Note                                                                                                  |
-| ----------------------------------------- | ----------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
-| `chat:message`                            | `{ message }`                                         | Sent to the **whole room including the sender**. See 5.2.                                             |
-| `chat:typing_state`                       | `{ reviewId, userId, typing }`                        | excludes sender                                                                                       |
-| `chat:read_state`                         | `{ reviewId, userId, upTo, at }`                      |                                                                                                       |
-| `comment:created` / `updated` / `deleted` | `{ comment }` / `{ commentId, reviewId, sectionKey }` |                                                                                                       |
-| `review:participant_joined` / `_left`     | `{ reviewId, user, at }`                              |                                                                                                       |
-| `review:presence`                         | `{ reviewId, online: [userId] }`                      | **full idempotent snapshot** on every membership change. Cheap for 2 or 3 people and immune to drift. |
-| `review:completed`                        | `{ reviewId, by, at, summary }`                       |                                                                                                       |
+| Event                                     | Payload                                               | Note                                                                                                         |
+| ----------------------------------------- | ----------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
+| `chat:message`                            | `{ message }`                                         | Sent to the **whole room including the sender**. See 5.2.                                                    |
+| `chat:typing_state`                       | `{ reviewId, userId, typing }`                        | excludes sender                                                                                              |
+| `chat:read_state`                         | `{ reviewId, userId, upTo, at }`                      |                                                                                                              |
+| `comment:created` / `updated` / `deleted` | `{ comment }` / `{ commentId, reviewId, sectionKey }` |                                                                                                              |
+| `review:participant_joined` / `_left`     | `{ reviewId, user, at }`                              |                                                                                                              |
+| `review:presence`                         | `{ reviewId, online: [userId] }`                      | **full idempotent snapshot** on every membership change. Cheap for 2 or 3 people and immune to drift.        |
+| `review:completed`                        | `{ reviewId, by, at, summary }`                       |                                                                                                              |
+| `review:resubmitted`                      | `{ reviewId, round, at }`                             | Emitted by `PATCH /reviews/:id/resubmit`; the room refetches the resume. The note arrives as `chat:message`. |
 
 **To `resume:<id>`:** `comment:created`, `comment:updated`, `comment:deleted`, `review:completed`.
 

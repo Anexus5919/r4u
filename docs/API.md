@@ -121,16 +121,16 @@ token carries `tv`.
 
 ## 4. Users
 
-| Method | Path                             | Guard    | Notes                                                                                           |
-| ------ | -------------------------------- | -------- | ----------------------------------------------------------------------------------------------- |
-| GET    | `/api/users/me`                  | user     |                                                                                                 |
-| PATCH  | `/api/users/me`                  | user     | name, headline, phone, location, theme                                                          |
-| PATCH  | `/api/users/me/password`         | user     | Requires the current password                                                                   |
-| POST   | `/api/users/me/avatar`           | user     | Multipart, streamed to Cloudinary with an eager 256x256 crop                                    |
-| DELETE | `/api/users/me`                  | user     | Cascades to resumes, reviews, messages, comments, notifications                                 |
-| GET    | `/api/users/reviewers`           | user     | Directory for the review-request modal. Returns only `reviewerProfile` fields and online state. |
-| GET    | `/api/users/me/reviewer-profile` | reviewer | The reviewer's own directory profile                                                            |
-| PATCH  | `/api/users/me/reviewer-profile` | reviewer | `bio`, `expertise`, `acceptingRequests`, `openSlots`                                            |
+| Method | Path                             | Guard    | Notes                                                                                                                                                                                       |
+| ------ | -------------------------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| GET    | `/api/users/me`                  | user     |                                                                                                                                                                                             |
+| PATCH  | `/api/users/me`                  | user     | name, headline, phone, location, theme                                                                                                                                                      |
+| PATCH  | `/api/users/me/password`         | user     | Requires the current password                                                                                                                                                               |
+| POST   | `/api/users/me/avatar`           | user     | Multipart, streamed to Cloudinary with an eager 256x256 crop                                                                                                                                |
+| DELETE | `/api/users/me`                  | user     | Cascades to resumes, reviews, messages, comments, notifications                                                                                                                             |
+| GET    | `/api/users/reviewers`           | user     | The reviewer directory: `reviewerProfile` fields, online state, `slotsFree` and a `record` computed from their reviews (completed, active, average rating, mean reply hours, member since). |
+| GET    | `/api/users/me/reviewer-profile` | reviewer | The reviewer's own directory profile                                                                                                                                                        |
+| PATCH  | `/api/users/me/reviewer-profile` | reviewer | `bio`, `expertise`, `acceptingRequests`, `openSlots`                                                                                                                                        |
 
 `GET /api/users/reviewers` returns reviewers where `acceptingRequests` is true. It never exposes
 email or phone.
@@ -254,19 +254,26 @@ accept-language fallback, and **excludes the owner's own views and downloads**.
 
 ## 9. Reviews
 
-| Method | Path                        | Guard           | Notes                                                                                        |
-| ------ | --------------------------- | --------------- | -------------------------------------------------------------------------------------------- |
-| GET    | `/api/reviews`              | user, reviewer  | Scoped to the caller as owner or reviewer                                                    |
-| POST   | `/api/reviews`              | owner           | `{ resumeId, reviewerId, message }`. Status `requested`.                                     |
-| GET    | `/api/reviews/:id`          | owner, reviewer | **Explicit deny for admin**                                                                  |
-| PATCH  | `/api/reviews/:id/respond`  | reviewer        | `{ accept: boolean }`                                                                        |
-| PATCH  | `/api/reviews/:id/complete` | reviewer        | `{ summary }`. Sets the owner-visible resume status.                                         |
-| GET    | `/api/reviews/:id/comments` | owner, reviewer | Comments are created over the socket; this is the initial load and the Postman-testable path |
-| GET    | `/api/reviews/:id/messages` | owner, reviewer | `?before=<messageId>`. Cursor page of 30, the REST twin of `review:history`                  |
-| GET    | `/api/reviews/:id/resume`   | owner, reviewer | The document for the room: no private notes, no hidden sections                              |
+| Method | Path                        | Guard           | Notes                                                                                         |
+| ------ | --------------------------- | --------------- | --------------------------------------------------------------------------------------------- |
+| GET    | `/api/reviews`              | user, reviewer  | Scoped to the caller as owner or reviewer                                                     |
+| POST   | `/api/reviews`              | owner           | `{ resumeId, reviewerId, message }`. Status `requested`.                                      |
+| GET    | `/api/reviews/:id`          | owner, reviewer | **Explicit deny for admin**                                                                   |
+| PATCH  | `/api/reviews/:id/respond`  | reviewer        | `{ accept: boolean }`                                                                         |
+| PATCH  | `/api/reviews/:id/complete` | reviewer        | `{ summary }`. Sets the owner-visible resume status.                                          |
+| PATCH  | `/api/reviews/:id/resubmit` | owner           | `{ note? }`. Active only. Moves `round` on, posts the note to the chat, notifies the reviewer |
+| PATCH  | `/api/reviews/:id/rating`   | owner           | `{ rating: 1 to 5, note? }`. Completed only. Feeds the reviewer directory                     |
+| GET    | `/api/reviews/:id/comments` | owner, reviewer | Comments are created over the socket; this is the initial load and the Postman-testable path  |
+| GET    | `/api/reviews/:id/messages` | owner, reviewer | `?before=<messageId>`. Cursor page of 30, the REST twin of `review:history`                   |
+| GET    | `/api/reviews/:id/resume`   | owner, reviewer | The document for the room: no private notes, no hidden sections                               |
 
 Assignment is an explicit request the reviewer accepts or declines, per ADR-012. There is no
 round-robin and no silent auto-assignment.
+
+**Acting on feedback.** While a review is active the owner edits the resume as usual, then sends it
+back with `resubmit`: same room, next round, and the reviewer's open room reloads the document
+live. A completed review is never reopened; asking for another round is a fresh request the
+reviewer accepts or declines.
 
 **Reviewers have read-only access to resume content.** They can comment and chat; they can never
 write to the document. That is what keeps FR 7.2 from colliding with autosave.

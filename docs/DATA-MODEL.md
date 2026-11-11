@@ -204,7 +204,10 @@ A deactivated template is hidden from new resumes without affecting existing one
     lastReadMessageId: ObjectId,
     lastReadAt: Date
   }],
-  requestedAt, respondedAt, completedAt }
+  requestedAt, respondedAt, completedAt,
+  round,                               // 1, then +1 each time the owner sends an update back
+  resubmittedAt,
+  rating, ratingNote, ratedAt }        // the owner's 1 to 5 verdict on a completed review
 ```
 
 Indexes: `{ owner: 1, status: 1 }`, `{ reviewer: 1, status: 1 }`, `{ resume: 1 }`.
@@ -212,6 +215,10 @@ Indexes: `{ owner: 1, status: 1 }`, `{ reviewer: 1, status: 1 }`, `{ resume: 1 }
 Read receipts live on the participant subdocument as `lastReadMessageId` plus `lastReadAt`. That
 is O(participants) storage. A per-message `readBy` array is O(messages x participants), rewrites
 hot documents on every scroll, and grows without bound.
+
+The reviewer directory aggregates `status`, `rating` and `respondedAt - requestedAt` per reviewer
+in one `$group` over `{ reviewer: 1, status: 1 }`, so a reviewer's record is what they did here,
+never what they typed into their profile.
 
 Per ADR-012, `requested` and `declined` exist because assignment is an explicit request the
 reviewer accepts or refuses, not auto-allocation.
