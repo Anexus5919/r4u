@@ -27,3 +27,6 @@ export type { NotificationDoc } from './Notification.js'
 
 export { ActivityLogModel, ReportModel } from './Moderation.js'
 export type { ReportDoc } from './Moderation.js'
+
+export { AtsScoreModel } from './AtsScore.js'
+export type { AtsScore } from './AtsScore.js'

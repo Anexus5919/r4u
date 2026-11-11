@@ -4,6 +4,7 @@ import { requireAuth } from '../../middleware/authenticate.js'
 import { validate } from '../../middleware/validate.js'
 import { validateBody } from '../../middleware/validateBody.js'
 import * as controller from './resumes.controller.js'
+import { atsRules, historyForOwner, scoreForOwner } from './resumes.ats.js'
 import {
   createRules,
   duplicateRules,
@@ -49,6 +50,10 @@ resumesRouter.post('/:id/duplicate', validate(duplicateRules), controller.duplic
 resumesRouter.get('/:id/export.json', validate([resumeIdRule]), controller.exportJson)
 
 resumesRouter.get('/:id/versions', validate([resumeIdRule]), controller.listVersions)
+
+// ATS Readiness (ATS-RUBRIC.md): scored on demand, only ids and points are kept
+resumesRouter.post('/:id/ats', validate(atsRules), scoreForOwner)
+resumesRouter.get('/:id/ats', validate([resumeIdRule]), historyForOwner)
 resumesRouter.post('/:id/versions', validate(versionLabelRules), controller.createVersion)
 resumesRouter.post(
   '/:id/versions/:versionId/restore',
