@@ -500,3 +500,22 @@ per second. `npm run migrate` runs the same on demand.
 **Share token.** The public path segment is the token itself, and only its SHA-256 and a four
 character hint are stored. The owner sees the full URL once, at creation, and can create a new link
 at any time. A link the server can show again is a link a leaked backup can show to anyone.
+
+---
+
+## ADR-020: The ATS scorer is dependency-free, and DOCX is a third adapter
+
+**Status:** accepted
+
+**ATS scorer.** ATS-RUBRIC.md planned `natural` for tokenising and stemming and an ESCO-seeded
+dictionary. The scorer instead lives in `shared` with no dependency, so the same code runs in the
+browser and on the server. The tokeniser is a regular expression and the stemmer is a small suffix
+stripper used only on the fallback bucket, which is the one place the rubric allows stemming. The
+skills dictionary is hand-curated for technology and business roles, never stemmed and never
+fuzzy-matched; because no third-party taxonomy is bundled, no ESCO or O*NET attribution is owed.
+
+**DOCX export (AR 11).** The Word file is produced by a third adapter over the same `LayoutNode[]`
+that drives the DOM preview and the PDF. A row becomes one paragraph with a right tab stop, a rule
+becomes a paragraph border, and a two-column row is written as its main column followed by its
+sidebar, so the document is always single-column and parses in the right order. No template is
+written twice. `docx` is MIT, loads on demand like react-pdf, and costs nothing.

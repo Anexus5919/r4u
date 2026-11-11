@@ -39,6 +39,7 @@ Every runtime and build dependency is MIT, Apache-2.0 or ISC. No dual-licensed p
 | Concern       | Package                                                                                | Licence          |
 | ------------- | -------------------------------------------------------------------------------------- | ---------------- |
 | PDF           | `@react-pdf/renderer`                                                                  | MIT              |
+| Word export   | `docx`                                                                                 | MIT              |
 | Thumbnails    | `html2canvas-pro`, `jspdf`                                                             | MIT              |
 | Forms         | `react-hook-form`, `@hookform/resolvers`                                               | MIT              |
 | Validation    | `zod`, `express-validator`                                                             | MIT              |
@@ -53,7 +54,6 @@ Every runtime and build dependency is MIT, Apache-2.0 or ISC. No dual-licensed p
 | Uploads       | `multer`, `cloudinary`                                                                 | MIT              |
 | Logging       | `pino`, `pino-http`                                                                    | MIT              |
 | IDs           | `nanoid`                                                                               | MIT              |
-| NLP           | `natural`                                                                              | MIT              |
 | Content       | `@mdx-js/rollup`                                                                       | MIT              |
 | Testing       | `vitest`, `@testing-library/react`, `supertest`, `mongodb-memory-server`, `playwright` | MIT / Apache-2.0 |
 
@@ -70,12 +70,11 @@ reproducible, which is the actual product differentiator. See `ATS-RUBRIC.md`.
 
 ## 3. Fonts and data
 
-| Asset                                                                       | Source       | Licence                   | Obligation                                   |
-| --------------------------------------------------------------------------- | ------------ | ------------------------- | -------------------------------------------- |
-| Geist, Source Serif 4, Source Sans 3, EB Garamond, IBM Plex Serif, Spectral | Google Fonts | SIL Open Font License 1.1 | None beyond keeping the licence file         |
-| Geist Mono                                                                  | Vercel       | SIL OFL 1.1               | None                                         |
-| Skills taxonomy                                                             | ESCO         | Free                      | **Must acknowledge the European Commission** |
-| Occupation data                                                             | O*NET        | CC BY 4.0                 | **Must ship an attribution notice**          |
+| Asset                                                                       | Source       | Licence                   | Obligation                               |
+| --------------------------------------------------------------------------- | ------------ | ------------------------- | ---------------------------------------- |
+| Geist, Source Serif 4, Source Sans 3, EB Garamond, IBM Plex Serif, Spectral | Google Fonts | SIL Open Font License 1.1 | None beyond keeping the licence file     |
+| Geist Mono                                                                  | Vercel       | SIL OFL 1.1               | None                                     |
+| Skills dictionary                                                           | Hand-curated | Project licence           | None: no third-party taxonomy is bundled |
 
 Both attribution lines appear in the ATS methodology panel. A licence violation in a graded
 project is an avoidable own goal.
