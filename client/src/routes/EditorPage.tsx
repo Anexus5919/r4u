@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useReducer, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { getTemplate, lintResume, reorderForTemplate, wouldReorder } from '@r4u/shared'
-import type { ResumeDetail, ResumeTemplate } from '@r4u/shared'
+import type { ResumeDetail, ResumeTemplate, ReviewItem } from '@r4u/shared'
 import { api, apiGet, toApiFailure } from '@/lib/api'
 import { cn } from '@/lib/cn'
 import { useToast } from '@/context/ToastContext'
@@ -178,6 +178,8 @@ function Editor({ loaded }: { loaded: EditorResume }) {
         </div>
       </header>
 
+      <InReviewBar resumeId={state.resume.id} />
+
       {/* three panels split by a hairline, not three cards on a grey field */}
       <div className="flex min-h-[calc(100dvh-8.5rem)] flex-col lg:flex-row">
         <aside className="shrink-0 border-b border-ink-04 px-4 py-6 lg:w-64 lg:border-r lg:border-b-0">
@@ -300,3 +302,39 @@ function Editor({ loaded }: { loaded: EditorResume }) {
 }
 
 export type { EditorState }
+
+// the way back from the editor to the review, so acting on feedback is one loop and not a hunt
+function InReviewBar({ resumeId }: { resumeId: string }) {
+  const [review, setReview] = useState<ReviewItem | null>(null)
+
+  useEffect(() => {
+    let cancelled = false
+    apiGet<{ reviews: ReviewItem[] }>('/reviews')
+      .then(({ reviews }) => {
+        if (cancelled) return
+        const open = reviews.find(
+          (item) => item.as === 'owner' && item.status === 'active' && item.resume.id === resumeId
+        )
+        setReview(open ?? null)
+      })
+      .catch(() => undefined)
+    return () => {
+      cancelled = true
+    }
+  }, [resumeId])
+
+  if (!review) return null
+
+  return (
+    <div className="flex flex-col gap-2 border-b border-ink-04 bg-ink-01 px-4 py-2.5 text-sm sm:flex-row sm:items-center sm:justify-between">
+      <p className="text-ink-10">
+        In review with <span className="font-semibold text-ink-12">{review.reviewer.name}</span>
+        {review.round > 1 ? `, round ${review.round}` : ''}. Changes save as you type; when you are
+        done, send it back from the review.
+      </p>
+      <ButtonLink to={`/reviews/${review.id}`} size="sm" variant="secondary" className="shrink-0">
+        Back to the review
+      </ButtonLink>
+    </div>
+  )
+}

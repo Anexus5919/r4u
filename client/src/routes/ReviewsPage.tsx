@@ -56,7 +56,13 @@ function ReviewRow({
       </div>
 
       <div className="flex shrink-0 items-center gap-3">
-        <StatusLabel on={review.status === 'active'}>{STATUS_LABEL[review.status]}</StatusLabel>
+        <StatusLabel on={review.status === 'active'}>
+          {review.status === 'active' && review.round > 1
+            ? review.as === 'reviewer'
+              ? `Updated, round ${review.round}`
+              : `Sent back, round ${review.round}`
+            : STATUS_LABEL[review.status]}
+        </StatusLabel>
         {review.as === 'reviewer' && review.status === 'requested' ? (
           <>
             <Button size="sm" variant="ghost" onClick={() => onRespond(review.id, false)}>
@@ -217,11 +223,18 @@ export function ReviewsPage() {
 
   return (
     <div className="mx-auto max-w-5xl">
-      <h1 className="text-xl text-ink-12">Reviews</h1>
-      <p className="mt-1.5 text-sm text-ink-09">
-        Feedback from mentors, pinned to sections, with live chat. Reviewers can read and comment,
-        never edit.
-      </p>
+      <div className="flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <h1 className="text-xl text-ink-12">Reviews</h1>
+          <p className="mt-1.5 text-sm text-ink-09">
+            Feedback from mentors, pinned to sections, with live chat. Reviewers can read and
+            comment, never edit.
+          </p>
+        </div>
+        <ButtonLink to="/reviewers" variant="secondary">
+          Find a reviewer
+        </ButtonLink>
+      </div>
 
       {error ? <Banner className="mt-6">{error}</Banner> : null}
       {reviews === null && !error ? <Skeleton className="mt-8 h-48" /> : null}
@@ -262,9 +275,9 @@ export function ReviewsPage() {
             </ul>
           ) : (
             <p className="mt-2 text-sm text-ink-09">
-              Open any resume and choose Request review to ask a mentor for feedback.{' '}
-              <Link to="/dashboard" className="font-medium text-accent-text">
-                Go to my resumes
+              Browse the reviewers, compare their ratings and expertise, and ask one for feedback.{' '}
+              <Link to="/reviewers" className="font-medium text-accent-text">
+                Find a reviewer
               </Link>
             </p>
           )}

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import type {
   ChatMessage,
@@ -13,10 +13,10 @@ import { ResumePreview } from '@/render/ResumePreview'
 import { useAuth } from '@/context/AuthContext'
 import { emitWithAck, useSocket, useSocketEvent } from '@/context/SocketContext'
 import { useToast } from '@/context/ToastContext'
-import { apiGet, toApiFailure } from '@/lib/api'
+import { apiGet, apiPatch, toApiFailure } from '@/lib/api'
 import { cn } from '@/lib/cn'
 import { formatRelative } from '@/lib/format'
-import { PresenceGlyph } from '@/components/review/RequestReviewModal'
+import { PresenceGlyph, RequestReviewModal } from '@/components/review/RequestReviewModal'
 import { Banner } from '@/components/ui/Banner'
 import { Button, ButtonLink } from '@/components/ui/Button'
 import { Card, Skeleton, StatusLabel } from '@/components/ui/Card'
@@ -109,6 +109,10 @@ export function ReviewRoomPage() {
   const [draft, setDraft] = useState('')
   const [completing, setCompleting] = useState(false)
   const [summary, setSummary] = useState('')
+  const [resubmitting, setResubmitting] = useState(false)
+  const [note, setNote] = useState('')
+  const [sending, setSending] = useState(false)
+  const [askAgain, setAskAgain] = useState(false)
 
   const me = user?.id ?? ''
   const list = useRef<HTMLUListElement>(null)
@@ -116,19 +120,17 @@ export function ReviewRoomPage() {
   const idleTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const typingClear = useRef<ReturnType<typeof setTimeout> | null>(null)
 
+  const loadResume = useCallback(
+    () =>
+      apiGet<{ resume: PublicResume }>(`/reviews/${id}/resume`)
+        .then(({ resume: doc }) => setResume(doc))
+        .catch((caught) => setError(toApiFailure(caught).message)),
+    [id]
+  )
+
   useEffect(() => {
-    let cancelled = false
-    apiGet<{ resume: PublicResume }>(`/reviews/${id}/resume`)
-      .then(({ resume: doc }) => {
-        if (!cancelled) setResume(doc)
-      })
-      .catch((caught) => {
-        if (!cancelled) setError(toApiFailure(caught).message)
-      })
-    return () => {
-      cancelled = true
-    }
-  }, [id])
+    void loadResume()
+  }, [loadResume])
 
   // re-join on every connect: the correctness path that survives restarts and lost buffers
   useEffect(() => {
@@ -187,6 +189,14 @@ export function ReviewRoomPage() {
   })
   useSocketEvent<{ reviewId: string; online: string[] }>('review:presence', (event) => {
     if (event.reviewId === id) setPresent(event.online)
+  })
+  // the owner sent a new version: the reviewer reads it without reloading the page
+  useSocketEvent<{ reviewId: string; round: number; at: string }>('review:resubmitted', (event) => {
+    if (event.reviewId !== id) return
+    setReview((current) =>
+      current ? { ...current, round: event.round, resubmittedAt: event.at } : current
+    )
+    void loadResume()
   })
   useSocketEvent<{ reviewId: string; summary: string; at: string }>('review:completed', (event) => {
     if (event.reviewId !== id) return
@@ -293,6 +303,24 @@ export function ReviewRoomPage() {
     } else toast('danger', reply.message)
   }
 
+  async function resubmit() {
+    setSending(true)
+    try {
+      const { review: next } = await apiPatch<{ review: ReviewItem }>(`/reviews/${id}/resubmit`, {
+        note,
+      })
+      setReview(next)
+      setNote('')
+      setResubmitting(false)
+      setTab('chat')
+      toast('success', `Sent. ${next.reviewer.name} has been told it is ready for another look.`)
+    } catch (caught) {
+      toast('danger', toApiFailure(caught).message)
+    } finally {
+      setSending(false)
+    }
+  }
+
   if (error) {
     return (
       <div className="mx-auto max-w-xl py-10">
@@ -317,6 +345,8 @@ export function ReviewRoomPage() {
   const otherHere = other ? present.includes(other.id) : false
   const active = review.status === 'active'
   const isReviewer = review.as === 'reviewer'
+  const isOwner = review.as === 'owner'
+  const openComments = comments.filter((comment) => !comment.resolved).length
   const sectionTitles = new Map<string, string>([['personal', 'Personal details']])
   for (const section of resume.sections) sectionTitles.set(section.type, section.title)
 
@@ -330,7 +360,10 @@ export function ReviewRoomPage() {
           </ButtonLink>
           <h1 className="mt-2 truncate text-xl text-ink-12">{review.resume.title}</h1>
           <div className="mt-1.5 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-ink-09">
-            <StatusLabel on={active}>{active ? 'In review' : 'Completed'}</StatusLabel>
+            <StatusLabel on={active}>
+              {active ? 'In review' : 'Completed'}
+              {review.round > 1 ? `, round ${review.round}` : ''}
+            </StatusLabel>
             {other ? (
               <span className="inline-flex items-center gap-1.5">
                 <PresenceGlyph online={otherHere || other.online} />
@@ -346,12 +379,54 @@ export function ReviewRoomPage() {
             Mark as reviewed
           </Button>
         ) : null}
+        {isOwner ? (
+          <div className="flex flex-wrap gap-2">
+            <ButtonLink to={`/resume/${review.resume.id}/edit`} variant="secondary">
+              Edit resume
+            </ButtonLink>
+            {active ? (
+              <Button variant="primary" onClick={() => setResubmitting(true)}>
+                Send for re-review
+              </Button>
+            ) : (
+              <Button variant="primary" onClick={() => setAskAgain(true)}>
+                Ask for another round
+              </Button>
+            )}
+          </div>
+        ) : null}
       </div>
+
+      {active && review.round > 1 && review.resubmittedAt ? (
+        <Banner tone="info" className="mt-6">
+          {isReviewer
+            ? `${review.owner.name} sent an updated version (round ${review.round}) ${formatRelative(review.resubmittedAt)}. The page below is the latest.`
+            : `You sent round ${review.round} to ${review.reviewer.name} ${formatRelative(review.resubmittedAt)}. They have been notified.`}
+        </Banner>
+      ) : null}
+
+      {isOwner && active && review.round === 1 ? (
+        <p className="mt-4 max-w-3xl text-sm text-ink-09">
+          Work through the comments in the editor, resolve each one here, then choose Send for
+          re-review so {review.reviewer.name} knows the new version is ready.
+        </p>
+      ) : null}
 
       {review.status === 'completed' && review.summary ? (
         <Banner tone="success" className="mt-6">
           Review completed. {review.summary}
         </Banner>
+      ) : null}
+
+      {isOwner && review.status === 'completed' ? (
+        <RatingPanel review={review} onRated={setReview} />
+      ) : null}
+
+      {isReviewer && review.status === 'completed' && review.rating !== null ? (
+        <p className="mt-4 text-sm text-ink-10">
+          {review.owner.name} rated this review {review.rating} out of 5
+          {review.ratingNote ? `: “${review.ratingNote}”` : '.'}
+        </p>
       ) : null}
 
       <div className="mt-6 grid grid-cols-1 items-start gap-6 lg:grid-cols-[minmax(0,1fr)_420px]">
@@ -447,7 +522,7 @@ export function ReviewRoomPage() {
               reviewId={id}
               active={active}
               me={me}
-              isOwner={review.as === 'owner'}
+              isOwner={isOwner}
               comments={comments}
               sectionTitles={sectionTitles}
             />
@@ -482,6 +557,53 @@ export function ReviewRoomPage() {
           )}
         </Field>
       </Modal>
+
+      <Modal
+        open={resubmitting}
+        onClose={() => setResubmitting(false)}
+        title="Send for re-review"
+        description={`${review.reviewer.name} is notified at once and sees the latest version of the resume. Your note goes into the chat.`}
+        footer={
+          <>
+            <Button variant="ghost" onClick={() => setResubmitting(false)}>
+              Not yet
+            </Button>
+            <Button variant="primary" loading={sending} onClick={() => void resubmit()}>
+              Send round {review.round + 1}
+            </Button>
+          </>
+        }
+      >
+        <div className="flex flex-col gap-4">
+          {openComments > 0 ? (
+            <Banner tone="warning">
+              {openComments === 1
+                ? '1 comment is still open.'
+                : `${openComments} comments are still open.`}{' '}
+              You can send now, or resolve them in the Comments tab first.
+            </Banner>
+          ) : null}
+          <Field label="What changed" value={note} max={2000}>
+            {({ id: fieldId }) => (
+              <Textarea
+                id={fieldId}
+                rows={4}
+                placeholder="Moved the latency result to the top and cut the summary to three lines."
+                value={note}
+                onChange={(event) => setNote(event.target.value)}
+              />
+            )}
+          </Field>
+        </div>
+      </Modal>
+
+      <RequestReviewModal
+        open={askAgain}
+        resumeId={review.resume.id}
+        reviewer={review.reviewer}
+        title={`Ask ${review.reviewer.name} for another round`}
+        onClose={() => setAskAgain(false)}
+      />
 
       <p className="mt-6 text-xs text-ink-08">
         Updated {formatRelative(resume.updatedAt)}. Reviewers read this resume; they cannot edit it.
@@ -555,7 +677,9 @@ function CommentsPanel({
       <div className="flex-1 overflow-y-auto px-4 py-3">
         {comments.length === 0 ? (
           <p className="py-8 text-center text-sm text-ink-09">
-            No comments yet. Pin one to a section below.
+            {isOwner
+              ? 'No comments yet. They appear here as the reviewer pins them to sections.'
+              : 'No comments yet. Pin one to a section below.'}
           </p>
         ) : null}
         {[...grouped.entries()].map(([key, items]) => (
@@ -604,7 +728,15 @@ function CommentsPanel({
         ))}
       </div>
 
-      {active ? (
+      {active && isOwner && comments.length > 0 ? (
+        <p className="border-t border-ink-04 p-3 text-xs text-ink-09">
+          Make each change in the editor, then Resolve the comment. When you are done, use Send for
+          re-review at the top of the page.
+        </p>
+      ) : null}
+
+      {/* the comment composer is the reviewer's tool; the owner answers by editing the resume */}
+      {active && !isOwner ? (
         <div className="flex flex-col gap-2 border-t border-ink-04 p-3">
           <label htmlFor="comment-section" className="text-xs font-medium text-ink-09">
             Pin to section
@@ -640,5 +772,92 @@ function CommentsPanel({
         </div>
       ) : null}
     </div>
+  )
+}
+
+const RATING_OPTIONS = (['1', '2', '3', '4', '5'] as const).map((value) => ({
+  value,
+  label: value,
+}))
+
+// the owner's verdict is what the reviewer directory averages, so it lives where the review ends
+function RatingPanel({
+  review,
+  onRated,
+}: {
+  review: ReviewItem
+  onRated: (review: ReviewItem) => void
+}) {
+  const { toast } = useToast()
+  const [rating, setRating] = useState<string>(review.rating ? String(review.rating) : '')
+  const [note, setNote] = useState(review.ratingNote)
+  const [editing, setEditing] = useState(review.rating === null)
+  const [saving, setSaving] = useState(false)
+
+  async function save() {
+    if (!rating) return
+    setSaving(true)
+    try {
+      const { review: next } = await apiPatch<{ review: ReviewItem }>(
+        `/reviews/${review.id}/rating`,
+        { rating: Number(rating), note }
+      )
+      onRated(next)
+      setEditing(false)
+      toast('success', 'Thank you. Your rating helps others choose a reviewer.')
+    } catch (caught) {
+      toast('danger', toApiFailure(caught).message)
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  if (!editing && review.rating !== null) {
+    return (
+      <p className="mt-4 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-ink-10">
+        You rated this review {review.rating} out of 5
+        {review.ratingNote ? `: “${review.ratingNote}”` : '.'}
+        <button
+          type="button"
+          className="text-sm font-medium text-accent-text"
+          onClick={() => setEditing(true)}
+        >
+          Change
+        </button>
+      </p>
+    )
+  }
+
+  return (
+    <Card className="mt-6 p-5">
+      <h2 className="text-md text-ink-12">How useful was this review?</h2>
+      <p className="mt-1 text-sm text-ink-09">
+        1 is not useful, 5 is excellent. Your rating appears in {review.reviewer.name}&rsquo;s
+        record in the reviewer directory; your note is shown only to them.
+      </p>
+      <div className="mt-4 flex flex-col gap-4 sm:flex-row sm:items-end">
+        <Segmented
+          label="Rating out of 5"
+          value={rating as (typeof RATING_OPTIONS)[number]['value']}
+          onChange={setRating}
+          options={RATING_OPTIONS}
+        />
+        <div className="flex-1">
+          <Field label="A note for the reviewer (optional)" value={note} max={500}>
+            {({ id }) => (
+              <Textarea
+                id={id}
+                rows={1}
+                value={note}
+                onChange={(event) => setNote(event.target.value)}
+              />
+            )}
+          </Field>
+        </div>
+        <Button variant="primary" loading={saving} disabled={!rating} onClick={() => void save()}>
+          Save rating
+        </Button>
+      </div>
+    </Card>
   )
 }
