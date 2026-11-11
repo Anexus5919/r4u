@@ -159,7 +159,8 @@ export async function forgotPassword(email: string): Promise<void> {
   })
 
   const url = `${env.APP_URL}/reset?token=${encodeURIComponent(token)}`
-  await sendMail(resetPasswordMail(user.email, user.name, url, RESET_TTL_MINUTES))
+  // never awaited: a slow mail server would hold the request, and the delay would reveal the account
+  void sendMail(resetPasswordMail(user.email, user.name, url, RESET_TTL_MINUTES))
 }
 
 export async function resetPassword(token: string, password: string): Promise<void> {

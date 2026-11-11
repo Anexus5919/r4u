@@ -3,12 +3,13 @@ import type { Transporter } from 'nodemailer'
 import { env, isProduction, isTest } from '../config/env.js'
 import { logger } from '../config/logger.js'
 
-export const mailConfigured = Boolean(env.SMTP_HOST && env.SMTP_USER && env.SMTP_PASS)
+const smtpConfigured = Boolean(env.SMTP_HOST && env.SMTP_USER && env.SMTP_PASS)
+export const mailConfigured = Boolean(env.BREVO_API_KEY) || smtpConfigured
 
 let transport: Transporter | null = null
 
 function transporter(): Transporter | null {
-  if (!mailConfigured) return null
+  if (!smtpConfigured) return null
   transport ??= nodemailer.createTransport({
     host: env.SMTP_HOST,
     port: env.SMTP_PORT,
@@ -16,6 +17,10 @@ function transporter(): Transporter | null {
     secure: env.SMTP_PORT === 465,
     requireTLS: env.SMTP_PORT !== 465,
     auth: { user: env.SMTP_USER, pass: env.SMTP_PASS },
+    // a blocked port must fail in seconds, not hang for minutes
+    connectionTimeout: 10_000,
+    greetingTimeout: 10_000,
+    socketTimeout: 20_000,
   })
   return transport
 }
@@ -27,8 +32,54 @@ export interface Mail {
   html: string
 }
 
+/** "R4U <you@example.com>" as name and address; a bare address keeps R4U as the name. */
+export function parseFrom(from: string): { name: string; email: string } {
+  const match = /^\s*"?([^"<]*?)"?\s*<([^>]+)>\s*$/.exec(from)
+  if (match) return { name: match[1]!.trim() || 'R4U', email: match[2]!.trim() }
+  return { name: 'R4U', email: from.trim() }
+}
+
+/** The Brevo transactional request. Pure, so the payload is tested without a network. */
+export function brevoRequest(mail: Mail, from: string, apiKey: string) {
+  return {
+    url: 'https://api.brevo.com/v3/smtp/email',
+    init: {
+      method: 'POST',
+      headers: {
+        'api-key': apiKey,
+        'content-type': 'application/json',
+        accept: 'application/json',
+      },
+      body: JSON.stringify({
+        sender: parseFrom(from),
+        to: [{ email: mail.to }],
+        subject: mail.subject,
+        textContent: mail.text,
+        htmlContent: mail.html,
+      }),
+    },
+  }
+}
+
+// HTTPS, not SMTP: Render's free plan blocks outbound mail ports, so a hosted API is the only way out
+async function sendWithBrevo(mail: Mail, apiKey: string) {
+  const { url, init } = brevoRequest(mail, env.MAIL_FROM, apiKey)
+  const res = await fetch(url, { ...init, signal: AbortSignal.timeout(15_000) })
+  if (!res.ok) throw new Error(`Brevo answered ${res.status}: ${(await res.text()).slice(0, 200)}`)
+}
+
 /** Sends, or in development logs, a message. Never throws: mail is never on a request's critical path. */
 export async function sendMail(mail: Mail): Promise<boolean> {
+  if (env.BREVO_API_KEY && !isTest) {
+    try {
+      await sendWithBrevo(mail, env.BREVO_API_KEY)
+      return true
+    } catch (error) {
+      logger.error({ err: error, to: mail.to }, 'mail delivery failed')
+      return false
+    }
+  }
+
   const smtp = transporter()
 
   if (!smtp) {

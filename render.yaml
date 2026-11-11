@@ -44,6 +44,9 @@ services:
         sync: false
       - key: MAIL_FROM
         sync: false
+      # Brevo sends over HTTPS; the free plan blocks SMTP ports, so this is how reset mail leaves
+      - key: BREVO_API_KEY
+        sync: false
       - key: CLOUDINARY_CLOUD_NAME
         sync: false
       - key: CLOUDINARY_API_KEY

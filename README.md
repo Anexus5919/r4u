@@ -208,17 +208,18 @@ database the seed refuses the built-in password unless `SEED_PASSWORD` is set.
 
 Server, in `server/.env` (validated with Zod at boot; the process refuses to start on a bad value):
 
-| Variable                                                               | Required               | Purpose                                                                  |
-| ---------------------------------------------------------------------- | ---------------------- | ------------------------------------------------------------------------ |
-| `MONGODB_URI`                                                          | yes                    | Atlas connection string, or any MongoDB URI                              |
-| `JWT_ACCESS_SECRET`, `JWT_REFRESH_SECRET`                              | yes                    | At least 32 characters each, and different                               |
-| `JWT_ACCESS_TTL`, `JWT_REFRESH_TTL`                                    | no                     | Default `15m` and `30d`                                                  |
-| `CORS_ORIGINS`                                                         | yes in production      | Comma-separated exact client origins                                     |
-| `APP_URL`                                                              | yes in production      | Public client URL, used in share and reset links                         |
-| `PORT`, `NODE_ENV`, `LOG_LEVEL`                                        | no                     | Defaults `5000`, `development`, `info`                                   |
-| `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `MAIL_FROM`        | no                     | Password reset email (a Gmail app password or Brevo free plan both work) |
-| `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET` | no                     | Avatar upload; reported as unavailable without them                      |
-| `SEED_PASSWORD`                                                        | for seeding production | Password given to demo accounts                                          |
+| Variable                                                               | Required               | Purpose                                                                                                       |
+| ---------------------------------------------------------------------- | ---------------------- | ------------------------------------------------------------------------------------------------------------- |
+| `MONGODB_URI`                                                          | yes                    | Atlas connection string, or any MongoDB URI                                                                   |
+| `JWT_ACCESS_SECRET`, `JWT_REFRESH_SECRET`                              | yes                    | At least 32 characters each, and different                                                                    |
+| `JWT_ACCESS_TTL`, `JWT_REFRESH_TTL`                                    | no                     | Default `15m` and `30d`                                                                                       |
+| `CORS_ORIGINS`                                                         | yes in production      | Comma-separated exact client origins                                                                          |
+| `APP_URL`                                                              | yes in production      | Public client URL, used in share and reset links                                                              |
+| `PORT`, `NODE_ENV`, `LOG_LEVEL`                                        | no                     | Defaults `5000`, `development`, `info`                                                                        |
+| `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `MAIL_FROM`        | no                     | Password reset email (a Gmail app password or Brevo free plan both work)                                      |
+| `BREVO_API_KEY`                                                        | no                     | Sends reset email over HTTPS through Brevo's free plan; required on Render, whose free plan blocks SMTP ports |
+| `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET` | no                     | Avatar upload; reported as unavailable without them                                                           |
+| `SEED_PASSWORD`                                                        | for seeding production | Password given to demo accounts                                                                               |
 
 Client (build time, optional): `VITE_SOCKET_URL`, the API origin for the WebSocket when the client
 and API are on different hosts. Empty means the same origin.

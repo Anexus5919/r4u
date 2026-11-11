@@ -45,6 +45,8 @@ const EnvSchema = z.object({
   SMTP_USER: z.string().optional(),
   SMTP_PASS: z.string().optional(),
   MAIL_FROM: z.string().default('R4U <no-reply@r4u.local>'),
+  // preferred over SMTP in production: Render's free plan blocks outbound mail ports
+  BREVO_API_KEY: z.string().optional(),
 
   // the password the seed script gives demo accounts; production refuses the built-in default
   SEED_PASSWORD: z.string().min(12).optional(),

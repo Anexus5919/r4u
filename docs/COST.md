@@ -11,14 +11,14 @@ project later must be added to this table first.
 
 ## 1. Runtime and hosting
 
-| Service       | Plan                             | Limits that actually bite                                                                                                                                          | Cost |
-| ------------- | -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---- |
-| Vercel        | Hobby                            | Non-commercial use only, which a coursework project satisfies. 100 GB bandwidth per month.                                                                         | Free |
-| Render        | Free web service                 | Spins down after 15 min idle, 30 to 60s cold start. 750 instance hours per month. 5 GB bandwidth per month (cut from 100 GB in April 2026). 512 MB RAM.            | Free |
-| MongoDB Atlas | M0                               | 0.5 GB storage **including indexes**. 100 operations per second. No Atlas Search. Auto-pauses after 30 days with zero connections.                                 | Free |
-| Cloudinary    | Free                             | 25 monthly credits. Transformations billed per 1,000, so build URLs with a helper and use eager transforms rather than on-the-fly transforms inside a list render. | Free |
-| SMTP          | Gmail app password or Brevo free | Gmail: 500 messages per day on a personal account. Brevo: 300 per day, no card. Password reset is the only mail R4U sends.                                         | Free |
-| GitHub        | Free, private repo               | 2,000 Actions minutes per month for private repositories. R4U's CI run is roughly 3 to 4 minutes, so that is comfortably over 400 pushes.                          | Free |
+| Service       | Plan                                         | Limits that actually bite                                                                                                                                                                                     | Cost |
+| ------------- | -------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---- |
+| Vercel        | Hobby                                        | Non-commercial use only, which a coursework project satisfies. 100 GB bandwidth per month.                                                                                                                    | Free |
+| Render        | Free web service                             | Spins down after 15 min idle, 30 to 60s cold start. 750 instance hours per month. 5 GB bandwidth per month (cut from 100 GB in April 2026). 512 MB RAM.                                                       | Free |
+| MongoDB Atlas | M0                                           | 0.5 GB storage **including indexes**. 100 operations per second. No Atlas Search. Auto-pauses after 30 days with zero connections.                                                                            | Free |
+| Cloudinary    | Free                                         | 25 monthly credits. Transformations billed per 1,000, so build URLs with a helper and use eager transforms rather than on-the-fly transforms inside a list render.                                            | Free |
+| Email         | Brevo free (HTTPS API), Gmail for local work | Brevo: 300 messages per day, no card. Render's free plan blocks outbound SMTP ports, so production sends through Brevo's HTTPS API; Gmail SMTP works only locally. Password reset is the only mail R4U sends. | Free |
+| GitHub        | Free, private repo                           | 2,000 Actions minutes per month for private repositories. R4U's CI run is roughly 3 to 4 minutes, so that is comfortably over 400 pushes.                                                                     | Free |
 
 **Render is the constraint to watch.** If the free web service becomes unusable, the closest free
 substitutes for a Docker container that must hold WebSocket connections are Koyeb's free instance
