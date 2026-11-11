@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom'
+import { CHECKS, DIMENSIONS, RUBRIC_VERSION, TEMPLATE_LIST } from '@r4u/shared'
 import { useAuth } from '@/context/AuthContext'
 import { TemplateGrid } from '@/components/resume/TemplateGrid'
 import { useTemplates } from '@/hooks/useTemplates'
@@ -186,6 +187,122 @@ export function TermsPage() {
           <p>
             R4U is provided free and as is, as a student project, without a guarantee of
             availability. Keep a downloaded PDF of anything you cannot afford to lose.
+          </p>
+        </Block>
+      </Prose>
+    </PublicLayout>
+  )
+}
+
+// generated from the same table the scorer reads, so the published method cannot drift from the real one
+export function AtsMethodologyPage() {
+  return (
+    <PublicLayout
+      title="How the ATS Readiness score works"
+      intro={`A deterministic, explainable 100-point rubric, version ${RUBRIC_VERSION}. The same resume and job posting always produce the same score, and every point lost names the rule behind it.`}
+    >
+      <Prose>
+        <Block heading="What an applicant tracking system actually does">
+          <p>
+            Workday, Taleo, Greenhouse, Lever, iCIMS and the rest do not score and reject resumes.
+            They extract the text, split it into sections by matching headings, and write fields
+            into a database that recruiters search. If the parser cannot read your work history, you
+            do not appear in those searches at all. That is the failure this score measures.
+          </p>
+          <p>
+            So the number is called ATS Readiness, never a chance of passing. It is built on the
+            published resume-quality codes of the Textkernel (Sovren) parser that iCIMS and Bullhorn
+            license, not on folklore.
+          </p>
+        </Block>
+
+        <Block heading="How R4U scores">
+          <p>
+            R4U already holds your resume as structured data, so it never has to guess by reading a
+            PDF. It writes out the exact plain text a line-by-line parser would see, interleaving
+            the columns of a two-column template the way a real parser does, and scores that text,
+            the structured data and the template together.
+          </p>
+          <p>
+            Without a job description the score covers dimensions A to D, out of 80, scaled to 100
+            and labelled Format only. Paste a posting to add dimension E.
+          </p>
+        </Block>
+
+        <section>
+          <h2 className="text-xl text-ink-12">The 100 points</h2>
+          <div className="mt-4 overflow-x-auto rounded-sm border border-ink-04 bg-ink-00">
+            <table className="w-full text-left text-sm">
+              <thead className="border-b border-ink-04 text-xs text-ink-09">
+                <tr>
+                  <th className="px-4 py-2.5 font-medium">Check</th>
+                  <th className="px-4 py-2.5 font-medium">What it looks for</th>
+                  <th className="px-4 py-2.5 text-right font-medium">Points</th>
+                </tr>
+              </thead>
+              {DIMENSIONS.map((dimension) => (
+                <tbody key={dimension.id} className="border-b border-ink-04 last:border-b-0">
+                  <tr className="bg-ink-01">
+                    <th colSpan={2} className="px-4 py-2 font-semibold text-ink-12">
+                      {dimension.id}. {dimension.title}
+                    </th>
+                    <td className="px-4 py-2 text-right font-semibold text-ink-12 tabular-nums">
+                      {dimension.points}
+                    </td>
+                  </tr>
+                  {CHECKS.filter((c) => c.dimension === dimension.id).map((c) => (
+                    <tr key={c.id} className="border-t border-ink-03">
+                      <td className="px-4 py-2 font-mono text-xs text-ink-09">{c.id}</td>
+                      <td className="px-4 py-2 text-ink-11">{c.title}</td>
+                      <td className="px-4 py-2 text-right text-ink-11 tabular-nums">{c.points}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              ))}
+            </table>
+          </div>
+        </section>
+
+        <Block heading="Three safeguards">
+          <p>
+            <strong className="text-ink-12">Hidden text scores zero.</strong> Text in the page
+            colour or below 6pt is extracted by every parser and shows up in recruiter exports. It
+            gets applications blacklisted, so R4U refuses to export it.
+          </p>
+          <p>
+            <strong className="text-ink-12">Keyword stuffing is capped, not rewarded.</strong> Each
+            keyword counts once. If one is repeated beyond reason, the skills list passes 30 items,
+            or most listed skills appear nowhere else, dimension E stops at 12 of 20.
+          </p>
+          <p>
+            <strong className="text-ink-12">Nothing is rewritten for you.</strong> Every failed
+            check links to the field it concerns. You decide what to change.
+          </p>
+        </Block>
+
+        <section>
+          <h2 className="text-xl text-ink-12">Template ceilings</h2>
+          <p className="mt-3">
+            A template&rsquo;s layout limits how well it can parse. Each one is badged with the most
+            it can earn on dimension A, so a two-column design never looks like a broken checker.
+          </p>
+          <dl className="mt-4 grid max-w-md grid-cols-[1fr_auto] gap-x-6 gap-y-1.5 text-sm">
+            {TEMPLATE_LIST.map((template) => (
+              <div key={template.key} className="contents">
+                <dt className="text-ink-11">{template.name}</dt>
+                <dd className="text-right text-ink-12 tabular-nums">
+                  {template.atsProfile.maxDimensionAScore} of 30
+                </dd>
+              </div>
+            ))}
+          </dl>
+        </section>
+
+        <Block heading="What is stored">
+          <p>
+            Only the check ids, their pass or fail status and the points, so you can see your score
+            change over time. Neither your resume text nor the job description you paste is ever
+            stored with a score.
           </p>
         </Block>
       </Prose>

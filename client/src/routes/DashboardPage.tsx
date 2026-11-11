@@ -98,6 +98,14 @@ function ResumeCard({
         <p className="mt-4 text-xs text-ink-09">
           Updated {formatRelative(resume.updatedAt)} · {resume.meta.sectionCount} sections ·{' '}
           {resume.meta.wordCount} words
+          {resume.meta.atsScore > 0 ? (
+            <>
+              {' · '}
+              <Link to={`/resume/${resume.id}/ats`} className="text-accent-text hover:underline">
+                ATS {resume.meta.atsScore}
+              </Link>
+            </>
+          ) : null}
         </p>
 
         <div className="mt-5 flex flex-wrap gap-2 border-t border-ink-04 pt-4">

@@ -6,7 +6,8 @@ import { NewResumePage } from './NewResumePage'
 import { NotificationsPage } from './NotificationsPage'
 import { PreviewPage } from './PreviewPage'
 import { ProfilePage } from './ProfilePage'
-import { AboutPage, PrivacyPage, TemplatesPage, TermsPage } from './PublicPages'
+import { AboutPage, AtsMethodologyPage, PrivacyPage, TemplatesPage, TermsPage } from './PublicPages'
+import { AtsPage } from './AtsPage'
 import { RegisterPage } from './RegisterPage'
 import { ResetPage } from './ResetPage'
 import { ReviewersPage } from './ReviewersPage'
@@ -29,6 +30,7 @@ export const router = createBrowserRouter([
   { path: '/', element: <LandingPage /> },
   { path: '/templates', element: <TemplatesPage /> },
   { path: '/about', element: <AboutPage /> },
+  { path: '/ats-methodology', element: <AtsMethodologyPage /> },
   { path: '/privacy', element: <PrivacyPage /> },
   { path: '/terms', element: <TermsPage /> },
   { path: '/r/:slug', element: <LazyPublicResumePage /> },
@@ -55,6 +57,7 @@ export const router = createBrowserRouter([
               { path: '/resume/new', element: <NewResumePage /> },
               { path: '/resume/:id/edit', element: <LazyEditorPage /> },
               { path: '/resume/:id', element: <PreviewPage /> },
+              { path: '/resume/:id/ats', element: <AtsPage /> },
               { path: '/reviews', element: <ReviewsPage /> },
               { path: '/reviewers', element: <ReviewersPage /> },
               { path: '/reviews/:id', element: <LazyReviewRoomPage /> },

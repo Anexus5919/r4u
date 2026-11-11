@@ -99,6 +99,7 @@ function SortableEntry({
   return (
     <li
       ref={setNodeRef}
+      data-entry-id={entry._id}
       style={{ transform: CSS.Translate.toString(transform), transition }}
       // an entry is whitespace plus a hairline, never a nested card
       className={cn(

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useReducer, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { useParams, useSearchParams } from 'react-router-dom'
 import { getTemplate, lintResume, reorderForTemplate, wouldReorder } from '@r4u/shared'
 import type { ResumeDetail, ResumeTemplate, ReviewItem } from '@r4u/shared'
 import { api, apiGet, toApiFailure } from '@/lib/api'
@@ -66,7 +66,13 @@ export function EditorPage() {
 function Editor({ loaded }: { loaded: EditorResume }) {
   const { toast } = useToast()
   const [state, dispatch] = useReducer(editorReducer, loaded, initialState)
-  const [activeId, setActiveId] = useState<string>(PERSONAL)
+  const [params] = useSearchParams()
+  // an ATS check links here with ?section, ?entry and ?field so a fix starts in the right place
+  const [activeId, setActiveId] = useState<string>(() => {
+    const wanted = params.get('section')
+    return wanted && loaded.sections.some((section) => section._id === wanted) ? wanted : PERSONAL
+  })
+  const focusEntry = params.get('entry')
   const [title, setTitle] = useState(loaded.title)
   const [pendingOrder, setPendingOrder] = useState<ResumeTemplate | null>(null)
 
@@ -91,6 +97,13 @@ function Editor({ loaded }: { loaded: EditorResume }) {
   }, [state.conflict, toast])
 
   const active = state.resume.sections.find((section) => section._id === activeId)
+
+  useEffect(() => {
+    if (!focusEntry) return
+    const node = document.querySelector<HTMLElement>(`[data-entry-id="${CSS.escape(focusEntry)}"]`)
+    node?.scrollIntoView({ block: 'center' })
+    node?.querySelector<HTMLElement>('input, textarea')?.focus({ preventScroll: true })
+  }, [focusEntry])
 
   // the switch never drops a section, so only the reorder needs asking about
   function chooseTemplate(key: string) {
@@ -172,6 +185,9 @@ function Editor({ loaded }: { loaded: EditorResume }) {
             </Button>
           </div>
 
+          <ButtonLink to={`/resume/${state.resume.id}/ats`} size="sm" variant="ghost">
+            ATS check
+          </ButtonLink>
           <ButtonLink to={`/resume/${state.resume.id}`} size="sm" variant="secondary">
             Preview
           </ButtonLink>
